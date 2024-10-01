@@ -1,6 +1,15 @@
-﻿namespace TFU_Resident_API.Data
+﻿using Microsoft.EntityFrameworkCore;
+
+namespace TFU_Resident_API.Data
 {
-    public class AppDbContext
+    public class AppDbContext : DbContext
     {
+        public AppDbContext(DbContextOptions options) : base(options)
+        {
+        }
+
+        protected AppDbContext()
+        {
+        }
     }
 }
