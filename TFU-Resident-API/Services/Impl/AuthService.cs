@@ -119,7 +119,7 @@ namespace Service.Impl
 
             await UnitOfWork.SaveChangesAsync();
 
-            await emailService.SendEmailAsync("recipient@example.com", "TB Dki tai khoan", BodyMaillRegister(user, customer));
+            await emailService.SendEmailAsync(user.Email, "TB Dki tai khoan", BodyMaillRegister(user, customer));
 
             return new ResponseData<RegisterResponseDto>(ErrorCodeAPI.OK);
         }

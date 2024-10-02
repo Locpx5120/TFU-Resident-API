@@ -51,6 +51,7 @@
                 }
                 catch (Exception ex)
                 {
+                    Console.WriteLine();
                 }
             }
         }
