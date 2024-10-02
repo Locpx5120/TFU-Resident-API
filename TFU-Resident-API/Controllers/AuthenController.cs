@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Service;
+using TFU_Resident_API.Core.Helper;
 using TFU_Resident_API.Model;
 
 namespace Controllers
@@ -10,10 +11,14 @@ namespace Controllers
     public class AuthenController : ControllerBase
     {
         private readonly IAuthService _authService;
+        private readonly EmailService emailService;
+        private readonly IConfiguration _config;
 
-        public AuthenController(IAuthService authService)
+        public AuthenController(IAuthService authService, IConfiguration config)
         {
             _authService = authService;
+            _config = config;
+            emailService = new EmailService(_config);
         }
 
         [HttpPost("token")]
@@ -57,6 +62,13 @@ namespace Controllers
             {
                 return BadRequest(ex.Message);
             }
+        }
+
+        [HttpGet("TestSendMail")]
+        public async Task<IActionResult> TestSendMail()
+        {
+            emailService.SendEmailAsync("levietaqviet2001@gmail.com", "A", "VVV");
+            return Ok("response");
         }
     }
 }

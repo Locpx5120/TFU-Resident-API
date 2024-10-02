@@ -117,9 +117,9 @@ namespace Service.Impl
             customer.UserId = user.Id;
             UnitOfWork.CustomerRepository.Add(customer);
 
-            UnitOfWork.SaveChangesAsync();
+            await UnitOfWork.SaveChangesAsync();
 
-            emailService.SendEmailAsync("recipient@example.com", "TB Dki tai khoan", BodyMaillRegister(user, customer));
+            await emailService.SendEmailAsync("recipient@example.com", "TB Dki tai khoan", BodyMaillRegister(user, customer));
 
             return new ResponseData<RegisterResponseDto>(ErrorCodeAPI.OK);
         }
