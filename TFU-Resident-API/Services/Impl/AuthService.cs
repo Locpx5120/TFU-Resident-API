@@ -199,5 +199,16 @@ namespace Service.Impl
 
             return emailBody;
         }
+
+        public async Task<ResponseData<RegisterResponseDto>> ForgotPassword(ForgotPasswordRequestDto request)
+        {
+            var userCheck = await UnitOfWork.UserRepository.GetQuery(x =>
+            x.Email == request.Email).FirstOrDefaultAsync();
+            if (userCheck == null) return new ResponseData<RegisterResponseDto>(ErrorCodeAPI.EmailNotUse);
+
+
+
+            throw new NotImplementedException();
+        }
     }
 }

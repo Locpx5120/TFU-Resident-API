@@ -64,11 +64,25 @@ namespace Controllers
             }
         }
 
-        [HttpGet("TestSendMail")]
-        public async Task<IActionResult> TestSendMail()
+        [HttpPost("forgot")]
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordRequestDto register)
         {
-            emailService.SendEmailAsync("levietaqviet2001@gmail.com", "A", "VVV");
-            return Ok("response");
+            try
+            {
+                var response = await _authService.ForgotPassword(register);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
+
+        //[HttpGet("TestSendMail")]
+        //public async Task<IActionResult> TestSendMail()
+        //{
+        //    emailService.SendEmailAsync("levietaqviet2001@gmail.com", "A", "VVV");
+        //    return Ok("response");
+        //}
     }
 }

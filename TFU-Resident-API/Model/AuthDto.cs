@@ -51,4 +51,11 @@ namespace TFU_Resident_API.Model
         public string Time { get; set; }
     }
 
+
+    public class ForgotPasswordRequestDto
+    {
+        [Required]
+        [EmailAddress]
+        public string Email { get; set; }
+    }
 }

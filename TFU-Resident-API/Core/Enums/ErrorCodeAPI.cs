@@ -28,6 +28,8 @@ namespace Core.Enums
         UserIsBlockOrDelete = 2005,
         [Description("Email không hợp lệ")]
         EmailNotAvailable = 2006,
+        [Description("Email chưa có trong hệ thống")]
+        EmailNotUse = 2007,
 
         //Customer mã lỗi từ 3001
         [Description("Customer đã được sử dụng!")]
