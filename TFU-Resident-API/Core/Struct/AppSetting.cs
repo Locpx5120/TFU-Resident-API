@@ -11,6 +11,10 @@
         public struct AppSettings
         {
             public const string SecretKey = "AppSettings:SecretKey";
+            public const string SmtpUsername = "AppSettings:SmtpUsername";
+            public const string SmtpPassword = "AppSettings:SmtpPassword";
+            public const string SmtpServer = "AppSettings:SmtpServer";
+            public const string SmtpPort = "AppSettings:SmtpPort";
         }
     }
 }

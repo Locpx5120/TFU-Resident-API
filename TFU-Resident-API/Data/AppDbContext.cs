@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Entity;
+using Microsoft.EntityFrameworkCore;
 
 namespace TFU_Resident_API.Data
 {
@@ -10,6 +11,15 @@ namespace TFU_Resident_API.Data
 
         protected AppDbContext()
         {
+        }
+
+        public DbSet<User> Users { get; set; }
+        public DbSet<Role> Roles { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+            modelBuilder.SeedData();
         }
     }
 }

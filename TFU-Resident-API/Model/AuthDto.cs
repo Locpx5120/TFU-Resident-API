@@ -32,4 +32,23 @@ namespace TFU_Resident_API.Model
         public Guid? RoleId { get; set; }
         public string? RoleName { get; set; }
     }
+
+    public class RegisterRequestDto
+    {
+        [Required]
+        public string CompanyName { get; set; }
+        [Required]
+        [EmailAddress]
+        public string Email { get; set; }
+        [Required]
+        public string Phone { get; set; }
+        [Required]
+        public string Password { get; set; }
+    }
+
+    public class RegisterResponseDto
+    {
+        public string Time { get; set; }
+    }
+
 }

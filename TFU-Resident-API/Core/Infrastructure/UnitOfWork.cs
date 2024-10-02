@@ -2,6 +2,7 @@
 using Entity;
 using Microsoft.EntityFrameworkCore;
 using TFU_Resident_API.Data;
+using TFU_Resident_API.Entity;
 
 namespace Core.Infrastructure
 {
@@ -35,8 +36,11 @@ namespace Core.Infrastructure
         #endregion
 
         #region Others
-
-
+        private IMasterDataRepository<Customer> _customerRepository;
+        public IMasterDataRepository<Customer> CustomerRepository
+        {
+            get { return _customerRepository ??= new MasterDataRepository<Customer>(_context, _currentUser); }
+        }
         #endregion
 
         public async Task<int> SaveChangesAsync()

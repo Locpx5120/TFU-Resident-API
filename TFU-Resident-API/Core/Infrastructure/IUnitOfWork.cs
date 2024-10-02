@@ -1,5 +1,6 @@
 ﻿using Entity;
 using TFU_Resident_API.Data;
+using TFU_Resident_API.Entity;
 
 namespace Core.Infrastructure
 {
@@ -13,6 +14,7 @@ namespace Core.Infrastructure
         #endregion
 
         #region Others
+        IMasterDataRepository<Customer> CustomerRepository { get; }
 
         #endregion
 

@@ -2,6 +2,8 @@
 using Core.Infrastructure.Dapper;
 using Core.Mapper;
 using fake_tool.Core.Dapper;
+using Service;
+using Service.Impl;
 
 namespace Core.AppStart
 {
@@ -16,11 +18,13 @@ namespace Core.AppStart
             services.AddAutoMapper(typeof(MappingProfile));
 
             //Repository
+
             //Dapper
             services.AddScoped<DapperCommon>();
 
             //Entity
             services.AddScoped<IUserIdentity, UserIdentity>();
+            services.AddScoped<IAuthService, AuthService>();
 
             //Singleton
             services.AddSingleton<DapperDbContext>();

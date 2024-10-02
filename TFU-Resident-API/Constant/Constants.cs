@@ -11,7 +11,7 @@
         public const string SALE_ROLE_NAME = "Staff";
 
         //DB
-        public const string SCHEMA_NAME = "tinsa";
+        public const string SCHEMA_NAME = "software";
 
     }
 }

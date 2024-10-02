@@ -44,5 +44,19 @@ namespace Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpPost("register")]
+        public async Task<IActionResult> Register(RegisterRequestDto register)
+        {
+            try
+            {
+                var response = await _authService.Register(register);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

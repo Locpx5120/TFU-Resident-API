@@ -11,8 +11,8 @@ namespace Core.AppStart
                 swagger.SwaggerDoc("v2.2.1", new OpenApiInfo
                 {
                     Version = "v2.2.1",
-                    Title = "Auto Tool API",
-                    Description = "Auto Tool API v1.0.0"
+                    Title = "Resident API",
+                    Description = "Resident API ver1.0"
                 });
 
                 // To Enable authorization using Swagger (JWT)  
@@ -66,7 +66,7 @@ namespace Core.AppStart
                 app.UseSwagger();
                 app.UseSwaggerUI(swagger =>
                 {
-                    swagger.SwaggerEndpoint("v2.2.1/swagger.json", "Auto Tool API v1.0");
+                    swagger.SwaggerEndpoint("v2.2.1/swagger.json", "Resident API ver1.0");
                     swagger.InjectJavascript("https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js");
                     swagger.InjectJavascript("swagger-basic-auth.js");
                 });

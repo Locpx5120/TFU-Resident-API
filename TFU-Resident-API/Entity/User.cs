@@ -1,20 +1,21 @@
 ﻿using Constant;
 using Core.Entity;
 using System.ComponentModel.DataAnnotations.Schema;
+using TFU_Resident_API.Entity;
 
 namespace Entity
 {
     [Table("Users", Schema = Constants.SCHEMA_NAME)]
     public partial class User : MasterDataEntityBase
     {
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
+        public string UserName { get; set; }
         public string Email { get; set; }
         public string? Phone { get; set; }
-        public string? Address { get; set; }
         public string Password { get; set; }
         public Guid RoleId { get; set; }
-        public decimal AvailableBalance { get; set; } // số dư khả dụng
-        public decimal PromotionalBalance { get; set; } // số dư khuyến mại
+        public bool IsChangePassword { get; set; } = false;
+
+        public virtual Role Role { get; set; }
+        public virtual IList<Customer> Customers { get; set; }
     }
 }

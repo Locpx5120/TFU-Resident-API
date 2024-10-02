@@ -26,5 +26,11 @@ namespace Core.Enums
         UserNotExit = 2004,
         [Description("Tài khoản đã bị khoá hoặc xoá! Liên hệ quản trị viên biết thêm chi tiết")]
         UserIsBlockOrDelete = 2005,
+        [Description("Email không hợp lệ")]
+        EmailNotAvailable = 2006,
+
+        //Customer mã lỗi từ 3001
+        [Description("Customer đã được sử dụng!")]
+        CustomerUsed = 3001,
     }
 }

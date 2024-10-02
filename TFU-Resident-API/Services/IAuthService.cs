@@ -7,5 +7,6 @@ namespace Service
     {
         public Task<ResponseData<LoginResponseDto>> Login(LoginRequestDto request);
         public Task<ResponseData<UserInfoResponse>> GetUserInfo();
+        public Task<ResponseData<RegisterResponseDto>> Register(RegisterRequestDto register);
     }
 }
