@@ -50,6 +50,21 @@ namespace Controllers
             }
         }
 
+        [HttpPost("changePassword")]
+        [Authorize]
+        public async Task<IActionResult> ChangePassword(ChangePasswordRequestDto request)
+        {
+            try
+            {
+                var response = await _authService.ChangePassword(request);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
         [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterRequestDto register)
         {
@@ -70,6 +85,20 @@ namespace Controllers
             try
             {
                 var response = await _authService.ForgotPassword(register);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost("confirm-otp")]
+        public async Task<IActionResult> ConfirmOtp(ConfirmOtpRequestDto request)
+        {
+            try
+            {
+                var response = await _authService.ConfirmOtp(request);
                 return Ok(response);
             }
             catch (Exception ex)

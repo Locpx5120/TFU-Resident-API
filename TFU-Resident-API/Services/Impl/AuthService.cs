@@ -8,6 +8,7 @@ using Entity;
 using fake_tool.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using TFU_Resident_API.Constant;
 using TFU_Resident_API.Core.Helper;
 using TFU_Resident_API.Entity;
 using TFU_Resident_API.Model;
@@ -52,11 +53,24 @@ namespace Service.Impl
             var role = await UnitOfWork.RoleRepository.GetByIdAsync(user.RoleId);
             if (role == null) return new ResponseData<LoginResponseDto>(ErrorCodeAPI.BadRequest);
 
+
             var token = jwt.GenerateToken(user, role.Name ?? "");
             var response = new LoginResponseDto()
             {
                 Token = token,
             };
+
+            if (user.IsChangePassword == true)
+            {
+                return new ResponseData<LoginResponseDto>()
+                {
+                    Success = true,
+                    Message = MessConstant.Successfully,
+                    Code = (int)ErrorCodeAPI.OKChangePass,
+                    Data = response,
+                };
+            }
+
             return new ResponseData<LoginResponseDto>()
             {
                 Success = true,
@@ -105,9 +119,10 @@ namespace Service.Impl
             user.Id = Guid.NewGuid();
             user.UserName = userName;
             user.Email = register.Email;
-            user.Password = register.Password;
+            user.Password = Utill.GeneratePassword();
             user.Phone = register.Phone;
             user.RoleId = Guid.Parse("98AE41E1-3379-4193-9856-1C9162A8C9C2"); //User
+            user.IsChangePassword = true;
             UnitOfWork.UserRepository.Add(user);
 
             Customer customer = new Customer();
@@ -200,15 +215,298 @@ namespace Service.Impl
             return emailBody;
         }
 
+        private string BodyMaillForgot(User user, String otp)
+        {
+            string emailBody = $@"
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+    <meta charset='UTF-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <style>
+        body {{
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }}
+        .container {{
+            background-color: #ffffff;
+            width: 100%;
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }}
+        .header {{
+            background-color: #4CAF50;
+            padding: 10px;
+            text-align: center;
+            border-radius: 10px 10px 0 0;
+            color: white;
+        }}
+        .content {{
+            margin: 20px 0;
+            text-align: left;
+        }}
+        .content p {{
+            font-size: 16px;
+            color: #333333;
+        }}
+        .content .highlight {{
+            color: #4CAF50;
+            font-weight: bold;
+        }}
+        .footer {{
+            text-align: center;
+            margin-top: 20px;
+            font-size: 12px;
+            color: #aaaaaa;
+        }}
+    </style>
+</head>
+<body>
+    <div class='container'>
+        <div class='header'>
+            <h1>Bạn đã thực hiện yêu cầu quên mật khẩu!</h1>
+        </div>
+        <div class='content'>
+            <p>Dear <span class='highlight'>{user.UserName}</span>,</p>
+            <p>Thông tin xác thức của bạn:</p>
+            <p><strong>OTP:</strong> <span class='highlight'>{otp}</span></p>
+            <p>Vui lòng giữ thông tin này an toàn và không chia sẻ với bất kỳ ai. Bạn có thể đăng nhập vào tài khoản của mình bằng thông tin đăng nhập được cung cấp.</p>
+        </div>
+        <div class='footer'>
+            <p>&copy; 2024 Our Company. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>";
+
+            return emailBody;
+        }
+
+        private string BodyMaillForgotOk(User user)
+        {
+            string emailBody = $@"
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+    <meta charset='UTF-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <style>
+        body {{
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }}
+        .container {{
+            background-color: #ffffff;
+            width: 100%;
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }}
+        .header {{
+            background-color: #4CAF50;
+            padding: 10px;
+            text-align: center;
+            border-radius: 10px 10px 0 0;
+            color: white;
+        }}
+        .content {{
+            margin: 20px 0;
+            text-align: left;
+        }}
+        .content p {{
+            font-size: 16px;
+            color: #333333;
+        }}
+        .content .highlight {{
+            color: #4CAF50;
+            font-weight: bold;
+        }}
+        .footer {{
+            text-align: center;
+            margin-top: 20px;
+            font-size: 12px;
+            color: #aaaaaa;
+        }}
+    </style>
+</head>
+<body>
+    <div class='container'>
+        <div class='header'>
+            <h1>Bạn đã thực hiện xác minh quên mật khẩu!</h1>
+        </div>
+        <div class='content'>
+            <p>Dear <span class='highlight'>{user.UserName}</span>,</p>
+            <p>Thông tin xác thức của bạn:</p>
+            <p><strong>Mật khẩu:</strong> <span class='highlight'>{user.Password}</span></p>
+            <p>Vui lòng giữ thông tin này an toàn và không chia sẻ với bất kỳ ai. Bạn có thể đăng nhập vào tài khoản của mình bằng thông tin đăng nhập được cung cấp.</p>
+        </div>
+        <div class='footer'>
+            <p>&copy; 2024 Our Company. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>";
+
+            return emailBody;
+        }
+
         public async Task<ResponseData<RegisterResponseDto>> ForgotPassword(ForgotPasswordRequestDto request)
         {
             var userCheck = await UnitOfWork.UserRepository.GetQuery(x =>
             x.Email == request.Email).FirstOrDefaultAsync();
             if (userCheck == null) return new ResponseData<RegisterResponseDto>(ErrorCodeAPI.EmailNotUse);
 
+            OTPMail oTPMail = new OTPMail();
+            oTPMail.UserId = userCheck.Id;
+            oTPMail.Otp = Utill.GenerateRandomInt(6);
+            oTPMail.ContentMail = BodyMaillForgot(userCheck, oTPMail.Otp);
+            oTPMail.EffectiveDate = DateTime.UtcNow.AddMinutes(15);
+            oTPMail.TypeOtp = TypeOtp.RESET_PASSWORD;
 
+            await emailService.SendEmailAsync(userCheck.Email, "Mã xác nhận quên mật khẩu", oTPMail.ContentMail);
 
-            throw new NotImplementedException();
+            UnitOfWork.OTPMailRepository.Add(oTPMail);
+
+            if (await UnitOfWork.SaveChangesAsync() > 0)
+            {
+                return new ResponseData<RegisterResponseDto>()
+                {
+                    Success = true,
+                    Message = MessConstant.Successfully,
+                    Code = (int)ErrorCodeAPI.OK,
+                    Data = null,
+                };
+            }
+
+            return new ResponseData<RegisterResponseDto>()
+            {
+                Success = true,
+                Message = MessConstant.Failed,
+                Code = (int)ErrorCodeAPI.SystemIsError,
+                Data = null,
+            };
+        }
+
+        public async Task<ResponseData<ChangePasswordResponseDto>> ChangePassword(ChangePasswordRequestDto request)
+        {
+            var user = await UnitOfWork.UserRepository.GetQuery(x => x.Id == _userIdentity.UserId).FirstOrDefaultAsync();
+            if (user == null) return new ResponseData<ChangePasswordResponseDto>(ErrorCodeAPI.UserNotExit);
+
+            (bool isValid, string mess) = Utill.ValidatePassword(request.Password);
+            if (!isValid)
+            {
+                return new ResponseData<ChangePasswordResponseDto>()
+                {
+                    Success = true,
+                    Message = mess,
+                    Code = (int)ErrorCodeAPI.PasswordIsNotValid,
+                    Data = null,
+                };
+            }
+
+            (isValid, mess) = Utill.ValidatePassword(request.NewPassword);
+            if (!isValid)
+            {
+                return new ResponseData<ChangePasswordResponseDto>()
+                {
+                    Success = true,
+                    Message = mess,
+                    Code = (int)ErrorCodeAPI.NewPasswordIsNotValid,
+                    Data = null,
+                };
+            }
+
+            //kiểm tra mật khẩu cũ
+            if (!user.Password.Equals(request.Password))
+            {
+                return new ResponseData<ChangePasswordResponseDto>()
+                {
+                    Success = true,
+                    Message = MessConstant.Failed,
+                    Code = (int)ErrorCodeAPI.PasswordIsNotCorrect,
+                    Data = null,
+                };
+            }
+
+            user.Password = request.NewPassword;
+            user.IsChangePassword = false;
+            UnitOfWork.UserRepository.Update(user);
+
+            if (await UnitOfWork.SaveChangesAsync() > 0)
+            {
+                return new ResponseData<ChangePasswordResponseDto>()
+                {
+                    Success = true,
+                    Message = MessConstant.Successfully,
+                    Code = (int)ErrorCodeAPI.OK,
+                    Data = null,
+                };
+            }
+
+            return new ResponseData<ChangePasswordResponseDto>()
+            {
+                Success = true,
+                Message = MessConstant.Failed,
+                Code = (int)ErrorCodeAPI.SystemIsError,
+                Data = null,
+            };
+        }
+
+        public async Task<ResponseData<ConfirmOtpResponseDto>> ConfirmOtp(ConfirmOtpRequestDto request)
+        {
+            var user = await UnitOfWork.UserRepository.GetQuery(x => x.Id == request.UserId).FirstOrDefaultAsync();
+            if (user == null) return new ResponseData<ConfirmOtpResponseDto>(ErrorCodeAPI.UserNotExit);
+
+            OTPMail oTPMail = await UnitOfWork.OTPMailRepository.GetQuery(x => x.UserId == request.UserId
+            && x.TypeOtp == request.TypeOtp
+            && x.IsActive == true
+            && x.Otp == request.Otp
+            && x.EffectiveDate >= DateTime.Now).FirstOrDefaultAsync();
+
+            if (oTPMail == null) return new ResponseData<ConfirmOtpResponseDto>(ErrorCodeAPI.OtpNotExit);
+
+            if (oTPMail.TypeOtp == TypeOtp.RESET_PASSWORD)
+            {
+                user.Password = Utill.GeneratePassword();
+                user.IsChangePassword = true;
+                UnitOfWork.UserRepository.Update(user);
+
+                await emailService.SendEmailAsync(user.Email, "Reset mật khẩu", BodyMaillForgotOk(user));
+            }
+
+            oTPMail.IsActive = false;
+
+            UnitOfWork.OTPMailRepository.Update(oTPMail);
+
+            if (await UnitOfWork.SaveChangesAsync() > 0)
+            {
+                return new ResponseData<ConfirmOtpResponseDto>()
+                {
+                    Success = true,
+                    Message = MessConstant.Successfully,
+                    Code = (int)ErrorCodeAPI.OK,
+                    Data = null,
+                };
+            }
+
+            return new ResponseData<ConfirmOtpResponseDto>()
+            {
+                Success = true,
+                Message = MessConstant.Failed,
+                Code = (int)ErrorCodeAPI.SystemIsError,
+                Data = null,
+            };
         }
     }
 }

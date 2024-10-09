@@ -20,6 +20,20 @@ namespace TFU_Resident_API.Model
         public string Password { get; set; }
     }
 
+    public class ChangePasswordRequestDto
+    {
+        [Required]
+        public string Password { get; set; }
+
+        [Required]
+        public string NewPassword { get; set; }
+    }
+
+    public class ChangePasswordResponseDto
+    {
+
+    }
+
     public class UserInfoResponse : MasterDataEntityBase
     {
         [JsonProperty("firstname")]
@@ -42,8 +56,6 @@ namespace TFU_Resident_API.Model
         public string Email { get; set; }
         [Required]
         public string Phone { get; set; }
-        [Required]
-        public string Password { get; set; }
     }
 
     public class RegisterResponseDto
@@ -57,5 +69,22 @@ namespace TFU_Resident_API.Model
         [Required]
         [EmailAddress]
         public string Email { get; set; }
+    }
+
+    public class ConfirmOtpRequestDto
+    {
+        [Required]
+        public Guid UserId { get; set; }
+
+        [Required]
+        public string TypeOtp { get; set; }
+
+        [Required]
+        public string Otp { get; set; }
+    }
+
+    public class ConfirmOtpResponseDto
+    {
+
     }
 }

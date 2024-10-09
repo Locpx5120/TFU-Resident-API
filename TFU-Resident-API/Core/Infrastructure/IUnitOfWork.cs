@@ -15,6 +15,7 @@ namespace Core.Infrastructure
 
         #region Others
         IMasterDataRepository<Customer> CustomerRepository { get; }
+        IMasterDataRepository<OTPMail> OTPMailRepository { get; }
 
         #endregion
 

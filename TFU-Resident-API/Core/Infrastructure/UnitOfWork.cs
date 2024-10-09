@@ -41,6 +41,12 @@ namespace Core.Infrastructure
         {
             get { return _customerRepository ??= new MasterDataRepository<Customer>(_context, _currentUser); }
         }
+
+        private IMasterDataRepository<OTPMail> _oTPMailRepository;
+        public IMasterDataRepository<OTPMail> OTPMailRepository
+        {
+            get { return _oTPMailRepository ??= new MasterDataRepository<OTPMail>(_context, _currentUser); }
+        }
         #endregion
 
         public async Task<int> SaveChangesAsync()
