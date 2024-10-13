@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using TFU_Resident_API.Dto;
 
 namespace Core.Mapper
 {
@@ -6,7 +7,12 @@ namespace Core.Mapper
     {
         public MappingProfile()
         {
-            // CreateMap<ComboSettingTool, ComboSettingToolInfoResponseDto>().ReverseMap();
+            //this.CreateMap<SuperOwnerModels.Investor, InvestorDto>();
+            this.CreateMap<CreateInvestorDto, SuperOwnerModels.Investor>();
+            //this.CreateMap<SuperOwnerModels.Project, ProjectDto>();
+            this.CreateMap<CreateProjectDto, SuperOwnerModels.Project>();
+            //this.CreateMap<SuperOwnerModels.Building, BuildingDto>();
+            this.CreateMap<CreateBuildingDto, SuperOwnerModels.Building>();
         }
     }
 }

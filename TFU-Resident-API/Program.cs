@@ -1,5 +1,6 @@
+using BuildingModels;
 using Core.AppStart;
-using Core.Struct;
+using Core.Mapper;
 using fake_tool.Helpers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -33,12 +34,19 @@ builder.Services.AddCors(options =>
 builder.Services.AddControllers();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration[AppSetting.ConnectionStrings.DbConnection]));
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("SuperOwner"),
+        b => b.MigrationsAssembly("TFU-Resident-API"));
+});
+
+builder.Services.AddDbContext<BuildingContext>(option =>
+{
+    option.UseSqlServer(builder.Configuration.GetConnectionString("BuildingTemplate"));
+});
 
 builder.Services.AddHttpContextAccessor();
-
 builder.Services.AddControllers
-    (
+(
      config =>
      {
          config.RespectBrowserAcceptHeader = true;
@@ -54,7 +62,7 @@ builder.Services.AddControllers
     .AddXmlDataContractSerializerFormatters();
 
 builder.Services.AddEndpointsApiExplorer();
-
+builder.Services.AddAutoMapper(typeof(MappingProfile));
 MediatorIoCConfig.ConfigureService(builder.Services);
 SwaggerConfig.ConfigureService(builder.Services, builder.Configuration);
 
@@ -100,7 +108,7 @@ builder.Services.AddAuthentication(options =>
             {
                 context.Token = accessToken;
             }
-            return Task.CompletedTask;
+            return System.Threading.Tasks.Task.CompletedTask;
         }
     };
 });
