@@ -63,7 +63,7 @@ namespace TFU_Resident_API.Controllers
                     transaction.RollbackToSavepoint("before_create_building");
                     throw;
                 }
-                return Ok(building);
+                return Ok();
             }
         }
     }
