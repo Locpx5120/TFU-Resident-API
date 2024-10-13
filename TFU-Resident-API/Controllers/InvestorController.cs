@@ -43,5 +43,7 @@ namespace TFU_Resident_API.Controllers
             this.superOwnerContext.SaveChanges();
             return Ok();
         }
+
+
     }
 }

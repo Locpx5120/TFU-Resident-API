@@ -1,4 +1,5 @@
 ﻿using Entity;
+using SuperOwnerModels;
 using TFU_Resident_API.Data;
 using TFU_Resident_API.Entity;
 
@@ -14,7 +15,7 @@ namespace Core.Infrastructure
         #endregion
 
         #region Others
-        IMasterDataRepository<Customer> CustomerRepository { get; }
+        IMasterDataRepository<Investor> InvestorRepository { get; }
         IMasterDataRepository<OTPMail> OTPMailRepository { get; }
 
         #endregion

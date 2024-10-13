@@ -1,7 +1,7 @@
 ﻿using Constant;
 using Core.Entity;
+using SuperOwnerModels;
 using System.ComponentModel.DataAnnotations.Schema;
-using TFU_Resident_API.Entity;
 
 namespace Entity
 {
@@ -12,10 +12,12 @@ namespace Entity
         public string Email { get; set; }
         public string? Phone { get; set; }
         public string Password { get; set; }
+        public string? Adress { get; set; }
+        public string? NumberCccd { get; set; }
         public Guid RoleId { get; set; }
         public bool IsChangePassword { get; set; } = false;
 
         public virtual Role Role { get; set; }
-        public virtual IList<Customer> Customers { get; set; }
+        public virtual IList<Investor> Investors { get; set; }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Core.Entity;
 using Entity;
 using Microsoft.EntityFrameworkCore;
+using SuperOwnerModels;
 using TFU_Resident_API.Data;
 using TFU_Resident_API.Entity;
 
@@ -36,10 +37,10 @@ namespace Core.Infrastructure
         #endregion
 
         #region Others
-        private IMasterDataRepository<Customer> _customerRepository;
-        public IMasterDataRepository<Customer> CustomerRepository
+        private IMasterDataRepository<Investor> _investorRepository;
+        public IMasterDataRepository<Investor> InvestorRepository
         {
-            get { return _customerRepository ??= new MasterDataRepository<Customer>(_context, _currentUser); }
+            get { return _investorRepository ??= new MasterDataRepository<Investor>(_context, _currentUser); }
         }
 
         private IMasterDataRepository<OTPMail> _oTPMailRepository;

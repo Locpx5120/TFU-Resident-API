@@ -8,6 +8,7 @@ using Entity;
 using fake_tool.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using SuperOwnerModels;
 using TFU_Resident_API.Constant;
 using TFU_Resident_API.Core.Helper;
 using TFU_Resident_API.Entity;
@@ -102,8 +103,8 @@ namespace Service.Impl
 
         public async Task<ResponseData<RegisterResponseDto>> Register(RegisterRequestDto register)
         {
-            var customerCheck = await UnitOfWork.CustomerRepository.GetQuery(x =>
-            x.Name == register.CompanyName
+            var customerCheck = await UnitOfWork.InvestorRepository.GetQuery(x =>
+            x.InvestorName == register.CompanyName
             ).FirstOrDefaultAsync();
 
             if (customerCheck != null) return new ResponseData<RegisterResponseDto>(ErrorCodeAPI.CustomerUsed);
@@ -125,12 +126,10 @@ namespace Service.Impl
             user.IsChangePassword = true;
             UnitOfWork.UserRepository.Add(user);
 
-            Customer customer = new Customer();
-            customer.Name = register.CompanyName;
-            customer.StartDate = DateTime.Now;
-            customer.CodePostion = "";
+            Investor customer = new Investor();
+            customer.InvestorName = register.CompanyName;
             customer.UserId = user.Id;
-            UnitOfWork.CustomerRepository.Add(customer);
+            UnitOfWork.InvestorRepository.Add(customer);
 
             await UnitOfWork.SaveChangesAsync();
 
@@ -139,7 +138,7 @@ namespace Service.Impl
             return new ResponseData<RegisterResponseDto>(ErrorCodeAPI.OK);
         }
 
-        private string BodyMaillRegister(User user, Customer customer)
+        private string BodyMaillRegister(User user, Investor customer)
         {
             string emailBody = $@"
 <!DOCTYPE html>

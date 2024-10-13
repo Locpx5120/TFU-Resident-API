@@ -18,7 +18,6 @@ namespace TFU_Resident_API.Data
 
         public DbSet<User> Users { get; set; }
         public DbSet<Role> Roles { get; set; }
-        public DbSet<Customer> Customers { get; set; }
         public DbSet<OTPMail> OTPMails { get; set; }
         public DbSet<Building> Buildings { get; set; }
         public DbSet<Investor> Investors { get; set; }
