@@ -12,6 +12,7 @@ namespace SuperOwnerModels
             Buildings = new HashSet<Building>();
         }
         public string Name { get; set; } = null!;
+        public string Position { get; set; } = null!;
         public string Permalink { get; set; } = null!;
         public Guid? InvestorId { get; set; }
         [ForeignKey(nameof(InvestorId))]

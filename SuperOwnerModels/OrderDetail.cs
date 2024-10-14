@@ -9,8 +9,10 @@ namespace SuperOwnerModels
     {
         public Guid InvestorId { get; set; }
         public Guid OrderId { get; set; }
+        public Guid ProjectId {  get; set; }
 
         public virtual Investor Investor { get; set; }
         public virtual Order Order { get; set; }
+        public virtual Project Project { get; set; }
     }
 }
