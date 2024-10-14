@@ -45,7 +45,7 @@ namespace TFU_Resident_API.Controllers
 
                     connection = string.Format(connectionTemplate,
                         investorDbServerConfigs["Server"],
-                        $"a_d".Replace("-", "_"),
+                        $"a_{project.InvestorId}_{project.Id}_{building.Id}".Replace("-", "_"),
                         investorDbServerConfigs["User"],
                         investorDbServerConfigs["Password"]);
 
