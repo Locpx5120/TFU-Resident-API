@@ -16,6 +16,8 @@ namespace Core.Infrastructure
 
         #region Others
         IMasterDataRepository<Investor> InvestorRepository { get; }
+        IMasterDataRepository<Project> ProjectRepository { get; }
+        IMasterDataRepository<Building> BuildingRepository { get; }
         IMasterDataRepository<OTPMail> OTPMailRepository { get; }
 
         #endregion

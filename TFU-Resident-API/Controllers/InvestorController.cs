@@ -1,49 +1,35 @@
-﻿using AutoMapper;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SuperOwnerModels;
-using TFU_Resident_API.Data;
 using TFU_Resident_API.Dto;
+using TFU_Resident_API.Services;
 
 namespace TFU_Resident_API.Controllers
 {
     [Route("api/investor")]
     [ApiController]
+    [Authorize]
     public class InvestorController : ControllerBase
     {
-        readonly AppDbContext superOwnerContext;
-        readonly IMapper mapper;
+        readonly IInvestorService _investorService;
 
-        public InvestorController(AppDbContext superOwnerContext, IMapper mapper)
+        public InvestorController(IInvestorService investorService)
         {
-            this.superOwnerContext = superOwnerContext;
-            this.mapper = mapper;
+            this._investorService = investorService;
         }
 
         [HttpPost("createInvestor")]
         public async Task<IActionResult> CreateInvestor(CreateInvestorDto createInvestorDto)
         {
-            var investor = new Investor()
-            {
-                UserId = createInvestorDto.UserId,
-            };
-            this.superOwnerContext.Add(investor);
-            this.superOwnerContext.SaveChanges();
-
-            return Ok();
+            var result = await _investorService.CreateInvestor(createInvestorDto);
+            return Ok(result);
         }
 
-        [HttpPost("createProject")]
-        public async Task<IActionResult> CreateProject(CreateProjectDto createProjectDto)
+        // Quản lý nhanh
+        [HttpPost("viewManager")]
+        public async Task<IActionResult> ViewManager()
         {
-            var project = new Project();
-            project.Permalink = createProjectDto.Permalink;
-            project.Name = createProjectDto.Name;
-            project.InvestorId = createProjectDto.InvestorId;
-            var newProject = this.superOwnerContext.Add(project);
-            this.superOwnerContext.SaveChanges();
-            return Ok();
+            var result = await _investorService.ViewManager();
+            return Ok(result);
         }
-
-
     }
 }

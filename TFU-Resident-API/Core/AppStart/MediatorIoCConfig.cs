@@ -4,6 +4,8 @@ using Core.Mapper;
 using fake_tool.Core.Dapper;
 using Service;
 using Service.Impl;
+using TFU_Resident_API.Services;
+using TFU_Resident_API.Services.Impl;
 
 namespace Core.AppStart
 {
@@ -25,6 +27,8 @@ namespace Core.AppStart
             //Entity
             services.AddScoped<IUserIdentity, UserIdentity>();
             services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<IInvestorService, InvestorService>();
+            services.AddScoped<IProjectService, ProjectService>();
 
             //Singleton
             services.AddSingleton<DapperDbContext>();

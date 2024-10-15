@@ -9,4 +9,12 @@
         public string PhoneNumber { get; set; } = null!;
         public string Password { get; set; } = null!;
     }
+
+    public class ViewManagerResponse
+    {
+        public double DsCuDan { get; set; } = 0;
+        public double DsCanHo { get; set; } = 0;
+        public double DsToaNha { get; set; } = 0;
+        public double DsDuAn { get; set; } = 0;
+    }
 }

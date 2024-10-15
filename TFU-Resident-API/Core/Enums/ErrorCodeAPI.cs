@@ -41,9 +41,13 @@ namespace Core.Enums
         [Description("Mã xác nhận chưa tồn tại")]
         OtpNotExit = 2011,
 
-        //Customer mã lỗi từ 3001
-        [Description("Customer đã được sử dụng!")]
+        //mã lỗi chung từ 3001
+        [Description("Investor đã được sử dụng!")]
         CustomerUsed = 3001,
+        [Description("Không tìm thấy tài khoản Investor!")]
+        InvestorNotFound = 3002,
+        [Description("Không tìm thấy dự án")]
+        ProjectNotFound = 3002,
 
         // Hệ thống mã lỗi từ 4001
         [Description("Lỗi hệ thống")]

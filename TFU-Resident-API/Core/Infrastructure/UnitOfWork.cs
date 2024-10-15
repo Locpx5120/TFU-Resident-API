@@ -48,6 +48,12 @@ namespace Core.Infrastructure
         {
             get { return _oTPMailRepository ??= new MasterDataRepository<OTPMail>(_context, _currentUser); }
         }
+
+        private IMasterDataRepository<Project> _projectRepository;
+        public IMasterDataRepository<Project> ProjectRepository => _projectRepository ??= new MasterDataRepository<Project>(_context, _currentUser);
+
+        private IMasterDataRepository<Building> _buildingRepository;
+        public IMasterDataRepository<Building> BuildingRepository => _buildingRepository ??= new MasterDataRepository<Building>(_context, _currentUser);
         #endregion
 
         public async Task<int> SaveChangesAsync()
