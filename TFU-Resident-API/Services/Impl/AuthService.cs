@@ -370,7 +370,7 @@ namespace Service.Impl
             oTPMail.UserId = userCheck.Id;
             oTPMail.Otp = Utill.GenerateRandomInt(6);
             oTPMail.ContentMail = BodyMaillForgot(userCheck, oTPMail.Otp);
-            oTPMail.EffectiveDate = DateTime.UtcNow.AddMinutes(15);
+            oTPMail.EffectiveDate = DateTime.Now.AddMinutes(15);
             oTPMail.TypeOtp = TypeOtp.RESET_PASSWORD;
 
             await emailService.SendEmailAsync(userCheck.Email, "Mã xác nhận quên mật khẩu", oTPMail.ContentMail);
@@ -477,7 +477,7 @@ namespace Service.Impl
 
             if (oTPMail.TypeOtp == TypeOtp.RESET_PASSWORD)
             {
-                user.Password = Utill.GeneratePassword();
+                user.Password = Utill.GeneratePassword(8);
                 user.IsChangePassword = true;
                 UnitOfWork.UserRepository.Update(user);
 
