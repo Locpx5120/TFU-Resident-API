@@ -10,7 +10,7 @@ namespace TFU_Resident_API.Controllers
     [Authorize]
     public class ProjectController : ControllerBase
     {
-        readonly IProjectService _projectService;
+        private readonly IProjectService _projectService;
 
         public ProjectController(IProjectService projectService)
         {

@@ -1,70 +1,27 @@
-﻿using AutoMapper;
-using BuildingModels;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
-using TFU_Resident_API.Data;
 using TFU_Resident_API.Dto;
+using TFU_Resident_API.Services;
 
 namespace TFU_Resident_API.Controllers
 {
     [Route("api/building")]
     [ApiController]
+    [Authorize]
     public class BuildingController : ControllerBase
     {
-        IConfiguration configuration;
-        readonly AppDbContext superOwnerContext;
-        readonly IMapper mapper;
-        readonly BuildingContext buildingContext;
+        private readonly IBuildingService buildingService;
 
-        public BuildingController(AppDbContext superOwnerContext, IMapper mapper, IConfiguration configuration, BuildingContext buildingContext)
+        public BuildingController(IBuildingService buildingService)
         {
-            this.superOwnerContext = superOwnerContext;
-            this.mapper = mapper;
-            this.configuration = configuration;
-            this.buildingContext = buildingContext;
+            this.buildingService = buildingService;
         }
 
         [HttpPost]
         public async Task<IActionResult> Create(CreateBuildingDto createBuildingDto)
         {
-            using (IDbContextTransaction transaction = superOwnerContext.Database.BeginTransaction())
-            {
-                SuperOwnerModels.Building building = this.mapper.Map<SuperOwnerModels.Building>(createBuildingDto);
-                try
-                {
-                    transaction.CreateSavepoint("before_create_building");
-                    var project = this.superOwnerContext.Projects.FirstOrDefault(x => x.Id == createBuildingDto.ProjectId);
-                    string connectionTemplate = configuration.GetConnectionString("BuildingTemplate");
-                    var investorDbServerConfigs = configuration.GetSection("MultiTenantDbSetting");
-                    string connection = connectionTemplate;
-
-                    building.ConnectionString = connection;
-                    var newBuilding = this.superOwnerContext.Add(building);
-                    this.superOwnerContext.SaveChanges();
-
-                    connection = string.Format(connectionTemplate,
-                        investorDbServerConfigs["Server"],
-                        $"a_{project.InvestorId}_{project.Id}_{building.Id}".Replace("-", "_"),
-                        investorDbServerConfigs["User"],
-                        investorDbServerConfigs["Password"]);
-
-                    this.buildingContext.Database.SetConnectionString(connection);
-                    this.buildingContext.Database.Migrate();
-                    building.ConnectionString = connection;
-                    this.superOwnerContext.Update(building);
-                    this.superOwnerContext.SaveChanges();
-
-                    transaction.ReleaseSavepoint("before_create_building");
-                    transaction.Commit();
-                }
-                catch (Exception)
-                {
-                    transaction.RollbackToSavepoint("before_create_building");
-                    throw;
-                }
-                return Ok();
-            }
+            var result = await buildingService.Create(createBuildingDto);
+            return Ok(result);
         }
     }
 }

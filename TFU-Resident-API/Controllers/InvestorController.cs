@@ -10,7 +10,7 @@ namespace TFU_Resident_API.Controllers
     [Authorize]
     public class InvestorController : ControllerBase
     {
-        readonly IInvestorService _investorService;
+        private readonly IInvestorService _investorService;
 
         public InvestorController(IInvestorService investorService)
         {
