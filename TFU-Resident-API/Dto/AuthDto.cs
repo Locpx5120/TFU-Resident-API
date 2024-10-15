@@ -70,6 +70,10 @@ namespace TFU_Resident_API.Model
         [EmailAddress]
         public string Email { get; set; }
     }
+    public class ForgotPasswordResponseDto
+    {
+        public Guid UserId { get; set; }
+    }
 
     public class ConfirmOtpRequestDto
     {

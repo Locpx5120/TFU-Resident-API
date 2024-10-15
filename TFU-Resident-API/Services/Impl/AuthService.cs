@@ -360,11 +360,11 @@ namespace Service.Impl
             return emailBody;
         }
 
-        public async Task<ResponseData<RegisterResponseDto>> ForgotPassword(ForgotPasswordRequestDto request)
+        public async Task<ResponseData<ForgotPasswordResponseDto>> ForgotPassword(ForgotPasswordRequestDto request)
         {
             var userCheck = await UnitOfWork.UserRepository.GetQuery(x =>
             x.Email == request.Email).FirstOrDefaultAsync();
-            if (userCheck == null) return new ResponseData<RegisterResponseDto>(ErrorCodeAPI.EmailNotUse);
+            if (userCheck == null) return new ResponseData<ForgotPasswordResponseDto>(ErrorCodeAPI.EmailNotUse);
 
             OTPMail oTPMail = new OTPMail();
             oTPMail.UserId = userCheck.Id;
@@ -379,16 +379,16 @@ namespace Service.Impl
 
             if (await UnitOfWork.SaveChangesAsync() > 0)
             {
-                return new ResponseData<RegisterResponseDto>()
+                return new ResponseData<ForgotPasswordResponseDto>()
                 {
                     Success = true,
                     Message = MessConstant.Successfully,
                     Code = (int)ErrorCodeAPI.OK,
-                    Data = null,
+                    Data = new ForgotPasswordResponseDto { UserId = userCheck.Id },
                 };
             }
 
-            return new ResponseData<RegisterResponseDto>()
+            return new ResponseData<ForgotPasswordResponseDto>()
             {
                 Success = true,
                 Message = MessConstant.Failed,
