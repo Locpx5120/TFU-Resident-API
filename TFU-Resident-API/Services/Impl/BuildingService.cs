@@ -104,5 +104,20 @@ namespace TFU_Resident_API.Services.Impl
                 };
             }
         }
+
+        public Task<ResponseData<object>> Delete(DeleteBuildingRequest request)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ResponseData<object>> Update(UpdateBuildingRequest request)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ResponseData<List<ViewManagerBuildingResponse>>> ViewManager(ViewManagerBuildingRequest request)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

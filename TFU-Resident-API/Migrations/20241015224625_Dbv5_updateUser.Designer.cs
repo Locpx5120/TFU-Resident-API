@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TFU_Resident_API.Data;
 
@@ -11,9 +12,10 @@ using TFU_Resident_API.Data;
 namespace TFU_Resident_API.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241015224625_Dbv5_updateUser")]
+    partial class Dbv5_updateUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -57,20 +59,20 @@ namespace TFU_Resident_API.Migrations
                         new
                         {
                             Id = new Guid("98ae41e1-3379-4193-9856-1c9162a8c9c2"),
-                            InsertedAt = new DateTime(2024, 10, 16, 6, 47, 16, 195, DateTimeKind.Local).AddTicks(8241),
+                            InsertedAt = new DateTime(2024, 10, 16, 5, 46, 25, 355, DateTimeKind.Local).AddTicks(1753),
                             IsActive = true,
                             IsDeleted = false,
                             Name = "User",
-                            UpdatedAt = new DateTime(2024, 10, 16, 6, 47, 16, 195, DateTimeKind.Local).AddTicks(8249)
+                            UpdatedAt = new DateTime(2024, 10, 16, 5, 46, 25, 355, DateTimeKind.Local).AddTicks(1763)
                         },
                         new
                         {
                             Id = new Guid("7fe6bd0c-afe5-489d-982d-6f107f1d06fd"),
-                            InsertedAt = new DateTime(2024, 10, 16, 6, 47, 16, 195, DateTimeKind.Local).AddTicks(8252),
+                            InsertedAt = new DateTime(2024, 10, 16, 5, 46, 25, 355, DateTimeKind.Local).AddTicks(1765),
                             IsActive = true,
                             IsDeleted = false,
                             Name = "Admin",
-                            UpdatedAt = new DateTime(2024, 10, 16, 6, 47, 16, 195, DateTimeKind.Local).AddTicks(8252)
+                            UpdatedAt = new DateTime(2024, 10, 16, 5, 46, 25, 355, DateTimeKind.Local).AddTicks(1766)
                         });
                 });
 
@@ -82,9 +84,6 @@ namespace TFU_Resident_API.Migrations
 
                     b.Property<string>("Adress")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("Dob")
-                        .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
                         .IsRequired()

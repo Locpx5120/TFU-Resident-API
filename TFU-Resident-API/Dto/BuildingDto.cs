@@ -6,4 +6,25 @@
         public string Permalink { get; set; } = null!;
         public string Name { get; set; } = null!;
     }
+
+    public class ViewManagerBuildingResponse
+    {
+
+    }
+
+    public class ViewManagerBuildingRequest
+    {
+
+    }
+
+    public class UpdateBuildingRequest
+    {
+
+    }
+
+    public class DeleteBuildingRequest
+    {
+
+    }
+
 }

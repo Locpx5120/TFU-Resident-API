@@ -48,6 +48,8 @@ namespace Core.Enums
         InvestorNotFound = 3002,
         [Description("Không tìm thấy dự án")]
         ProjectNotFound = 3002,
+        [Description("Không tìm thấy user")]
+        UserNotFound = 3003,
 
         // Hệ thống mã lỗi từ 4001
         [Description("Lỗi hệ thống")]

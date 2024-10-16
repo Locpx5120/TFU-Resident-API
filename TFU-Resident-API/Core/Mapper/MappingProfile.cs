@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Entity;
 using TFU_Resident_API.Dto;
 
 namespace Core.Mapper
@@ -13,6 +14,14 @@ namespace Core.Mapper
             this.CreateMap<CreateProjectDto, SuperOwnerModels.Project>();
             //this.CreateMap<SuperOwnerModels.Building, BuildingDto>();
             this.CreateMap<CreateBuildingDto, SuperOwnerModels.Building>();
+            this.CreateMap<UserCreateRequest, User>().ReverseMap();
+            this.CreateMap<UserDeleteRequest, User>().ReverseMap();
+            this.CreateMap<UserUpdateRequest, User>().ReverseMap();
+            this.CreateMap<UserDto, User>()
+                .ForMember(dest => dest.Gender,
+                       opt => opt.MapFrom(src => src.Genders.Equals("Male", StringComparison.OrdinalIgnoreCase))) // Ánh xạ Gender
+                .ReverseMap();
+            this.CreateMap<ViewManagerUserRequest, User>().ReverseMap();
         }
     }
 }
