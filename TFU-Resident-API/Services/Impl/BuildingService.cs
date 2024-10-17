@@ -33,7 +33,8 @@ namespace TFU_Resident_API.Services.Impl
             IHttpContextAccessor httpContextAccessor,
             IUserIdentity userIdentity,
             IMapper mapper,
-            BuildingContext buildingContext
+            BuildingContext buildingContext,
+            AppDbContext superOwnerContext
         ) : base(unitOfWork, httpContextAccessor)
         {
             _appSettings = optionsMonitor.CurrentValue;
@@ -42,6 +43,7 @@ namespace TFU_Resident_API.Services.Impl
             _mapper = mapper;
             emailService = new EmailService(_config);
             this.buildingContext = buildingContext;
+            this.superOwnerContext = superOwnerContext;
         }
 
         public async Task<ResponseData<object>> Create(CreateBuildingDto createBuildingDto)
@@ -68,7 +70,7 @@ namespace TFU_Resident_API.Services.Impl
 
                     connection = string.Format(connectionTemplate,
                         investorDbServerConfigs["Server"],
-                        $"a_{project.InvestorId}_{project.Id}_{building.Id}".Replace("-", "_"),
+                        $"a_{building.Id}".Replace("-", "_"),
                         investorDbServerConfigs["User"],
                         investorDbServerConfigs["Password"]);
 
