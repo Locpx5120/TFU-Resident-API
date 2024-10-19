@@ -4,7 +4,7 @@ namespace BuildingModels;
 
 public partial class Apartment : MasterDataEntityBase
 {
-    public string? DepartmentType { get; set; }
+    public string? DepartmentType { get; set; } 
 
     public double? Price { get; set; }
 
