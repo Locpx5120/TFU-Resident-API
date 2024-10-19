@@ -7,6 +7,7 @@ namespace SuperOwnerModels
     [Table("Orders", Schema = Constants.SCHEMA_NAME)]
     public class Order : MasterDataEntityBase
     {
+
         public double? TotalPrice { get; set; }
         public Guid InvestorId { get; set; }
 

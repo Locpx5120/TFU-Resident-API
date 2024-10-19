@@ -102,7 +102,7 @@ namespace TFU_Resident_API.Services.Impl
             foreach (var project in projects)
             {
                 ViewManagerProjectResponse viewManagerProject = new ViewManagerProjectResponse();
-                viewManagerProject.Address = project.Name;
+                viewManagerProject.Address = project.Position;
                 viewManagerProject.Name = project.Name;
                 viewManagerProject.Id = project.Id;
 
