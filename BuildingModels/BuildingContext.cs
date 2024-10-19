@@ -19,10 +19,12 @@ public partial class BuildingContext : DbContext
         Database.SetConnectionString(connectionString);
     }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        optionsBuilder.UseSqlServer("server=.;database=DBJustBlog;Trusted_Connection=True;TrustServerCertificate=True");
-    }
+    //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    //{
+    //    optionsBuilder.UseSqlServer("server=.;database=DBJustBlog;Trusted_Connection=True;TrustServerCertificate=True");
+    //}
+
+    //add-migration DB
 
     public virtual DbSet<Apartment> Apartments { get; set; }
 
