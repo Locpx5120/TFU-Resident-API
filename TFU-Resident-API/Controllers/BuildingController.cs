@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using TFU_Resident_API.Dto;
 using TFU_Resident_API.Services;
 
@@ -7,7 +6,7 @@ namespace TFU_Resident_API.Controllers
 {
     [Route("api/building")]
     [ApiController]
-    [Authorize]
+    //[Authorize]
     public class BuildingController : ControllerBase
     {
         private readonly IBuildingService buildingService;
@@ -17,10 +16,17 @@ namespace TFU_Resident_API.Controllers
             this.buildingService = buildingService;
         }
 
-        [HttpPost]
+        [HttpPost("Create")]
         public async Task<IActionResult> Create(CreateBuildingDto createBuildingDto)
         {
             var result = await buildingService.Create(createBuildingDto);
+            return Ok(result);
+        }
+
+        [HttpPost("UpdateDBMig")]
+        public async Task<IActionResult> UpdateDBMig()
+        {
+            var result = await buildingService.UpdateDBMig();
             return Ok(result);
         }
     }

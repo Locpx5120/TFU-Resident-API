@@ -9,5 +9,6 @@ namespace TFU_Resident_API.Services
         public Task<ResponseData<List<ViewManagerBuildingResponse>>> ViewManager(ViewManagerBuildingRequest request);
         public Task<ResponseData<object>> Update(UpdateBuildingRequest request);
         public Task<ResponseData<object>> Delete(DeleteBuildingRequest request);
+        public Task<ResponseData<object>> UpdateDBMig();
     }
 }

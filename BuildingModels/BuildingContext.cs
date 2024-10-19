@@ -74,6 +74,8 @@ public partial class BuildingContext : DbContext
 
     public virtual DbSet<ThirdPartyContact> ThirdPartyContacts { get; set; }
 
+    public virtual DbSet<OTPMail> OTPMails { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

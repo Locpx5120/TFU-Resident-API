@@ -117,6 +117,56 @@ namespace TFU_Resident_API.Services.Impl
             throw new NotImplementedException();
         }
 
+        public async Task<ResponseData<object>> UpdateDBMig()
+        {
+
+            List<SuperOwnerModels.Building> buildings = UnitOfWork.BuildingRepository.GetQuery(x => x.IsDeleted == false).ToList();
+            foreach (var building in buildings)
+            {
+                using (IDbContextTransaction transaction = superOwnerContext.Database.BeginTransaction())
+                {
+                    try
+                    {
+                        transaction.CreateSavepoint("before_create_building");
+
+                        this.buildingContext.Database.SetConnectionString(building.ConnectionString);
+                        this.buildingContext.Database.OpenConnection();
+                        this.buildingContext.Database.Migrate();
+
+                        UnitOfWork.BuildingRepository.Update(building);
+                        await UnitOfWork.SaveChangesAsync();
+
+                        //this.superOwnerContext.SaveChanges();
+
+                        transaction.ReleaseSavepoint("before_create_building");
+                        transaction.Commit();
+                    }
+                    catch (Exception e)
+                    {
+                        transaction.RollbackToSavepoint("before_create_building");
+
+                        return new ResponseData<object>()
+                        {
+                            Success = false,
+                            Message = e.Message,
+                            Code = (int)ErrorCodeAPI.SystemIsError,
+                        };
+                    }
+                    finally
+                    {
+                        this.buildingContext.Database.CloseConnection();
+                    }
+                }
+            }
+
+            return new ResponseData<object>()
+            {
+                Success = true,
+                Message = MessConstant.Successfully,
+                Code = (int)ErrorCodeAPI.OK,
+            };
+        }
+
         public Task<ResponseData<List<ViewManagerBuildingResponse>>> ViewManager(ViewManagerBuildingRequest request)
         {
             throw new NotImplementedException();
