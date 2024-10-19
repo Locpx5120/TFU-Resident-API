@@ -5,13 +5,13 @@ using Core.Enums;
 using Core.Handler;
 using Core.Infrastructure;
 using Core.Model;
-using Entity;
 using fake_tool.Helpers;
 using Microsoft.Extensions.Options;
 using TFU_Resident_API.Core.Helper;
 using TFU_Resident_API.Data;
 using TFU_Resident_API.Dto;
 using RoleEntity = Entity.Role;
+using UserEntity = Entity.User;
 
 namespace TFU_Resident_API.Services.Impl
 {
@@ -46,7 +46,7 @@ namespace TFU_Resident_API.Services.Impl
 
         public async Task<ResponseData<object>> Create(UserCreateRequest request)
         {
-            var user = this._mapper.Map<User>(request);
+            var user = this._mapper.Map<UserEntity>(request);
             if (user == null) return new ResponseData<object>(ErrorCodeAPI.UserNotFound);
 
             user.Password = Utill.GeneratePassword(8);
@@ -73,7 +73,7 @@ namespace TFU_Resident_API.Services.Impl
             };
         }
 
-        private string BodyMaillRegister(User user)
+        private string BodyMaillRegister(UserEntity user)
         {
             string emailBody = $@"
 <!DOCTYPE html>
@@ -211,7 +211,7 @@ namespace TFU_Resident_API.Services.Impl
 
         public async Task<ResponseData<List<UserDto>>> ViewManager(ViewManagerUserRequest request)
         {
-            List<User> users = UnitOfWork.UserRepository
+            List<UserEntity> users = UnitOfWork.UserRepository
                 .GetQuery(x => x.IsActive == true && x.IsDeleted == false).ToList();
 
             if (!String.IsNullOrEmpty(request.Name))

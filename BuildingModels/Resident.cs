@@ -4,13 +4,10 @@ namespace BuildingModels;
 
 public partial class Resident : MasterDataEntityBase
 {
-    public string? Username { get; set; }
-    public string? Password { get; set; }
-    public string? Fullname { get; set; }
-    public int? PhoneNumber { get; set; }
-    public DateTime? Dob { get; set; }
     public DateTime? RegistratorDate { get; set; }
 
+    public Guid? UserId { get; set; }
+    public virtual User? User { get; set; } = null!;
     public Guid? OwnerShipId { get; set; }
 
     public virtual OwnerShip? OwnerShip { get; set; }
