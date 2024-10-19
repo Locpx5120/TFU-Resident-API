@@ -25,6 +25,7 @@
   <ItemGroup>
     <ProjectReference Include="..\BuildingModels\BuildingModels.csproj" />
     <ProjectReference Include="..\CommonModels\CommonModels.csproj" />
+    <ProjectReference Include="..\Enums\Enums.csproj" />
     <ProjectReference Include="..\SuperOwnerModels\SuperOwnerModels.csproj" />
   </ItemGroup>
 

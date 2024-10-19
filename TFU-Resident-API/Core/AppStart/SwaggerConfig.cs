@@ -51,8 +51,6 @@ namespace Core.AppStart
                     }
                 });
 
-                //var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-                //swagger.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
                 swagger.ResolveConflictingActions(x => x.First());
             });
         }

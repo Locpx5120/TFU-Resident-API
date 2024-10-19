@@ -8,7 +8,6 @@ namespace SuperOwnerModels
     public class Building : MasterDataEntityBase
     {
         public string Name { get; set; } = null!;
-        public string Permalink { get; set; } = null!;
         public string ConnectionString { get; set; } = null!;
 
         public double MaxNumberApartments { get; set; } = 0; // căn hộ tối đa
