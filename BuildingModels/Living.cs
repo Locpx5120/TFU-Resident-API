@@ -12,4 +12,6 @@ public partial class Living : MasterDataEntityBase
 
     public virtual Apartment? Apartment { get; set; }
     public virtual Resident? Resident { get; set; }
+    public Guid? UserId { get; set; }
+    public virtual User? User { get; set; } = null!;
 }

@@ -11,4 +11,6 @@ public partial class OwnerShip : MasterDataEntityBase
 
     public virtual Apartment? Apartment { get; set; }
     public virtual ICollection<Resident> Residents { get; set; } = new List<Resident>();
+    public Guid? UserId { get; set; }
+    public virtual User? User { get; set; } = null!;
 }

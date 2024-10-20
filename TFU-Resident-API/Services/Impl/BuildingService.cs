@@ -145,12 +145,12 @@ namespace TFU_Resident_API.Services.Impl
                     {
                         transaction.RollbackToSavepoint("before_create_building");
 
-                        return new ResponseData<object>()
-                        {
-                            Success = false,
-                            Message = e.Message,
-                            Code = (int)ErrorCodeAPI.SystemIsError,
-                        };
+                        //return new ResponseData<object>()
+                        //{
+                        //    Success = false,
+                        //    Message = e.Message,
+                        //    Code = (int)ErrorCodeAPI.SystemIsError,
+                        //};
                     }
                     finally
                     {
