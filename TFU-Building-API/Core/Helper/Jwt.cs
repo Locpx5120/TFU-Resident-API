@@ -1,11 +1,12 @@
 ﻿using BuildingModels;
+using fake_tool.Helpers;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using TFU_Building_API.Core.Struct;
-using static TFU_Building_API.Core.Struct.AppSetting;
+//using static TFU_Building_API.Core.Struct.AppSetting;
 
 namespace TFU_Building_API.Helpers
 {

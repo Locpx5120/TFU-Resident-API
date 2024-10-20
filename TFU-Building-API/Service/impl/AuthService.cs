@@ -3,8 +3,9 @@ using BuildingModels;
 using Constant;
 using Core.Enums;
 using Core.Model;
-
 using fake_tool.Helpers;
+
+//using fake_tool.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using TFU_Building_API.Core.Handler;
@@ -13,7 +14,7 @@ using TFU_Building_API.Core.Infrastructure;
 using TFU_Building_API.Helpers;
 using TFU_Building_API.Model;
 using TFU_Resident_API.Constant;
-using AppSettings = TFU_Building_API.Core.Struct.AppSetting.AppSettings;
+using AppSettings = fake_tool.Helpers.AppSettings;
 
 namespace TFU_Building_API.Service.Impl
 {
@@ -104,34 +105,49 @@ namespace TFU_Building_API.Service.Impl
 
         public async Task<ResponseData<RegisterResponseDto>> Register(RegisterRequestDto register)
         {
-            //var customerCheck = await UnitOfWork.InvestorRepository.GetQuery(x =>
-            //x.InvestorName == register.CompanyName
-            //).FirstOrDefaultAsync();
+            try
+            {
 
-            //if (customerCheck != null) return new ResponseData<RegisterResponseDto>(ErrorCodeAPI.CustomerUsed);
 
-            //var userCheck = await UnitOfWork.UserRepository.GetQuery(x =>
-            //x.Email == register.Email).FirstOrDefaultAsync();
-            //if (userCheck != null) return new ResponseData<RegisterResponseDto>(ErrorCodeAPI.EmailUsed);
 
-            string userName = register.Email.Split('@')[0];
-            if (String.IsNullOrEmpty(userName)) return new ResponseData<RegisterResponseDto>(ErrorCodeAPI.EmailNotAvailable);
+                //var customerCheck = await UnitOfWork.InvestorRepository.GetQuery(x =>
+                //x.InvestorName == register.CompanyName
+                //).FirstOrDefaultAsync();
 
-            User user = new User();
-            user.Id = Guid.NewGuid();
-            user.FullName = userName;
-            user.Email = register.Email;
-            user.Password = Utill.GeneratePassword();
-            user.PhoneNumber = register.Phone;
-            user.RoleId = Guid.Parse("98AE41E1-3379-4193-9856-1C9162A8C9C2"); //User
-            user.IsChangePassword = true;
-            UnitOfWork.UserRepository.Add(user);
+                //if (customerCheck != null) return new ResponseData<RegisterResponseDto>(ErrorCodeAPI.CustomerUsed);
 
-            await UnitOfWork.SaveChangesAsync();
+                //var userCheck = await UnitOfWork.UserRepository.GetQuery(x =>
+                //x.Email == register.Email).FirstOrDefaultAsync();
+                //if (userCheck != null) return new ResponseData<RegisterResponseDto>(ErrorCodeAPI.EmailUsed);
 
-            await emailService.SendEmailAsync(user.Email, "TB Dki tai khoan", BodyMaillRegister(user));
+                string userName = register.Email.Split('@')[0];
+                if (String.IsNullOrEmpty(userName)) return new ResponseData<RegisterResponseDto>(ErrorCodeAPI.EmailNotAvailable);
 
-            return new ResponseData<RegisterResponseDto>(ErrorCodeAPI.OK);
+                User user = new User();
+                user.Id = Guid.NewGuid();
+                user.FullName = userName;
+                user.Username = userName;
+                user.Email = register.Email;
+                user.Password = Utill.GeneratePassword();
+                user.PhoneNumber = register.Phone;
+                user.RoleId = Guid.Parse("98ae41e1-3379-4193-9856-1c9162a8c9c2"); //User
+                user.IsChangePassword = true;
+                user.InsertedAt = DateTime.Now;
+                user.UpdatedAt = DateTime.Now;
+                user.IsDeleted = false;
+                UnitOfWork.UserRepository.Add(user);
+
+                await UnitOfWork.SaveChangesAsync();
+
+                await emailService.SendEmailAsync(user.Email, "TB Dki tai khoan", BodyMaillRegister(user));
+
+                return new ResponseData<RegisterResponseDto>(ErrorCodeAPI.OK);
+            }
+            catch (Exception e)
+            {
+
+                throw;
+            }
         }
 
         private string BodyMaillRegister(User user)
