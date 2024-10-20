@@ -5,7 +5,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using TFU_Building_API.Core.Struct;
-using static TFU_Building_API.Core.Struct.AppSetting;
+using fake_tool.Helpers;
 
 namespace TFU_Building_API.Helpers
 {

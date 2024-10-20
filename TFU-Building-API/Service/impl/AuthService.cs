@@ -13,7 +13,7 @@ using TFU_Building_API.Core.Infrastructure;
 using TFU_Building_API.Helpers;
 using TFU_Building_API.Model;
 using TFU_Resident_API.Constant;
-using AppSettings = TFU_Building_API.Core.Struct.AppSetting.AppSettings;
+using AppSettings = fake_tool.Helpers.AppSettings;
 
 namespace TFU_Building_API.Service.Impl
 {
@@ -120,11 +120,15 @@ namespace TFU_Building_API.Service.Impl
             User user = new User();
             user.Id = Guid.NewGuid();
             user.FullName = userName;
+            user.Username = userName;
             user.Email = register.Email;
             user.Password = Utill.GeneratePassword();
             user.PhoneNumber = register.Phone;
-            user.RoleId = Guid.Parse("98AE41E1-3379-4193-9856-1C9162A8C9C2"); //User
+            user.RoleId = Guid.Parse("98ae41e1-3379-4193-9856-1c9162a8c9c2"); //User
             user.IsChangePassword = true;
+            user.InsertedAt = DateTime.Now;
+            user.UpdatedAt = DateTime.Now;
+            user.IsDeleted = false;
             UnitOfWork.UserRepository.Add(user);
 
             await UnitOfWork.SaveChangesAsync();
