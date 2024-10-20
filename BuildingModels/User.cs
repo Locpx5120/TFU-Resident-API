@@ -15,6 +15,8 @@ namespace BuildingModels
         public virtual Role Role { get; set; } = null!;
 
         public virtual ICollection<Staff> Staffs { get; set; } = new List<Staff>();
+        public virtual ICollection<Living> Livings { get; set; } = new List<Living>();
+        public virtual ICollection<OwnerShip> OwnerShips { get; set; } = new List<OwnerShip>();
         public virtual ICollection<Resident> Residents { get; set; } = new List<Resident>();
     }
 }
