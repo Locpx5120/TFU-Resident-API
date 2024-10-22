@@ -13,7 +13,7 @@ namespace TFU_Building_API.Configure
             BuildingContext buildingContext = context.HttpContext.RequestServices.GetRequiredService<BuildingContext>();
 
             Guid? buildingPermalink = null;
-
+            //BuildingPermalink --> id building
             // Lấy giá trị từ request header
             var headers = context.HttpContext.Request.Headers;
 

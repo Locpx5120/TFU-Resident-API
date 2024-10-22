@@ -29,5 +29,12 @@ namespace TFU_Resident_API.Controllers
             var result = await buildingService.UpdateDBMig();
             return Ok(result);
         }
+
+        [HttpPost("GetBuildings")]
+        public async Task<IActionResult> GetBuildings(ViewManagerBuildingRequest request)
+        {
+            var result = await buildingService.ViewManager(request);
+            return Ok(result);
+        }
     }
 }

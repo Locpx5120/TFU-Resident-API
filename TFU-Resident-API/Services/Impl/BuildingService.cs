@@ -167,9 +167,22 @@ namespace TFU_Resident_API.Services.Impl
             };
         }
 
-        public Task<ResponseData<List<ViewManagerBuildingResponse>>> ViewManager(ViewManagerBuildingRequest request)
+        public async Task<ResponseData<List<ViewManagerBuildingResponse>>> ViewManager(ViewManagerBuildingRequest request)
         {
-            throw new NotImplementedException();
+            List<SuperOwnerModels.Building> buildings = UnitOfWork.BuildingRepository.GetQuery(x => x.IsDeleted == false).ToList();
+            if (!String.IsNullOrEmpty(request.Name))
+            {
+                buildings = buildings.Where(x => x.Name.StartsWith(request.Name)).ToList();
+            }
+            var buildingDtos = this._mapper.Map<List<ViewManagerBuildingResponse>>(buildings);
+
+            return new ResponseData<List<ViewManagerBuildingResponse>>()
+            {
+                Success = true,
+                Message = MessConstant.Successfully,
+                Code = (int)ErrorCodeAPI.OK,
+                Data = buildingDtos
+            };
         }
     }
 }

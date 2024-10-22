@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Entity;
+using SuperOwnerModels;
 using TFU_Resident_API.Dto;
 
 namespace Core.Mapper
@@ -22,6 +23,7 @@ namespace Core.Mapper
                        opt => opt.MapFrom(src => src.Genders.Equals("Male", StringComparison.OrdinalIgnoreCase))) // Ánh xạ Gender
                 .ReverseMap();
             this.CreateMap<ViewManagerUserRequest, User>().ReverseMap();
+            this.CreateMap<ViewManagerBuildingResponse, Building>().ReverseMap();
         }
     }
 }
