@@ -39,6 +39,14 @@ namespace TFU_Building_API.Core.Infrastructure
         public IMasterDataRepository<OTPMail> OTPMailRepository => _oTPMailRepository ??= new MasterDataRepository<OTPMail>(_context, _currentUser);
         #endregion
 
+        #region Staff
+        private IMasterDataRepository<Staff> _staffRepository;
+        public IMasterDataRepository<Staff> StaffRepository
+        {
+            get { return _staffRepository ??= new MasterDataRepository<Staff>(_context, _currentUser); }
+        }
+        #endregion
+
         public async Task<int> SaveChangesAsync()
         {
             if (_currentUser != null)

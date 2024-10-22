@@ -2,6 +2,7 @@
 using TFU_Building_API.Core.Infrastructure.Dapper;
 using TFU_Building_API.Core.Mapper;
 using TFU_Building_API.Service;
+using TFU_Building_API.Service.impl;
 using TFU_Building_API.Service.Impl;
 
 namespace TFU_Building_API.Core.AppStart
@@ -20,6 +21,8 @@ namespace TFU_Building_API.Core.AppStart
             services.AddScoped<IAuthService, AuthService>();
 
             services.AddScoped<IUserIdentity, UserIdentity>();
+
+            services.AddScoped<IStaffService, StaffService>();
 
 
             //Singleton

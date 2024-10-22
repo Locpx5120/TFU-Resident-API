@@ -16,6 +16,10 @@ namespace TFU_Building_API.Core.Infrastructure
         IMasterDataRepository<OTPMail> OTPMailRepository { get; }
         #endregion
 
+        #region Staff
+        IMasterDataRepository<Staff> StaffRepository { get; }
+        #endregion
+
         Task<int> SaveChangesAsync();
     }
 }
