@@ -24,6 +24,8 @@ namespace TFU_Building_API.Core.AppStart
 
             services.AddScoped<IStaffService, StaffService>();
 
+            services.AddScoped<IRoleService, RoleService>();
+
 
             //Singleton
             services.AddSingleton<DapperDbContext>();
