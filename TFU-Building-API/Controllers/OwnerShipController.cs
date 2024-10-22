@@ -18,7 +18,7 @@ namespace TFU_Building_API.Controllers
         }
 
         [HttpPost("addOwnerShip")]
-        public async Task<IActionResult> AddOwnerShip([FromBody] OwnerShipRequestDto request)
+        public async Task<IActionResult> AddOwnerShip(OwnerShipRequestDto request)
         {
             var response = await _ownerShipService.AddOwnerShip(request);
             if (response.Success)
@@ -29,7 +29,7 @@ namespace TFU_Building_API.Controllers
         }
 
         [HttpPut("UpdateOwnerShip")]
-        public async Task<IActionResult> UpdateOwnerShip([FromBody] OwnerShipUpdateRequestDto request)
+        public async Task<IActionResult> UpdateOwnerShip(OwnerShipUpdateRequestDto request)
         {
             var response = await _ownerShipService.UpdateOwnerShip(request);
             if (!response.Success)
@@ -41,7 +41,7 @@ namespace TFU_Building_API.Controllers
         }
 
         [HttpDelete("deleteOwnerShip")]
-        public async Task<IActionResult> DeleteOwnerShip([FromBody] OwnerShipDeleteRequestDto request)
+        public async Task<IActionResult> DeleteOwnerShip(OwnerShipDeleteRequestDto request)
         {
             if (!ModelState.IsValid)
             {
@@ -57,8 +57,8 @@ namespace TFU_Building_API.Controllers
             return Ok(response);
         }
 
-        [HttpGet("getOwnerShips")]
-        public async Task<IActionResult> GetOwnerShips([FromQuery] OwnerShipSearchRequestDto request)
+        [HttpPost("getOwnerShips")]
+        public async Task<IActionResult> GetOwnerShips(OwnerShipSearchRequestDto request)
         {
             if (!ModelState.IsValid)
             {

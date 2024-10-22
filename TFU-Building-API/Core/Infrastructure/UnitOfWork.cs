@@ -71,6 +71,14 @@ namespace TFU_Building_API.Core.Infrastructure
         }
         #endregion
 
+        #region Resident
+        private IMasterDataRepository<Resident> _residentRepository;
+        public IMasterDataRepository<Resident> ResidentRepository
+        {
+            get { return _residentRepository ??= new MasterDataRepository<Resident>(_context, _currentUser); }
+        }
+        #endregion
+
         public async Task<int> SaveChangesAsync()
         {
             if (_currentUser != null)
