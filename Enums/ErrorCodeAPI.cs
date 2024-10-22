@@ -14,6 +14,8 @@ namespace Core.Enums
         BadRequest = 400,
         [Description("Unauthorized")]
         Unauthorized = 401,
+        [Description("Not Found")]
+        NotFound = 404,
 
         //Auth & User mã lỗi bắt đầu từ 2000
         [Description("OKChangePass")]

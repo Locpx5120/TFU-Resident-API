@@ -6,8 +6,9 @@ public partial class Resident : MasterDataEntityBase
 {
     public DateTime? RegistratorDate { get; set; }
 
-    public Guid? UserId { get; set; }
-    public virtual User? User { get; set; } = null!;
+    public string? Name { get; set; }
+    public string? Email { get; set; }
+    public string? Phone { get; set; }
     public Guid? OwnerShipId { get; set; }
 
     public virtual OwnerShip? OwnerShip { get; set; }

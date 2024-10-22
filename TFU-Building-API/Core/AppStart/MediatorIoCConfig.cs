@@ -26,6 +26,10 @@ namespace TFU_Building_API.Core.AppStart
 
             services.AddScoped<IRoleService, RoleService>();
 
+            services.AddScoped<IBuildingService, BuildingService>();
+
+            services.AddScoped<IOwnerShipService, OwnerShipService>();
+
 
             //Singleton
             services.AddSingleton<DapperDbContext>();

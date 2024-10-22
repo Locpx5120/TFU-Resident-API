@@ -4,6 +4,7 @@ using BuildingModels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BuildingModels.Migrations
 {
     [DbContext(typeof(BuildingContext))]
-    partial class BuildingContextModelSnapshot : ModelSnapshot
+    [Migration("20241022162448_UpdateTableApartment")]
+    partial class UpdateTableApartment
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -26,6 +28,9 @@ namespace BuildingModels.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("BuildingId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("DepartmentType")
@@ -59,6 +64,8 @@ namespace BuildingModels.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("BuildingId");
 
                     b.ToTable("Apartments");
                 });
@@ -1168,6 +1175,13 @@ namespace BuildingModels.Migrations
                     b.ToTable("User");
                 });
 
+            modelBuilder.Entity("BuildingModels.Apartment", b =>
+                {
+                    b.HasOne("BuildingModels.Building", null)
+                        .WithMany("Apartments")
+                        .HasForeignKey("BuildingId");
+                });
+
             modelBuilder.Entity("BuildingModels.Assigment", b =>
                 {
                     b.HasOne("BuildingModels.Staff", "Staff")
@@ -1424,6 +1438,11 @@ namespace BuildingModels.Migrations
                     b.Navigation("Livings");
 
                     b.Navigation("OwnerShips");
+                });
+
+            modelBuilder.Entity("BuildingModels.Building", b =>
+                {
+                    b.Navigation("Apartments");
                 });
 
             modelBuilder.Entity("BuildingModels.OwnerShip", b =>

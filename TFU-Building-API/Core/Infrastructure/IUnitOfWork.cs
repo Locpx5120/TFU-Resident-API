@@ -20,6 +20,18 @@ namespace TFU_Building_API.Core.Infrastructure
         IMasterDataRepository<Staff> StaffRepository { get; }
         #endregion
 
+        #region Building
+        IMasterDataRepository<Building> BuildingRepository { get; }
+        #endregion
+
+        #region OwnerShip
+        IMasterDataRepository<OwnerShip> OwnerShipRepository { get; }
+        #endregion
+
+        #region Apartment
+        IMasterDataRepository<Apartment> ApartmentRepository { get; }
+        #endregion
+
         Task<int> SaveChangesAsync();
     }
 }
