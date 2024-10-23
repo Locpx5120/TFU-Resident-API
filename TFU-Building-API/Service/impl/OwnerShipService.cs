@@ -275,5 +275,83 @@ namespace TFU_Building_API.Service.impl
                 };
             }
         }
+
+        public async Task<ResponseData<OwnershipInfoResponseDto>> GetOwnershipById(Guid ownershipId)
+        {
+            try
+            {
+                // Tìm Ownership dựa trên Id
+                var ownership = await _unitOfWork.OwnerShipRepository.GetQuery(x => x.Id == ownershipId && x.IsDeleted == false)
+                    .FirstOrDefaultAsync();
+
+                if (ownership == null)
+                {
+                    // Nếu không tìm thấy Ownership, trả về thông báo lỗi
+                    return new ResponseData<OwnershipInfoResponseDto>
+                    {
+                        Success = false,
+                        Message = "Ownership not found.",
+                        Code = (int)ErrorCodeAPI.NotFound
+                    };
+                }
+
+                // Lấy thông tin từ bảng User dựa trên UserId
+                var user = await _unitOfWork.UserRepository.GetQuery(u => u.Id == ownership.UserId && u.IsDeleted == false)
+                    .FirstOrDefaultAsync();
+
+                if (user == null)
+                {
+                    return new ResponseData<OwnershipInfoResponseDto>
+                    {
+                        Success = false,
+                        Message = "User associated with ownership not found.",
+                        Code = (int)ErrorCodeAPI.UserNotFound
+                    };
+                }
+
+                // Lấy thông tin từ bảng Apartment dựa trên ApartmentId
+                var apartment = await _unitOfWork.ApartmentRepository.GetQuery(a => a.Id == ownership.ApartmentId && a.IsDeleted == false)
+                    .FirstOrDefaultAsync();
+
+                if (apartment == null)
+                {
+                    return new ResponseData<OwnershipInfoResponseDto>
+                    {
+                        Success = false,
+                        Message = "Apartment associated with ownership not found.",
+                        Code = (int)ErrorCodeAPI.NotFound
+                    };
+                }
+
+                // Tạo đối tượng response với các trường cần thiết
+                var response = new OwnershipInfoResponseDto
+                {
+                    Id = ownership.Id,
+                    Email = user.Email,
+                    Floor = apartment.Floor.GetValueOrDefault(),
+                    RoomNumber = apartment.RoomNumber.GetValueOrDefault()
+                };
+
+                // Trả về kết quả thành công
+                return new ResponseData<OwnershipInfoResponseDto>
+                {
+                    Success = true,
+                    Message = "Ownership found successfully.",
+                    Data = response,
+                    Code = (int)ErrorCodeAPI.OK
+                };
+            }
+            catch (Exception ex)
+            {
+                // Xử lý lỗi và trả về thông báo lỗi chi tiết
+                return new ResponseData<OwnershipInfoResponseDto>
+                {
+                    Success = false,
+                    Message = ex.Message,
+                    Code = (int)ErrorCodeAPI.SystemIsError
+                };
+            }
+        }
+
     }
 }

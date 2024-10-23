@@ -2,6 +2,7 @@
 using TFU_Building_API.Configure;
 using TFU_Building_API.Dto;
 using TFU_Building_API.Service;
+using TFU_Building_API.Service.impl;
 
 namespace TFU_Building_API.Controllers
 {
@@ -73,6 +74,20 @@ namespace TFU_Building_API.Controllers
 
             return Ok(response.Data);
         }
+
+        [HttpGet("GetOwnerShipById/{ownershipId}")]
+        public async Task<IActionResult> GetOwnershipById(Guid ownershipId)
+        {
+            var response = await _ownerShipService.GetOwnershipById(ownershipId);
+
+            if (!response.Success)
+            {
+                return NotFound(response.Message);
+            }
+
+            return Ok(response.Data);
+        }
+
     }
 
 }

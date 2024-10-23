@@ -237,5 +237,56 @@ namespace TFU_Building_API.Service.impl
                 };
             }
         }
+
+        public async Task<ResponseData<ResidentInfoResponseDto>> GetResidentById(Guid residentId)
+        {
+            try
+            {
+                // Tìm kiếm Resident dựa trên residentId
+                var resident = await _unitOfWork.ResidentRepository.GetQuery(r => r.Id == residentId && r.IsDeleted == false)
+                    .FirstOrDefaultAsync();
+
+                if (resident == null)
+                {
+                    // Nếu không tìm thấy Resident, trả về thông báo lỗi
+                    return new ResponseData<ResidentInfoResponseDto>
+                    {
+                        Success = false,
+                        Message = "Resident not found.",
+                        Code = (int)ErrorCodeAPI.NotFound
+                    };
+                }
+
+                // Tạo đối tượng response với các trường cần thiết
+                var response = new ResidentInfoResponseDto
+                {
+                    Id = resident.Id,
+                    Name = resident.Name,
+                    Email = resident.Email,
+                    Phone = resident.Phone
+                };
+
+                // Trả về kết quả thành công
+                return new ResponseData<ResidentInfoResponseDto>
+                {
+                    Success = true,
+                    Message = "Resident found successfully.",
+                    Data = response,
+                    Code = (int)ErrorCodeAPI.OK
+                };
+            }
+            catch (Exception ex)
+            {
+                // Xử lý lỗi và trả về thông báo lỗi chi tiết
+                return new ResponseData<ResidentInfoResponseDto>
+                {
+                    Success = false,
+                    Message = ex.Message,
+                    Code = (int)ErrorCodeAPI.SystemIsError
+                };
+            }
+        }
+
+
     }
 }

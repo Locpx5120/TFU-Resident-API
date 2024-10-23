@@ -10,8 +10,10 @@ namespace TFU_Building_API.Service.impl
 {
     public class StaffService : BaseHandler, IStaffService
     {
+        private readonly IUnitOfWork _unitOfWork;
         public StaffService(IUnitOfWork UnitOfWork, IHttpContextAccessor HttpContextAccessor) : base(UnitOfWork, HttpContextAccessor)
         {
+            _unitOfWork = UnitOfWork;
         }
 
         public async Task<ResponseData<StaffResponseDto>> AddStaff(StaffRequestDto request)
@@ -19,7 +21,7 @@ namespace TFU_Building_API.Service.impl
             try
             {
                 // Tìm kiếm user dựa trên email (nếu không tìm thấy thì báo lỗi)
-                var existingUser = await UnitOfWork.UserRepository.GetQuery(x => x.Email == request.Email && x.IsDeleted == false).FirstOrDefaultAsync();
+                var existingUser = await _unitOfWork.UserRepository.GetQuery(x => x.Email == request.Email && x.IsDeleted == false).FirstOrDefaultAsync();
 
                 if (existingUser == null)
                 {
@@ -80,7 +82,7 @@ namespace TFU_Building_API.Service.impl
             try
             {
                 // Tìm kiếm nhân viên dựa trên StaffId
-                var staff = await UnitOfWork.StaffRepository.GetQuery(x => x.Id == request.StaffId && x.IsDeleted == false).FirstOrDefaultAsync();
+                var staff = await _unitOfWork.StaffRepository.GetQuery(x => x.Id == request.StaffId && x.IsDeleted == false).FirstOrDefaultAsync();
 
                 // Nếu không tìm thấy nhân viên, trả về thông báo lỗi
                 if (staff == null)
@@ -125,7 +127,7 @@ namespace TFU_Building_API.Service.impl
             try
             {
                 // Tìm kiếm nhân viên dựa trên StaffId
-                var staff = await UnitOfWork.StaffRepository.GetQuery(x => x.Id == request.StaffId && x.IsDeleted == false).FirstOrDefaultAsync();
+                var staff = await _unitOfWork.StaffRepository.GetQuery(x => x.Id == request.StaffId && x.IsDeleted == false).FirstOrDefaultAsync();
 
                 // Nếu không tìm thấy nhân viên, trả về thông báo lỗi
                 if (staff == null)
@@ -225,6 +227,82 @@ namespace TFU_Building_API.Service.impl
                 };
             }
         }
+
+        public async Task<ResponseData<StaffInfoResponseDto>> GetStaffById(Guid staffId)
+        {
+            try
+            {
+                // Lấy thông tin nhân viên dựa trên Id
+                var staff = await _unitOfWork.StaffRepository.GetQuery(x => x.Id == staffId && x.IsDeleted == false)
+                    .FirstOrDefaultAsync();
+
+                if (staff == null)
+                {
+                    return new ResponseData<StaffInfoResponseDto>
+                    {
+                        Success = false,
+                        Message = "Staff not found.",
+                        Code = (int)ErrorCodeAPI.NotFound
+                    };
+                }
+
+                // Lấy thông tin từ bảng User dựa trên UserId của nhân viên
+                var user = await _unitOfWork.UserRepository.GetQuery(u => u.Id == staff.UserId && u.IsDeleted == false)
+                    .FirstOrDefaultAsync();
+
+                if (user == null)
+                {
+                    return new ResponseData<StaffInfoResponseDto>
+                    {
+                        Success = false,
+                        Message = "User not found.",
+                        Code = (int)ErrorCodeAPI.UserNotFound
+                    };
+                }
+
+                // Lấy thông tin từ bảng Role (bộ phận) dựa trên RoleId của nhân viên
+                var role = await _unitOfWork.RoleRepository.GetQuery(r => r.Id == staff.RoleId && r.IsDeleted == false)
+                    .FirstOrDefaultAsync();
+
+                if (role == null)
+                {
+                    return new ResponseData<StaffInfoResponseDto>
+                    {
+                        Success = false,
+                        Message = "Role not found.",
+                        Code = (int)ErrorCodeAPI.RoleNotFound
+                    };
+                }
+
+                // Tạo đối tượng response với các trường cần thiết
+                var response = new StaffInfoResponseDto
+                {
+                    Id = staff.Id,
+                    Email = user.Email,
+                    Department = role.Name
+                };
+
+                // Trả về kết quả thành công
+                return new ResponseData<StaffInfoResponseDto>
+                {
+                    Success = true,
+                    Message = "Staff found successfully.",
+                    Data = response,
+                    Code = (int)ErrorCodeAPI.OK
+                };
+            }
+            catch (Exception ex)
+            {
+                // Xử lý lỗi và trả về thông báo lỗi chi tiết
+                return new ResponseData<StaffInfoResponseDto>
+                {
+                    Success = false,
+                    Message = ex.Message,
+                    Code = (int)ErrorCodeAPI.SystemIsError
+                };
+            }
+        }
+
 
     }
 }

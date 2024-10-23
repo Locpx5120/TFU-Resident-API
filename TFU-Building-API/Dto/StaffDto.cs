@@ -43,4 +43,11 @@ namespace TFU_Building_API.Dto
         public Guid Id { get; set; }
         public int TotalRecords { get; set; }
     }
+
+    public class StaffInfoResponseDto
+    {
+        public Guid Id { get; set; }
+        public string Email { get; set; }
+        public string Department { get; set; }
+    }
 }

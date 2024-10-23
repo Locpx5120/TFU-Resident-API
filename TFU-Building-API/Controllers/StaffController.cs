@@ -7,7 +7,7 @@ using Status = BuildingModels.Status;
 
 namespace TFU_Building_API.Controllers
 {
-    [Route("api/ceo")]
+    [Route("api/staff")]
     [ApiController]
     [CustomFilter]
     public class StaffController : ControllerBase
@@ -70,5 +70,19 @@ namespace TFU_Building_API.Controllers
 
             return BadRequest(response);
         }
+
+        [HttpGet("GetById/{staffId}")]
+        public async Task<IActionResult> GetStaffById(Guid staffId)
+        {
+            var response = await _staffService.GetStaffById(staffId);
+
+            if (!response.Success)
+            {
+                return NotFound(response.Message);
+            }
+
+            return Ok(response.Data);
+        }
+
     }
 }

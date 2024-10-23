@@ -64,4 +64,12 @@ namespace TFU_Building_API.Dto
         public int TotalRecords { get; set; }
         public List<T> Data { get; set; }
     }
+
+    public class OwnershipInfoResponseDto
+    {
+        public Guid Id { get; set; }
+        public string Email { get; set; }
+        public int Floor { get; set; }
+        public int RoomNumber { get; set; }
+    }
 }

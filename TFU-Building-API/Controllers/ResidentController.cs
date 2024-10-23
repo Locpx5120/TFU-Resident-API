@@ -76,5 +76,19 @@ namespace TFU_Building_API.Controllers
 
             return Ok(response.Data);
         }
+
+        [HttpGet("GetById/{residentId}")]
+        public async Task<IActionResult> GetResidentById(Guid residentId)
+        {
+            var response = await _residentService.GetResidentById(residentId);
+
+            if (!response.Success)
+            {
+                return NotFound(response.Message);
+            }
+
+            return Ok(response.Data);
+        }
+
     }
 }

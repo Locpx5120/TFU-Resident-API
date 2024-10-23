@@ -69,4 +69,12 @@ namespace TFU_Building_API.Dto
     {
         public Guid ResidentId { get; set; }
     }
+
+    public class ResidentInfoResponseDto
+    {
+        public Guid Id { get; set; }
+        public string Name { get; set; }
+        public string Email { get; set; }
+        public string Phone { get; set; }
+    }
 }
