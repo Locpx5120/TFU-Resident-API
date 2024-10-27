@@ -34,6 +34,8 @@ namespace TFU_Building_API.Core.AppStart
 
             services.AddScoped<IServiceApartment, ServiceApartment>();
 
+            services.AddScoped<IInvoiceService, InvoiceService>();
+
 
             //Singleton
             services.AddSingleton<DapperDbContext>();

@@ -44,6 +44,7 @@ namespace TFU_Building_API.Core.Infrastructure
         #region Service
         IMasterDataRepository<BuildingModels.Service> ServiceRepository { get; }
 
+        IMasterDataRepository<Invoice> InvoiceRepository { get; }
         #endregion
 
         #region ApartmentType

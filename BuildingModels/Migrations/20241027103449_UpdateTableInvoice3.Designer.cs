@@ -4,6 +4,7 @@ using BuildingModels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BuildingModels.Migrations
 {
     [DbContext(typeof(BuildingContext))]
-    partial class BuildingContextModelSnapshot : ModelSnapshot
+    [Migration("20241027103449_UpdateTableInvoice3")]
+    partial class UpdateTableInvoice3
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -372,6 +374,9 @@ namespace BuildingModels.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("ApartmentId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTime?>("DueDate")
                         .HasColumnType("datetime2");
 
@@ -399,6 +404,9 @@ namespace BuildingModels.Migrations
                     b.Property<Guid>("ServiceContractId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("StatusId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<decimal>("TotalAmount")
                         .HasColumnType("decimal(18,2)");
 
@@ -413,7 +421,11 @@ namespace BuildingModels.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ApartmentId");
+
                     b.HasIndex("ServiceContractId");
+
+                    b.HasIndex("StatusId");
 
                     b.HasIndex("UserId");
 
@@ -963,9 +975,6 @@ namespace BuildingModels.Migrations
                     b.Property<DateTime?>("LastRenewalDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("PackageServiceId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<int?>("Quantity")
                         .HasColumnType("int");
 
@@ -990,8 +999,6 @@ namespace BuildingModels.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ApartmentId");
-
-                    b.HasIndex("PackageServiceId");
 
                     b.HasIndex("ServiceId");
 
@@ -1343,17 +1350,29 @@ namespace BuildingModels.Migrations
 
             modelBuilder.Entity("BuildingModels.Invoice", b =>
                 {
+                    b.HasOne("BuildingModels.Apartment", "Apartment")
+                        .WithMany("Invoices")
+                        .HasForeignKey("ApartmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("BuildingModels.ServiceContract", "ServiceContract")
                         .WithMany()
                         .HasForeignKey("ServiceContractId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("BuildingModels.Status", null)
+                        .WithMany("Invoices")
+                        .HasForeignKey("StatusId");
+
                     b.HasOne("BuildingModels.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Apartment");
 
                     b.Navigation("ServiceContract");
 
@@ -1455,17 +1474,11 @@ namespace BuildingModels.Migrations
                         .WithMany()
                         .HasForeignKey("ApartmentId");
 
-                    b.HasOne("BuildingModels.PackageService", "PackageService")
-                        .WithMany()
-                        .HasForeignKey("PackageServiceId");
-
                     b.HasOne("BuildingModels.Service", "Service")
                         .WithMany()
                         .HasForeignKey("ServiceId");
 
                     b.Navigation("Apartment");
-
-                    b.Navigation("PackageService");
 
                     b.Navigation("Service");
                 });
@@ -1513,6 +1526,8 @@ namespace BuildingModels.Migrations
 
             modelBuilder.Entity("BuildingModels.Apartment", b =>
                 {
+                    b.Navigation("Invoices");
+
                     b.Navigation("Livings");
 
                     b.Navigation("OwnerShips");
@@ -1538,6 +1553,11 @@ namespace BuildingModels.Migrations
             modelBuilder.Entity("BuildingModels.Role", b =>
                 {
                     b.Navigation("Users");
+                });
+
+            modelBuilder.Entity("BuildingModels.Status", b =>
+                {
+                    b.Navigation("Invoices");
                 });
 
             modelBuilder.Entity("BuildingModels.Task", b =>

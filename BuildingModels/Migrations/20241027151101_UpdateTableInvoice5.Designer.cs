@@ -4,6 +4,7 @@ using BuildingModels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BuildingModels.Migrations
 {
     [DbContext(typeof(BuildingContext))]
-    partial class BuildingContextModelSnapshot : ModelSnapshot
+    [Migration("20241027151101_UpdateTableInvoice5")]
+    partial class UpdateTableInvoice5
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -963,9 +965,6 @@ namespace BuildingModels.Migrations
                     b.Property<DateTime?>("LastRenewalDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("PackageServiceId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<int?>("Quantity")
                         .HasColumnType("int");
 
@@ -990,8 +989,6 @@ namespace BuildingModels.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ApartmentId");
-
-                    b.HasIndex("PackageServiceId");
 
                     b.HasIndex("ServiceId");
 
@@ -1455,17 +1452,11 @@ namespace BuildingModels.Migrations
                         .WithMany()
                         .HasForeignKey("ApartmentId");
 
-                    b.HasOne("BuildingModels.PackageService", "PackageService")
-                        .WithMany()
-                        .HasForeignKey("PackageServiceId");
-
                     b.HasOne("BuildingModels.Service", "Service")
                         .WithMany()
                         .HasForeignKey("ServiceId");
 
                     b.Navigation("Apartment");
-
-                    b.Navigation("PackageService");
 
                     b.Navigation("Service");
                 });

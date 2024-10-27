@@ -14,6 +14,9 @@ public partial class ServiceContract : MasterDataEntityBase
     public bool IsApprove { get; set; }
     public Guid? ApartmentId { get; set; }
     public Guid? ServiceId { get; set; }
+    public Guid? PackageServiceId { get; set; }
+
+    public virtual PackageService? PackageService { get; set; }
 
     public virtual Apartment? Apartment { get; set; } = null!;
     public virtual Service? Service { get; set; } = null!;

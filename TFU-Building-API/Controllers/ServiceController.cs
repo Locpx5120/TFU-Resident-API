@@ -52,6 +52,41 @@ namespace TFU_Building_API.Controllers
 
             return Ok(response);
         }
+
+        [HttpGet("unpaid-summary")]
+        public async Task<IActionResult> GetUnpaidServiceSummary([FromQuery] int pageSize = 10, [FromQuery] int pageNumber = 1)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier); // Lấy userId từ token
+            if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out var userGuid))
+            {
+                return Unauthorized("User ID not found in token.");
+            }
+
+            var response = await _apartmentService.GetUnpaidServiceSummaryByUserId(userGuid, pageSize, pageNumber);
+            if (!response.Success)
+            {
+                return BadRequest(response.Message);
+            }
+
+            return Ok(response.Data);
+        }
+
+        [HttpPost("unpaid-details")]
+        public async Task<IActionResult> GetUnpaidServiceDetailsByApartmentId([FromBody] UnpaidServiceDetailRequestDto request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var response = await _apartmentService.GetUnpaidServiceDetailsByApartmentId(request);
+            if (!response.Success)
+            {
+                return BadRequest(response.Message);
+            }
+
+            return Ok(response.Data);
+        }
     }
 
 

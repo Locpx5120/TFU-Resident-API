@@ -40,6 +40,38 @@ namespace TFU_Building_API.Dto
         public string ServiceType { get; set; } // Loại dịch vụ (ví dụ: "Gửi xe", "Dịch vụ phòng")
     }
 
+    public class UnpaidServiceSummaryDto
+    {
+        public Guid ApartmentId { get; set; }
+        public int RoomNumber { get; set; }
+        public int TotalServices { get; set; }
+        public int Month { get; set; }
+        public string PaymentStatus { get; set; }
+    }
+
+    public class UnpaidServiceDetailDto
+    {
+        public string ServiceName { get; set; }     // Tên dịch vụ
+        public string Description { get; set; }     // Mô tả
+        public string QuantityOrArea { get; set; }  // Số lượng hoặc diện tích
+        public decimal UnitPrice { get; set; }      // Giá tiền
+        public decimal TotalPrice { get; set; }     // Tổng tiền
+    }
+
+    public class UnpaidServiceDetailResponseDto
+    {
+        public List<UnpaidServiceDetailDto> Services { get; set; }  // Danh sách chi tiết từng dịch vụ
+        public decimal TotalAmount { get; set; }                    // Tổng giá trị của tất cả dịch vụ
+    }
+
+    public class UnpaidServiceDetailRequestDto
+    {
+        [Required]
+        public Guid ApartmentId { get; set; }
+
+        public string ServiceType { get; set; } // Loại dịch vụ (ví dụ: "Gửi xe", "Dịch vụ phòng")
+    }
+
     //public class PaginatedResponseDto<T>
     //{
     //    public int TotalRecords { get; set; }

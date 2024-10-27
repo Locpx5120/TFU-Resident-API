@@ -4,14 +4,17 @@ namespace BuildingModels;
 
 public partial class Invoice : MasterDataEntityBase
 {
-    public int? Amount { get; set; }
+    public decimal TotalAmount { get; set; }
+    public bool PaidStatus { get; set; }
+    public DateTime? PaidDate { get; set; }
     public DateTime? IssueDate { get; set; }
     public DateTime? DueDate { get; set; }
-    public DateTime? TransactionDate { get; set; }
 
-    public Guid StatusId { get; set; }
-    public Guid ApartmentId { get; set; }
+    public Guid ServiceContractId { get; set; }
 
-    public virtual Apartment Apartment { get; set; } = null!;
-    public virtual Status Status { get; set; } = null!;
+    public Guid UserId { get; set; }
+
+    public virtual User User { get; set; }
+
+    public virtual ServiceContract ServiceContract { get; set; }
 }
