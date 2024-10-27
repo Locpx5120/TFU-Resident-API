@@ -4,6 +4,7 @@ using BuildingModels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BuildingModels.Migrations
 {
     [DbContext(typeof(BuildingContext))]
-    partial class BuildingContextModelSnapshot : ModelSnapshot
+    [Migration("20241026043410_AddTableDepartmentType")]
+    partial class AddTableDepartmentType
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -641,48 +643,6 @@ namespace BuildingModels.Migrations
                     b.ToTable("OwnerShips");
                 });
 
-            modelBuilder.Entity("BuildingModels.PackageService", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("AutoRenew")
-                        .HasColumnType("bit");
-
-                    b.Property<decimal?>("Discount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("DurationInMonth")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("InsertedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("InsertedById")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("UpdatedById")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("PackageServices");
-                });
-
             modelBuilder.Entity("BuildingModels.Postion", b =>
                 {
                     b.Property<Guid>("Id")
@@ -886,10 +846,6 @@ namespace BuildingModels.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime?>("InsertedAt")
                         .HasColumnType("datetime2");
 
@@ -902,19 +858,11 @@ namespace BuildingModels.Migrations
                     b.Property<bool?>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("IsPackageAllowed")
-                        .HasColumnType("bit");
-
                     b.Property<string>("ServiceName")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Unit")
-                        .IsRequired()
+                    b.Property<string>("ServiceType")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("UnitPrice")
-                        .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -933,11 +881,11 @@ namespace BuildingModels.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<int?>("Amount")
+                        .HasColumnType("int");
+
                     b.Property<Guid?>("ApartmentId")
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("Canceled")
-                        .HasColumnType("bit");
 
                     b.Property<DateTime?>("EndDate")
                         .HasColumnType("datetime2");
@@ -951,19 +899,7 @@ namespace BuildingModels.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("IsApprove")
-                        .HasColumnType("bit");
-
                     b.Property<bool?>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime?>("LastRenewalDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("Quantity")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("RenewStatus")
                         .HasColumnType("bit");
 
                     b.Property<Guid?>("ServiceId")

@@ -12,7 +12,7 @@ namespace TFU_Building_API.Dto
         public int RoomNumber { get; set; }
 
         [Required]
-        public int Floor { get; set; }
+        public int FloorNumber { get; set; }
     }
 
     public class OwnerShipResponseDto
@@ -33,7 +33,7 @@ namespace TFU_Building_API.Dto
         public int RoomNumber { get; set; }
 
         [Required]
-        public int Floor { get; set; }
+        public int FloorNumber { get; set; }
     }
 
     public class OwnerShipDeleteRequestDto
@@ -45,7 +45,7 @@ namespace TFU_Building_API.Dto
     public class OwnerShipListResponseDto
     {
         public string FullName { get; set; }
-        public int Floor { get; set; }
+        public int FloorNumber { get; set; }
         public int RoomNumber { get; set; }
         public string PhoneNumber { get; set; }
         public string Email { get; set; }
@@ -69,7 +69,7 @@ namespace TFU_Building_API.Dto
     {
         public Guid Id { get; set; }
         public string Email { get; set; }
-        public int Floor { get; set; }
+        public int FloorNumber { get; set; }
         public int RoomNumber { get; set; }
     }
 }

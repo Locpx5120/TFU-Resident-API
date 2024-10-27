@@ -4,6 +4,7 @@ using BuildingModels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BuildingModels.Migrations
 {
     [DbContext(typeof(BuildingContext))]
-    partial class BuildingContextModelSnapshot : ModelSnapshot
+    [Migration("20241026181435_AddTablePackageService")]
+    partial class AddTablePackageService
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -886,10 +888,6 @@ namespace BuildingModels.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime?>("InsertedAt")
                         .HasColumnType("datetime2");
 
@@ -906,7 +904,6 @@ namespace BuildingModels.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("ServiceName")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Unit")
@@ -933,6 +930,9 @@ namespace BuildingModels.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<int?>("Amount")
+                        .HasColumnType("int");
+
                     b.Property<Guid?>("ApartmentId")
                         .HasColumnType("uniqueidentifier");
 
@@ -951,17 +951,11 @@ namespace BuildingModels.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("IsApprove")
-                        .HasColumnType("bit");
-
                     b.Property<bool?>("IsDeleted")
                         .HasColumnType("bit");
 
                     b.Property<DateTime?>("LastRenewalDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<int?>("Quantity")
-                        .HasColumnType("int");
 
                     b.Property<bool>("RenewStatus")
                         .HasColumnType("bit");

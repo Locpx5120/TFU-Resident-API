@@ -23,7 +23,7 @@ namespace TFU_Building_API.Service.impl
             try
             {
                 // Tìm kiếm Apartment theo roomnumber và floor
-                var apartment = await _unitOfWork.ApartmentRepository.GetQuery(a => a.RoomNumber == request.RoomNumber && a.Floor == request.Floor && a.IsDeleted == false).FirstOrDefaultAsync();
+                var apartment = await _unitOfWork.ApartmentRepository.GetQuery(a => a.RoomNumber == request.RoomNumber && a.FloorNumber == request.FloorNumber && a.IsDeleted == false).FirstOrDefaultAsync();
                 if (apartment == null)
                 {
                     return new ResponseData<OwnerShipResponseDto>
@@ -111,7 +111,7 @@ namespace TFU_Building_API.Service.impl
                 }
 
                 // Tìm kiếm Apartment theo roomnumber và floor
-                var apartment = await _unitOfWork.ApartmentRepository.GetQuery(a => a.RoomNumber == request.RoomNumber && a.Floor == request.Floor && a.IsDeleted == false).FirstOrDefaultAsync();
+                var apartment = await _unitOfWork.ApartmentRepository.GetQuery(a => a.RoomNumber == request.RoomNumber && a.FloorNumber == request.FloorNumber && a.IsDeleted == false).FirstOrDefaultAsync();
                 if (apartment == null)
                 {
                     return new ResponseData<OwnerShipResponseDto>
@@ -229,7 +229,7 @@ namespace TFU_Building_API.Service.impl
                                      select new OwnerShipListResponseDto
                                      {
                                          FullName = user.FullName,
-                                         Floor = apartment.Floor.GetValueOrDefault(),
+                                         FloorNumber = apartment.FloorNumber.GetValueOrDefault(),
                                          RoomNumber = apartment.RoomNumber.GetValueOrDefault(),
                                          PhoneNumber = user.PhoneNumber,
                                          Email = user.Email,
@@ -328,7 +328,7 @@ namespace TFU_Building_API.Service.impl
                 {
                     Id = ownership.Id,
                     Email = user.Email,
-                    Floor = apartment.Floor.GetValueOrDefault(),
+                    FloorNumber = apartment.FloorNumber.GetValueOrDefault(),
                     RoomNumber = apartment.RoomNumber.GetValueOrDefault()
                 };
 

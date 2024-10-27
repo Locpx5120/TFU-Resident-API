@@ -27,6 +27,7 @@ public partial class BuildingContext : DbContext
     //add-migration DB
 
     public virtual DbSet<Apartment> Apartments { get; set; }
+    public virtual DbSet<ApartmentType> ApartmentTypes { get; set; }
 
     public virtual DbSet<Assigment> Assigments { get; set; }
 
@@ -64,6 +65,8 @@ public partial class BuildingContext : DbContext
 
     public virtual DbSet<ServiceContract> ServiceContracts { get; set; }
 
+    public virtual DbSet<PackageService> PackageServices { get; set; }
+
     public virtual DbSet<Staff> Staff { get; set; }
 
     public virtual DbSet<Status> Statuses { get; set; }
@@ -76,7 +79,6 @@ public partial class BuildingContext : DbContext
 
     public virtual DbSet<OTPMail> OTPMails { get; set; }
 
-    public virtual DbSet<Department> Departments { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

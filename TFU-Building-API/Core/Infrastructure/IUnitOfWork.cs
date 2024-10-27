@@ -35,6 +35,21 @@ namespace TFU_Building_API.Core.Infrastructure
         #region Resident
         IMasterDataRepository<Resident> ResidentRepository { get; }
         #endregion
+
+        #region ServiceContract
+        IMasterDataRepository<ServiceContract> ServiceContractRepository { get; }
+
+        #endregion
+
+        #region Service
+        IMasterDataRepository<BuildingModels.Service> ServiceRepository { get; }
+
+        #endregion
+
+        #region ApartmentType
+        IMasterDataRepository<ApartmentType> ApartmentTypeRepository { get; }
+
+        #endregion
         Task<int> SaveChangesAsync();
     }
 }

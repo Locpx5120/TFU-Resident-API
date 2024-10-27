@@ -79,6 +79,30 @@ namespace TFU_Building_API.Core.Infrastructure
         }
         #endregion
 
+        #region ServiceContract
+        private IMasterDataRepository<ServiceContract> _serviceContractRepository;
+        public IMasterDataRepository<ServiceContract> ServiceContractRepository
+        {
+            get { return _serviceContractRepository ??= new MasterDataRepository<ServiceContract>(_context, _currentUser); }
+        }
+        #endregion
+
+        #region Service
+        private IMasterDataRepository<BuildingModels.Service> _serviceRepository;
+        public IMasterDataRepository<BuildingModels.Service> ServiceRepository
+        {
+            get { return _serviceRepository ??= new MasterDataRepository<BuildingModels.Service>(_context, _currentUser); }
+        }
+        #endregion
+
+        #region ApartmentType
+        private IMasterDataRepository<ApartmentType> _apartmentTypeRepository;
+        public IMasterDataRepository<ApartmentType> ApartmentTypeRepository
+        {
+            get { return _apartmentTypeRepository ??= new MasterDataRepository<ApartmentType>(_context, _currentUser); }
+        }
+        #endregion
+
         public async Task<int> SaveChangesAsync()
         {
             if (_currentUser != null)

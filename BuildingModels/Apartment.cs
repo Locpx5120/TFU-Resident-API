@@ -4,11 +4,12 @@ namespace BuildingModels;
 
 public partial class Apartment : MasterDataEntityBase
 {
-    public string? DepartmentType { get; set; }
+    public Guid ApartmentTypeId { get; set; }
+    public virtual ApartmentType ApartmentType { get; set; }
 
     public double? Price { get; set; }
 
-    public int? Floor { get; set; }
+    public int? FloorNumber { get; set; }
     public int? RoomNumber { get; set; }
 
     public virtual ICollection<Invoice> Invoices { get; set; } = new List<Invoice>();
