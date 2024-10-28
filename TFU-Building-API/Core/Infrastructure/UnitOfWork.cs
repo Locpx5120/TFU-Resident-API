@@ -99,6 +99,12 @@ namespace TFU_Building_API.Core.Infrastructure
         {
             get { return _invoiceRepository ??= new MasterDataRepository<Invoice>(_context, _currentUser); }
         }
+
+        private IMasterDataRepository<PackageService> _packageServiceRepository;
+        public IMasterDataRepository<PackageService> PackageServiceRepository
+        {
+            get { return _packageServiceRepository ??= new MasterDataRepository<PackageService>(_context, _currentUser); }
+        }
         #endregion
 
         #region ApartmentType

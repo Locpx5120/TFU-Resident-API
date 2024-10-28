@@ -1,11 +1,8 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using TFU_Building_API.Dto;
-using TFU_Building_API.Core.Infrastructure;
+﻿using Core.Enums;
 using Core.Model;
-using Core.Enums;
+using Microsoft.EntityFrameworkCore;
+using TFU_Building_API.Core.Infrastructure;
+using TFU_Building_API.Dto;
 
 namespace TFU_Building_API.Service.impl
 {
@@ -71,6 +68,8 @@ namespace TFU_Building_API.Service.impl
             }
         }
 
+       
+
         public async Task<ResponseData<List<ServiceDetailDto>>> GetServiceDetailsByApartmentId(ServiceDetailRequestDto request)
         {
             try
@@ -82,15 +81,21 @@ namespace TFU_Building_API.Service.impl
                                 on sc.ApartmentId equals a.Id
                             join at in _unitOfWork.ApartmentTypeRepository.GetQuery(x => x.IsActive && (x.IsDeleted == false))
                                 on a.ApartmentTypeId equals at.Id
-                            select new ServiceDetailDto
+                            join ps in _unitOfWork.PackageServiceRepository.GetQuery(x => x.IsActive && (x.IsDeleted == false))
+                                on sc.PackageServiceId equals ps.Id into psJoin
+                            from ps in psJoin.DefaultIfEmpty()
+                            select new
                             {
                                 ServiceName = s.ServiceName,
                                 Description = s.Description,
                                 QuantityOrArea = s.Unit == "m2" ? $"{at.LandArea} m2" : $"x{sc.Quantity}",
                                 UnitPrice = s.UnitPrice,
-                                TotalPrice = s.UnitPrice * (s.Unit == "m2" ? at.LandArea : sc.Quantity ?? 0),
-                                StartDate = sc.StartDate??DateTime.Now,
-                                EndDate = sc.EndDate ?? DateTime.Now
+                                StartDate = sc.StartDate ?? DateTime.Now,
+                                EndDate = sc.EndDate ?? DateTime.Now,
+                                Discount = ps.Discount ?? 0,
+                                Unit = s.Unit,
+                                LandArea = at.LandArea,
+                                Quantity = sc.Quantity
                             };
 
                 // Áp dụng bộ lọc theo loại dịch vụ nếu có
@@ -99,7 +104,19 @@ namespace TFU_Building_API.Service.impl
                     query = query.Where(x => x.ServiceName.Contains(request.ServiceType));
                 }
 
-                var data = await query.ToListAsync();
+                var result = await query.ToListAsync();
+
+                // Tính toán TotalPrice sau khi dữ liệu được tải
+                var data = result.Select(item => new ServiceDetailDto
+                {
+                    ServiceName = item.ServiceName,
+                    Description = item.Description,
+                    QuantityOrArea = item.QuantityOrArea,
+                    UnitPrice = item.UnitPrice,
+                    StartDate = item.StartDate,
+                    EndDate = item.EndDate,
+                    TotalPrice = CalculateTotalPrice(item.UnitPrice, item.StartDate, item.EndDate, item.Discount, item.Unit, item.LandArea, item.Quantity)
+                }).ToList();
 
                 return new ResponseData<List<ServiceDetailDto>>
                 {
@@ -119,6 +136,42 @@ namespace TFU_Building_API.Service.impl
                 };
             }
         }
+
+        // Helper method to calculate TotalPrice
+        private static decimal CalculateTotalPrice(decimal unitPrice, DateTime startDate, DateTime endDate, decimal discount, string unit, decimal landArea, int? quantity)
+        {
+            if (unit == "m2")
+            {
+                // Tính số tháng giữa StartDate và EndDate
+                int months = ((endDate.Year - startDate.Year) * 12) + endDate.Month - startDate.Month + 1;
+
+                // Tính giá dựa trên số tháng và diện tích LandArea
+                //decimal baseAmount = unitPrice * landArea * months;
+
+                // Tính giá dựa trên số tháng
+                decimal baseAmount = unitPrice * months;
+
+
+
+                // Áp dụng chiết khấu cho từng đơn vị
+                //return baseAmount * (1 - discount / 100);
+                return baseAmount;
+            }
+            else
+            {
+                // Tính số ngày giữa StartDate và EndDate
+                int days = (endDate - startDate).Days;
+
+                // Tính giá cơ bản cho từng đơn vị dựa trên Quantity và số ngày
+                decimal baseAmount = unitPrice * (quantity ?? 0) * days;
+
+                // Áp dụng chiết khấu cho từng đơn vị
+                return baseAmount * (1 - discount / 100);
+            }
+        }
+
+
+
 
         public async Task<ResponseData<PaginatedResponseDto<UnpaidServiceSummaryDto>>> GetUnpaidServiceSummaryByUserId(Guid userId, int pageSize, int pageNumber)
         {
@@ -182,6 +235,8 @@ namespace TFU_Building_API.Service.impl
             }
         }
 
+       
+
         public async Task<ResponseData<UnpaidServiceDetailResponseDto>> GetUnpaidServiceDetailsByApartmentId(UnpaidServiceDetailRequestDto request)
         {
             try
@@ -198,14 +253,22 @@ namespace TFU_Building_API.Service.impl
                                 on sc.ApartmentId equals a.Id
                             join at in _unitOfWork.ApartmentTypeRepository.GetQuery(x => x.IsActive && (x.IsDeleted == false))
                                 on a.ApartmentTypeId equals at.Id
+                            join ps in _unitOfWork.PackageServiceRepository.GetQuery(x => x.IsActive && (x.IsDeleted == false))
+                                on sc.PackageServiceId equals ps.Id into psJoin
+                            from ps in psJoin.DefaultIfEmpty()
                             where inv.IssueDate.HasValue && inv.IssueDate.Value.Month == currentMonth && inv.IssueDate.Value.Year == currentYear
-                            select new UnpaidServiceDetailDto
+                            select new
                             {
                                 ServiceName = s.ServiceName,
                                 Description = s.Description,
                                 QuantityOrArea = s.Unit == "m2" ? $"{at.LandArea} m2" : $"x{sc.Quantity}",
                                 UnitPrice = s.UnitPrice,
-                                TotalPrice = s.UnitPrice * (s.Unit == "m2" ? at.LandArea : sc.Quantity ?? 0)
+                                Discount = ps.Discount ?? 0,
+                                Unit = s.Unit,
+                                LandArea = at.LandArea,
+                                Quantity = sc.Quantity,
+                                StartDate = sc.StartDate ?? DateTime.Now,
+                                EndDate = sc.EndDate ?? DateTime.Now
                             };
 
                 // Áp dụng bộ lọc theo loại dịch vụ nếu có
@@ -214,13 +277,23 @@ namespace TFU_Building_API.Service.impl
                     query = query.Where(x => x.ServiceName.Contains(request.ServiceType));
                 }
 
-                var services = await query.ToListAsync();
+                var result = await query.ToListAsync();
+
+                // Tính toán TotalPrice sau khi dữ liệu được tải
+                var services = result.Select(item => new UnpaidServiceDetailDto
+                {
+                    ServiceName = item.ServiceName,
+                    Description = item.Description,
+                    QuantityOrArea = item.QuantityOrArea,
+                    UnitPrice = item.UnitPrice,
+                    TotalPrice = CalculateTotalPrice(item.UnitPrice, item.StartDate, item.EndDate, item.Discount, item.Unit, item.LandArea, item.Quantity)
+                }).ToList();
 
                 // Tính tổng giá của tất cả dịch vụ
                 var totalAmount = services.Sum(x => x.TotalPrice);
 
                 // Đóng gói kết quả vào UnpaidServiceDetailResponseDto
-                var result = new UnpaidServiceDetailResponseDto
+                var response = new UnpaidServiceDetailResponseDto
                 {
                     Services = services,
                     TotalAmount = totalAmount
@@ -230,7 +303,7 @@ namespace TFU_Building_API.Service.impl
                 {
                     Success = true,
                     Message = "Successfully retrieved unpaid service details.",
-                    Data = result,
+                    Data = response,
                     Code = (int)ErrorCodeAPI.OK
                 };
             }
