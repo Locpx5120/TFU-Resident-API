@@ -11,7 +11,7 @@ public partial class ServiceContract : MasterDataEntityBase
     public DateTime? EndDate { get; set; }
     public int? Status { get; set; }
     public int? Quantity { get; set; }
-    public bool IsApprove { get; set; }
+    public string Note { get; set; }
     public Guid? ApartmentId { get; set; }
     public Guid? ServiceId { get; set; }
     public Guid? PackageServiceId { get; set; }
