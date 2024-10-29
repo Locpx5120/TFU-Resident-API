@@ -38,6 +38,10 @@ namespace TFU_Building_API.Core.AppStart
 
             services.AddScoped<IServiceContractService, ServiceContractService>();
 
+            services.AddScoped<IService, ServiceImplement>();
+
+            services.AddScoped<IPackageService, PackageService>();
+
 
             //Singleton
             services.AddSingleton<DapperDbContext>();

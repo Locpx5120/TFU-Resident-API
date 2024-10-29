@@ -72,6 +72,13 @@ namespace TFU_Building_API.Dto
         public string ServiceType { get; set; } // Loại dịch vụ (ví dụ: "Gửi xe", "Dịch vụ phòng")
     }
 
+    public class ServiceDto
+    {
+        public Guid Id { get; set; }
+        public string ServiceName { get; set; }
+    }
+
+
     //public class PaginatedResponseDto<T>
     //{
     //    public int TotalRecords { get; set; }

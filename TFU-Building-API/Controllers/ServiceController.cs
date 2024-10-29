@@ -12,11 +12,29 @@ namespace TFU_Building_API.Controllers
     public class ApartmentServiceController : ControllerBase
     {
         private readonly IServiceApartment _apartmentService;
+        private readonly IService _service;
 
-        public ApartmentServiceController(IServiceApartment apartmentService)
+        public ApartmentServiceController(
+            IServiceApartment apartmentService, 
+            IService service)
         {
             _apartmentService = apartmentService;
+            _service = service;
         }
+
+        [HttpGet("get-services")]
+        public async Task<IActionResult> GetServices()
+        {
+            var response = await _service.GetServices();
+
+            if (response.Success)
+            {
+                return Ok(response);
+            }
+
+            return BadRequest(response);
+        }
+
 
         [HttpGet("summary")]
         public async Task<IActionResult> GetApartmentServiceSummary(int pageSize = 10, [FromQuery] int pageNumber = 1)
