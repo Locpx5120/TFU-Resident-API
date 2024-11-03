@@ -78,6 +78,17 @@ namespace TFU_Building_API.Dto
         public string ServiceName { get; set; }
     }
 
+    public class ServiceResponseDto
+    {
+        public Guid Id { get; set; }
+        public string ServiceName { get; set; }
+        public string Description { get; set; }
+        public decimal UnitPrice { get; set; }
+        public string Unit { get; set; }
+        public bool IsPackageAllowed { get; set; }
+    }
+
+
 
     //public class PaginatedResponseDto<T>
     //{

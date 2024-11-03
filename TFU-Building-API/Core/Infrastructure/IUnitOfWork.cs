@@ -56,6 +56,14 @@ namespace TFU_Building_API.Core.Infrastructure
         #region ApartmentType
         IMasterDataRepository<ApartmentType> ApartmentTypeRepository { get; }
 
+        #endregion  
+        #region Vehicle
+        IMasterDataRepository<Vehicle> VehicleRepository { get; }
+
+        #endregion
+        #region ServiceCategory
+        IMasterDataRepository<ServiceCategory> ServiceCategoryRepository { get; }
+
         #endregion
         Task<int> SaveChangesAsync();
     }

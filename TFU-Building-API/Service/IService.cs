@@ -6,5 +6,6 @@ namespace TFU_Building_API.Service
     public interface IService
     {
         Task<ResponseData<List<ServiceDto>>> GetServices();
+        Task<ResponseData<List<ServiceResponseDto>>> GetServicesByCategoryIdAsync(Guid serviceCategoryId);
     }
 }

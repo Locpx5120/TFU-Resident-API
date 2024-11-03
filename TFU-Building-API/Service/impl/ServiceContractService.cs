@@ -281,6 +281,103 @@ namespace TFU_Building_API.Service.impl
             };
         }
 
+        public async Task<ResponseData<List<AddVehicleServiceResponseDto>>> AddVehicleServiceAsync(AddVehicleServiceRequestDto request)
+        {
+            try
+            {
+                // Khởi tạo danh sách response
+                var responseList = new List<AddVehicleServiceResponseDto>();
+
+                foreach (var serviceRequest in request.Services)
+                {
+                    // Step 1: Add Vehicle to Vehicles table
+                    var vehicle = new Vehicle
+                    {
+                        Id = Guid.NewGuid(),
+                        ResidentId = serviceRequest.ResidentId,
+                        VehicleType = serviceRequest.VehicleType,
+                        LicensePlate = serviceRequest.LicensePlate,
+                        IsDeleted = false,
+                        InsertedAt = DateTime.Now,
+                        UpdatedAt = DateTime.Now,
+                        IsActive = true
+                    };
+                    _unitOfWork.VehicleRepository.Add(vehicle);
+
+                    // Step 2: Check Package Service
+                    var packageService = await _unitOfWork.PackageServiceRepository
+                        .GetQuery(p => p.Id == serviceRequest.PackageServiceId && p.IsDeleted == false)
+                        .FirstOrDefaultAsync();
+
+                    if (packageService == null)
+                    {
+                        responseList.Add(new AddVehicleServiceResponseDto
+                        {
+                            Success = false,
+                            Message = $"Invalid package service for license plate {serviceRequest.LicensePlate}."
+                        });
+                        continue;
+                    }
+
+                    // Step 3: Add Service Contract to ServiceContracts table
+                    var serviceContract = new ServiceContract
+                    {
+                        Id = Guid.NewGuid(),
+                        StartDate = DateTime.Now,
+                        EndDate = DateTime.Now.AddMonths(packageService.DurationInMonth),
+                        Status = 1,
+                        Quantity = 1,
+                        Note = serviceRequest.Note,
+                        ApartmentId = serviceRequest.ApartmentId,
+                        ServiceId = serviceRequest.ServiceId,
+                        PackageServiceId = serviceRequest.PackageServiceId,
+                        VehicleId = vehicle.Id,
+                        IsDeleted = false,
+                        InsertedAt = DateTime.Now,
+                        UpdatedAt = DateTime.Now,
+                        IsActive = true
+                    };
+
+                    _unitOfWork.ServiceContractRepository.Add(serviceContract);
+
+                    // Thêm response cho từng dịch vụ đã thêm thành công
+                    responseList.Add(new AddVehicleServiceResponseDto
+                    {
+                        Success = true,
+                        Message = $"Service added successfully for license plate {serviceRequest.LicensePlate}."
+                    });
+                }
+
+                // Lưu tất cả thay đổi một lần
+                await _unitOfWork.SaveChangesAsync();
+
+                return new ResponseData<List<AddVehicleServiceResponseDto>>
+                {
+                    Success = true,
+                    Message = "Vehicle services added successfully.",
+                    Data = responseList,
+                    Code = (int)ErrorCodeAPI.OK
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResponseData<List<AddVehicleServiceResponseDto>>
+                {
+                    Success = false,
+                    Message = ex.Message,
+                    Data = new List<AddVehicleServiceResponseDto>
+                    {
+                        new AddVehicleServiceResponseDto
+                        {
+                            Success = false,
+                            Message = ex.Message
+                        }
+                    },
+                    Code = (int)ErrorCodeAPI.SystemIsError
+                };
+            }
+        }
+
 
     }
 }

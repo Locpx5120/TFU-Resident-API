@@ -56,5 +56,21 @@ namespace TFU_Building_API.Controllers
             return BadRequest(response);
         }
 
+        [HttpPost("add-vehicle-service")]
+        /// <summary>
+        /// Thêm dịch vụ gửi xe cho cư dân.
+        /// </summary>
+        /// <param name="request">Yêu cầu thêm dịch vụ gửi xe.</param>
+        /// <returns>Kết quả thêm dịch vụ.</returns>
+        public async Task<IActionResult> AddVehicleService([FromBody] AddVehicleServiceRequestDto request)
+        {
+            var result = await _serviceContractService.AddVehicleServiceAsync(request);
+            if (!result.Success)
+                return BadRequest(result);
+
+            return Ok(result);
+        }
+
+
     }
 }

@@ -123,6 +123,21 @@ namespace TFU_Building_API.Core.Infrastructure
         }
         #endregion
 
+        #region Vehicle
+        private IMasterDataRepository<Vehicle> _vehicleRepository;
+        public IMasterDataRepository<Vehicle> VehicleRepository
+        {
+            get { return _vehicleRepository ??= new MasterDataRepository<Vehicle>(_context, _currentUser); }
+        }
+        #endregion 
+        #region ServiceCategory
+        private IMasterDataRepository<ServiceCategory> _serviceCategoryRepository;
+        public IMasterDataRepository<ServiceCategory> ServiceCategoryRepository
+        {
+            get { return _serviceCategoryRepository ??= new MasterDataRepository<ServiceCategory>(_context, _currentUser); }
+        }
+        #endregion
+
 
 
         public async Task<int> SaveChangesAsync()

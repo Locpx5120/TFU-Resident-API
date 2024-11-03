@@ -56,6 +56,7 @@ namespace Core.Enums
         // Hệ thống mã lỗi từ 4001
         [Description("Lỗi hệ thống")]
         SystemIsError = 4001,
+        InvalidData = 4003,
 
         // Mã lỗi Duplicate Entry cho trường hợp dữ liệu bị trùng lặp
         [Description("Dữ liệu đã tồn tại")]

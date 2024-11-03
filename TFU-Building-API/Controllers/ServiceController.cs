@@ -105,6 +105,19 @@ namespace TFU_Building_API.Controllers
 
             return Ok(response.Data);
         }
+
+        /// <summary>
+        /// Lấy danh sách dịch vụ theo ServiceCategoryId.
+        /// </summary>
+        /// <param name="serviceCategoryId">ID của danh mục dịch vụ.</param>
+        /// <returns>Danh sách các dịch vụ thuộc danh mục dịch vụ.</returns>
+        [HttpGet]
+        [Route("GetByCategory/{serviceCategoryId}")]
+        public async Task<IActionResult> GetServicesByCategoryId(Guid serviceCategoryId)
+        {
+            var result = await _service.GetServicesByCategoryIdAsync(serviceCategoryId);
+            return StatusCode(result.Code, result);
+        }
     }
 
 
