@@ -9,8 +9,11 @@ public partial class Apartment : MasterDataEntityBase
 
     public double? Price { get; set; }
 
-    public int? FloorNumber { get; set; }
-    public int? RoomNumber { get; set; }
+    public int FloorNumber { get; set; }
+    public int RoomNumber { get; set; }
+
+    public Guid BuildingId { get; set; }
+    public virtual Building Building { get; set; }
 
     public virtual ICollection<Living> Livings { get; set; } = new List<Living>();
 

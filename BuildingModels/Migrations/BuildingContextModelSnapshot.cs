@@ -31,7 +31,10 @@ namespace BuildingModels.Migrations
                     b.Property<Guid>("ApartmentTypeId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int?>("FloorNumber")
+                    b.Property<Guid>("BuildingId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("FloorNumber")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("InsertedAt")
@@ -49,7 +52,7 @@ namespace BuildingModels.Migrations
                     b.Property<double?>("Price")
                         .HasColumnType("float");
 
-                    b.Property<int?>("RoomNumber")
+                    b.Property<int>("RoomNumber")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdatedAt")
@@ -61,6 +64,8 @@ namespace BuildingModels.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ApartmentTypeId");
+
+                    b.HasIndex("BuildingId");
 
                     b.ToTable("Apartments");
                 });
@@ -158,9 +163,6 @@ namespace BuildingModels.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("BuildingName")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime?>("InsertedAt")
                         .HasColumnType("datetime2");
 
@@ -172,6 +174,9 @@ namespace BuildingModels.Migrations
 
                     b.Property<bool?>("IsDeleted")
                         .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("NumberApartment")
                         .HasColumnType("int");
@@ -179,7 +184,7 @@ namespace BuildingModels.Migrations
                     b.Property<int?>("NumberFloor")
                         .HasColumnType("int");
 
-                    b.Property<Guid?>("PostionId")
+                    b.Property<Guid?>("ProjectId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("UpdatedAt")
@@ -189,57 +194,8 @@ namespace BuildingModels.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("PostionId");
 
                     b.ToTable("Buildings");
-                });
-
-            modelBuilder.Entity("BuildingModels.Contributor", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("EndDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("InsertedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("InsertedById")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<Guid?>("StaffId")
-                        .IsRequired()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("StartDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("ThirdPartyId")
-                        .IsRequired()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("UpdatedById")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("StaffId");
-
-                    b.HasIndex("ThirdPartyId");
-
-                    b.ToTable("Contributors");
                 });
 
             modelBuilder.Entity("BuildingModels.Finance", b =>
@@ -396,6 +352,9 @@ namespace BuildingModels.Migrations
                     b.Property<bool>("PaidStatus")
                         .HasColumnType("bit");
 
+                    b.Property<Guid>("ResidentId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid>("ServiceContractId")
                         .HasColumnType("uniqueidentifier");
 
@@ -408,14 +367,11 @@ namespace BuildingModels.Migrations
                     b.Property<Guid?>("UpdatedById")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("ServiceContractId");
+                    b.HasIndex("ResidentId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("ServiceContractId");
 
                     b.ToTable("Invoices");
                 });
@@ -456,16 +412,11 @@ namespace BuildingModels.Migrations
                     b.Property<Guid?>("UpdatedById")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("Id");
 
                     b.HasIndex("ApartmentId");
 
                     b.HasIndex("ResidentId");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Livings");
                 });
@@ -550,55 +501,6 @@ namespace BuildingModels.Migrations
                     b.ToTable("NotifyCategories");
                 });
 
-            modelBuilder.Entity("BuildingModels.OTPMail", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("ContentMail")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("EffectiveDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("InsertedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("InsertedById")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Otp")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("TypeOtp")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("UpdatedById")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("OTPMails");
-                });
-
             modelBuilder.Entity("BuildingModels.OwnerShip", b =>
                 {
                     b.Property<Guid>("Id")
@@ -623,6 +525,9 @@ namespace BuildingModels.Migrations
                     b.Property<bool?>("IsDeleted")
                         .HasColumnType("bit");
 
+                    b.Property<Guid?>("ResidentId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTime?>("StartDate")
                         .HasColumnType("datetime2");
 
@@ -632,14 +537,11 @@ namespace BuildingModels.Migrations
                     b.Property<Guid?>("UpdatedById")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("Id");
 
                     b.HasIndex("ApartmentId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("ResidentId");
 
                     b.ToTable("OwnerShips");
                 });
@@ -684,42 +586,6 @@ namespace BuildingModels.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("PackageServices");
-                });
-
-            modelBuilder.Entity("BuildingModels.Postion", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("CodePosition")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("CustomerId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("InsertedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("InsertedById")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("UpdatedById")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Postions");
                 });
 
             modelBuilder.Entity("BuildingModels.RequestComplain", b =>
@@ -774,6 +640,9 @@ namespace BuildingModels.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<DateTime?>("Birthday")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");
 
@@ -786,14 +655,21 @@ namespace BuildingModels.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
+                    b.Property<bool?>("IsChangePassword")
+                        .HasColumnType("bit");
+
                     b.Property<bool?>("IsDeleted")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsOwner")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid?>("OwnerShipId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("Password")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Phone")
                         .HasColumnType("nvarchar(max)");
@@ -808,8 +684,6 @@ namespace BuildingModels.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("OwnerShipId");
 
                     b.ToTable("Residents");
                 });
@@ -1005,6 +879,17 @@ namespace BuildingModels.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<DateTime?>("Birthday")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime?>("HireDate")
                         .HasColumnType("datetime2");
 
@@ -1017,10 +902,20 @@ namespace BuildingModels.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
+                    b.Property<bool?>("IsChangePassword")
+                        .HasColumnType("bit");
+
                     b.Property<bool?>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<Guid?>("RoleId")
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("RoleId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("UpdatedAt")
@@ -1029,14 +924,9 @@ namespace BuildingModels.Migrations
                     b.Property<Guid?>("UpdatedById")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("Id");
 
                     b.HasIndex("RoleId");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Staff");
                 });
@@ -1117,7 +1007,11 @@ namespace BuildingModels.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Contact")
+                    b.Property<Guid>("ApartmentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("InsertedAt")
@@ -1132,11 +1026,18 @@ namespace BuildingModels.Migrations
                     b.Property<bool?>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<string>("Name")
+                    b.Property<bool>("IsTenant")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("NameCompany")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Type")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<Guid>("StaffId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("Status")
+                        .HasColumnType("bit");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -1144,7 +1045,14 @@ namespace BuildingModels.Migrations
                     b.Property<Guid?>("UpdatedById")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("ApartmentId");
+
+                    b.HasIndex("StaffId");
 
                     b.ToTable("ThirdParties");
                 });
@@ -1153,9 +1061,6 @@ namespace BuildingModels.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("BuildingId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("EndDate")
@@ -1173,6 +1078,13 @@ namespace BuildingModels.Migrations
                     b.Property<bool?>("IsDeleted")
                         .HasColumnType("bit");
 
+                    b.Property<string>("NameService")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<DateTime?>("StartDate")
                         .HasColumnType("datetime2");
 
@@ -1187,69 +1099,9 @@ namespace BuildingModels.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("BuildingId");
-
                     b.HasIndex("ThirdPartyId");
 
                     b.ToTable("ThirdPartyContacts");
-                });
-
-            modelBuilder.Entity("BuildingModels.User", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("Dob")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("FullName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("InsertedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("InsertedById")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsChangePassword")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Password")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PhoneNumber")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("RoleId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("UpdatedById")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Username")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("RoleId");
-
-                    b.ToTable("User");
                 });
 
             modelBuilder.Entity("BuildingModels.Apartment", b =>
@@ -1260,7 +1112,15 @@ namespace BuildingModels.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("BuildingModels.Building", "Building")
+                        .WithMany()
+                        .HasForeignKey("BuildingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("ApartmentType");
+
+                    b.Navigation("Building");
                 });
 
             modelBuilder.Entity("BuildingModels.Assigment", b =>
@@ -1276,34 +1136,6 @@ namespace BuildingModels.Migrations
                     b.Navigation("Staff");
 
                     b.Navigation("Task");
-                });
-
-            modelBuilder.Entity("BuildingModels.Building", b =>
-                {
-                    b.HasOne("BuildingModels.Postion", "Postion")
-                        .WithMany("Buildings")
-                        .HasForeignKey("PostionId");
-
-                    b.Navigation("Postion");
-                });
-
-            modelBuilder.Entity("BuildingModels.Contributor", b =>
-                {
-                    b.HasOne("BuildingModels.Staff", "Staff")
-                        .WithMany()
-                        .HasForeignKey("StaffId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("BuildingModels.ThirdParty", "ThirdParty")
-                        .WithMany()
-                        .HasForeignKey("ThirdPartyId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Staff");
-
-                    b.Navigation("ThirdParty");
                 });
 
             modelBuilder.Entity("BuildingModels.FinanceBuilding", b =>
@@ -1344,21 +1176,21 @@ namespace BuildingModels.Migrations
 
             modelBuilder.Entity("BuildingModels.Invoice", b =>
                 {
+                    b.HasOne("BuildingModels.Resident", "Resident")
+                        .WithMany()
+                        .HasForeignKey("ResidentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("BuildingModels.ServiceContract", "ServiceContract")
                         .WithMany()
                         .HasForeignKey("ServiceContractId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BuildingModels.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Navigation("Resident");
 
                     b.Navigation("ServiceContract");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("BuildingModels.Living", b =>
@@ -1371,15 +1203,9 @@ namespace BuildingModels.Migrations
                         .WithMany("Livings")
                         .HasForeignKey("ResidentId");
 
-                    b.HasOne("BuildingModels.User", "User")
-                        .WithMany("Livings")
-                        .HasForeignKey("UserId");
-
                     b.Navigation("Apartment");
 
                     b.Navigation("Resident");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("BuildingModels.Notify", b =>
@@ -1399,28 +1225,19 @@ namespace BuildingModels.Migrations
                     b.Navigation("NotifyCategory");
                 });
 
-            modelBuilder.Entity("BuildingModels.OTPMail", b =>
-                {
-                    b.HasOne("BuildingModels.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("BuildingModels.OwnerShip", b =>
                 {
                     b.HasOne("BuildingModels.Apartment", "Apartment")
                         .WithMany("OwnerShips")
                         .HasForeignKey("ApartmentId");
 
-                    b.HasOne("BuildingModels.User", "User")
-                        .WithMany("OwnerShips")
-                        .HasForeignKey("UserId");
+                    b.HasOne("BuildingModels.Resident", "Resident")
+                        .WithMany()
+                        .HasForeignKey("ResidentId");
 
                     b.Navigation("Apartment");
 
-                    b.Navigation("User");
+                    b.Navigation("Resident");
                 });
 
             modelBuilder.Entity("BuildingModels.RequestComplain", b =>
@@ -1430,15 +1247,6 @@ namespace BuildingModels.Migrations
                         .HasForeignKey("ResidentId");
 
                     b.Navigation("Resident");
-                });
-
-            modelBuilder.Entity("BuildingModels.Resident", b =>
-                {
-                    b.HasOne("BuildingModels.OwnerShip", "OwnerShip")
-                        .WithMany("Residents")
-                        .HasForeignKey("OwnerShipId");
-
-                    b.Navigation("OwnerShip");
                 });
 
             modelBuilder.Entity("BuildingModels.Salary", b =>
@@ -1474,36 +1282,6 @@ namespace BuildingModels.Migrations
             modelBuilder.Entity("BuildingModels.Staff", b =>
                 {
                     b.HasOne("BuildingModels.Role", "Role")
-                        .WithMany()
-                        .HasForeignKey("RoleId");
-
-                    b.HasOne("BuildingModels.User", "User")
-                        .WithMany("Staffs")
-                        .HasForeignKey("UserId");
-
-                    b.Navigation("Role");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("BuildingModels.ThirdPartyContact", b =>
-                {
-                    b.HasOne("BuildingModels.Building", "Building")
-                        .WithMany()
-                        .HasForeignKey("BuildingId");
-
-                    b.HasOne("BuildingModels.ThirdParty", "ThirdParty")
-                        .WithMany()
-                        .HasForeignKey("ThirdPartyId");
-
-                    b.Navigation("Building");
-
-                    b.Navigation("ThirdParty");
-                });
-
-            modelBuilder.Entity("BuildingModels.User", b =>
-                {
-                    b.HasOne("BuildingModels.Role", "Role")
                         .WithMany("Users")
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1512,21 +1290,39 @@ namespace BuildingModels.Migrations
                     b.Navigation("Role");
                 });
 
+            modelBuilder.Entity("BuildingModels.ThirdParty", b =>
+                {
+                    b.HasOne("BuildingModels.Apartment", "Apartment")
+                        .WithMany()
+                        .HasForeignKey("ApartmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BuildingModels.Staff", "Staff")
+                        .WithMany()
+                        .HasForeignKey("StaffId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Apartment");
+
+                    b.Navigation("Staff");
+                });
+
+            modelBuilder.Entity("BuildingModels.ThirdPartyContact", b =>
+                {
+                    b.HasOne("BuildingModels.ThirdParty", "ThirdParty")
+                        .WithMany()
+                        .HasForeignKey("ThirdPartyId");
+
+                    b.Navigation("ThirdParty");
+                });
+
             modelBuilder.Entity("BuildingModels.Apartment", b =>
                 {
                     b.Navigation("Livings");
 
                     b.Navigation("OwnerShips");
-                });
-
-            modelBuilder.Entity("BuildingModels.OwnerShip", b =>
-                {
-                    b.Navigation("Residents");
-                });
-
-            modelBuilder.Entity("BuildingModels.Postion", b =>
-                {
-                    b.Navigation("Buildings");
                 });
 
             modelBuilder.Entity("BuildingModels.Resident", b =>
@@ -1544,15 +1340,6 @@ namespace BuildingModels.Migrations
             modelBuilder.Entity("BuildingModels.Task", b =>
                 {
                     b.Navigation("Assigments");
-                });
-
-            modelBuilder.Entity("BuildingModels.User", b =>
-                {
-                    b.Navigation("Livings");
-
-                    b.Navigation("OwnerShips");
-
-                    b.Navigation("Staffs");
                 });
 #pragma warning restore 612, 618
         }

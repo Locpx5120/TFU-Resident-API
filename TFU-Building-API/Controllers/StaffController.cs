@@ -58,31 +58,31 @@ namespace TFU_Building_API.Controllers
             return BadRequest(response);
         }
 
-        [HttpGet("listEmployee")]
-        public async Task<IActionResult> GetStaffList([FromQuery] StaffSearchRequestDto request)
-        {
-            var response = await _staffService.GetStaffList(request);
+        //[HttpGet("listEmployee")]
+        //public async Task<IActionResult> GetStaffList([FromQuery] StaffSearchRequestDto request)
+        //{
+        //    var response = await _staffService.GetStaffList(request);
 
-            if (response.Success)
-            {
-                return Ok(response);
-            }
+        //    if (response.Success)
+        //    {
+        //        return Ok(response);
+        //    }
 
-            return BadRequest(response);
-        }
+        //    return BadRequest(response);
+        //}
 
-        [HttpGet("GetById/{staffId}")]
-        public async Task<IActionResult> GetStaffById(Guid staffId)
-        {
-            var response = await _staffService.GetStaffById(staffId);
+        //[HttpGet("GetById/{staffId}")]
+        //public async Task<IActionResult> GetStaffById(Guid staffId)
+        //{
+        //    var response = await _staffService.GetStaffById(staffId);
 
-            if (!response.Success)
-            {
-                return NotFound(response.Message);
-            }
+        //    if (!response.Success)
+        //    {
+        //        return NotFound(response.Message);
+        //    }
 
-            return Ok(response.Data);
-        }
+        //    return Ok(response.Data);
+        //}
 
     }
 }

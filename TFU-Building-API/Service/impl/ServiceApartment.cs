@@ -22,13 +22,13 @@ namespace TFU_Building_API.Service.impl
                 var query = from sc in _unitOfWork.ServiceContractRepository.GetQuery(x => x.IsActive && x.IsDeleted == false)
                             join s in _unitOfWork.ServiceRepository.GetQuery(x => x.IsDeleted == false)
                                 on sc.ServiceId equals s.Id
-                            join o in _unitOfWork.OwnerShipRepository.GetQuery(x => x.UserId == userId && x.IsDeleted == false)
+                            join o in _unitOfWork.OwnerShipRepository.GetQuery(x => x.ResidentId == userId && x.IsDeleted == false)
                                 on sc.ApartmentId equals o.ApartmentId
                             group new { sc, s } by new { sc.ApartmentId, RoomNumber = sc.Apartment.RoomNumber } into apartmentGroup
                             select new ApartmentServiceSummaryDto
                             {
                                 ApartmentId = apartmentGroup.Key.ApartmentId ?? new Guid(),
-                                RoomNumber = apartmentGroup.Key.RoomNumber ?? 0,
+                                RoomNumber = apartmentGroup.Key.RoomNumber,
                                 TotalServices = apartmentGroup.Sum(x => x.s.Unit == "m2" ? 1 : x.sc.Quantity ?? 0)
                             };
 
@@ -183,7 +183,7 @@ namespace TFU_Building_API.Service.impl
                 var query = from inv in _unitOfWork.InvoiceRepository.GetQuery(x => x.PaidStatus == false && x.IsDeleted == false)
                             join sc in _unitOfWork.ServiceContractRepository.GetQuery(x => x.IsActive && x.IsDeleted == false)
                                 on inv.ServiceContractId equals sc.Id
-                            join o in _unitOfWork.OwnerShipRepository.GetQuery(x => x.UserId == userId && x.IsDeleted == false)
+                            join o in _unitOfWork.OwnerShipRepository.GetQuery(x => x.ResidentId == userId && x.IsDeleted == false)
                                 on sc.ApartmentId equals o.ApartmentId
                             join a in _unitOfWork.ApartmentRepository.GetQuery(x => x.IsDeleted == false)
                                 on sc.ApartmentId equals a.Id
@@ -192,7 +192,7 @@ namespace TFU_Building_API.Service.impl
                             select new UnpaidServiceSummaryDto
                             {
                                 ApartmentId = apartmentGroup.Key.Id, // Trả về ApartmentId
-                                RoomNumber = apartmentGroup.Key.RoomNumber ?? 0,
+                                RoomNumber = apartmentGroup.Key.RoomNumber,
                                 TotalServices = apartmentGroup.Sum(x => x.sc.Quantity ?? 1), // Tổng số lượng từ cột Quantity của bảng ServiceContract
                                 Month = currentMonth,
                                 PaymentStatus = "Chưa thanh toán"

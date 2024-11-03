@@ -7,6 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Contributor.cs" />
+    <Compile Remove="OTPMail.cs" />
+    <Compile Remove="Postion.cs" />
+    <Compile Remove="User.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="Apartment.cs~RF949b75.TMP" />
   </ItemGroup>
 

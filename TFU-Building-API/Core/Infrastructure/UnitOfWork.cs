@@ -20,11 +20,11 @@ namespace TFU_Building_API.Core.Infrastructure
 
 
         #region Authen
-        private IMasterDataRepository<User> _userRepository;
-        public IMasterDataRepository<User> UserRepository
-        {
-            get { return _userRepository ??= new MasterDataRepository<User>(_context, _currentUser); }
-        }
+        //private IMasterDataRepository<User> _userRepository;
+        //public IMasterDataRepository<User> UserRepository
+        //{
+        //    get { return _userRepository ??= new MasterDataRepository<User>(_context, _currentUser); }
+        //}
 
         private IMasterDataRepository<Role> _roleRepository;
         public IMasterDataRepository<Role> RoleRepository
@@ -35,8 +35,8 @@ namespace TFU_Building_API.Core.Infrastructure
         #endregion
 
         #region Others
-        private IMasterDataRepository<OTPMail> _oTPMailRepository;
-        public IMasterDataRepository<OTPMail> OTPMailRepository => _oTPMailRepository ??= new MasterDataRepository<OTPMail>(_context, _currentUser);
+        //private IMasterDataRepository<OTPMail> _oTPMailRepository;
+        //public IMasterDataRepository<OTPMail> OTPMailRepository => _oTPMailRepository ??= new MasterDataRepository<OTPMail>(_context, _currentUser);
         #endregion
 
         #region Staff
@@ -114,6 +114,16 @@ namespace TFU_Building_API.Core.Infrastructure
             get { return _apartmentTypeRepository ??= new MasterDataRepository<ApartmentType>(_context, _currentUser); }
         }
         #endregion
+
+        #region Living
+        private IMasterDataRepository<Living> _livingRepository;
+        public IMasterDataRepository<Living> LivingRepository
+        {
+            get { return _livingRepository ??= new MasterDataRepository<Living>(_context, _currentUser); }
+        }
+        #endregion
+
+
 
         public async Task<int> SaveChangesAsync()
         {

@@ -5,10 +5,29 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace BuildingModels.Migrations
 {
-    public partial class DBv1 : Migration
+    public partial class DB : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "ApartmentTypes",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    LandArea = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: true),
+                    InsertedById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    InsertedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ApartmentTypes", x => x.Id);
+                });
+
             migrationBuilder.CreateTable(
                 name: "Finances",
                 columns: table => new
@@ -51,6 +70,27 @@ namespace BuildingModels.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "PackageServices",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Discount = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    DurationInMonth = table.Column<int>(type: "int", nullable: false),
+                    AutoRenew = table.Column<bool>(type: "bit", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: true),
+                    InsertedById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    InsertedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PackageServices", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Postions",
                 columns: table => new
                 {
@@ -70,11 +110,36 @@ namespace BuildingModels.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Residents",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    RegistratorDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Birthday = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Phone = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Password = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsOwner = table.Column<bool>(type: "bit", nullable: false),
+                    IsChangePassword = table.Column<bool>(type: "bit", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: true),
+                    InsertedById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    InsertedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Residents", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Roles",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    RollName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: true),
                     InsertedById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     InsertedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -92,8 +157,11 @@ namespace BuildingModels.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ServiceName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ServiceType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ServiceName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    UnitPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Unit = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsPackageAllowed = table.Column<bool>(type: "bit", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: true),
                     InsertedById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     InsertedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -145,33 +213,14 @@ namespace BuildingModels.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ThirdParties",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Type = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Contact = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: true),
-                    InsertedById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    InsertedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    UpdatedById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ThirdParties", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Buildings",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    BuildingName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     NumberFloor = table.Column<int>(type: "int", nullable: true),
                     NumberApartment = table.Column<int>(type: "int", nullable: true),
+                    ProjectId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     PostionId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: true),
                     InsertedById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
@@ -187,6 +236,33 @@ namespace BuildingModels.Migrations
                         name: "FK_Buildings_Postions_PostionId",
                         column: x => x.PostionId,
                         principalTable: "Postions",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "RequestComplains",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Status = table.Column<int>(type: "int", nullable: true),
+                    DateRequest = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Note = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ResidentId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: true),
+                    InsertedById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    InsertedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RequestComplains", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_RequestComplains_Residents_ResidentId",
+                        column: x => x.ResidentId,
+                        principalTable: "Residents",
                         principalColumn: "Id");
                 });
 
@@ -219,13 +295,14 @@ namespace BuildingModels.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Username = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Password = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    FullName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PhoneNumber = table.Column<int>(type: "int", nullable: true),
                     HireDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    RoleId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    FullName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsChangePassword = table.Column<bool>(type: "bit", nullable: true),
+                    Birthday = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    RoleId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: true),
                     InsertedById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     InsertedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -240,7 +317,8 @@ namespace BuildingModels.Migrations
                         name: "FK_Staff_Roles_RoleId",
                         column: x => x.RoleId,
                         principalTable: "Roles",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -248,10 +326,11 @@ namespace BuildingModels.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DepartmentType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ApartmentTypeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Price = table.Column<double>(type: "float", nullable: true),
-                    Floor = table.Column<int>(type: "int", nullable: true),
-                    BuildingId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    FloorNumber = table.Column<int>(type: "int", nullable: false),
+                    RoomNumber = table.Column<int>(type: "int", nullable: false),
+                    BuildingId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: true),
                     InsertedById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     InsertedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -263,10 +342,17 @@ namespace BuildingModels.Migrations
                 {
                     table.PrimaryKey("PK_Apartments", x => x.Id);
                     table.ForeignKey(
+                        name: "FK_Apartments_ApartmentTypes_ApartmentTypeId",
+                        column: x => x.ApartmentTypeId,
+                        principalTable: "ApartmentTypes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
                         name: "FK_Apartments_Buildings_BuildingId",
                         column: x => x.BuildingId,
                         principalTable: "Buildings",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -334,14 +420,14 @@ namespace BuildingModels.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Contributors",
+                name: "Livings",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     StartDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     EndDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    StaffId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ThirdPartyId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ResidentId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    ApartmentId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: true),
                     InsertedById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     InsertedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -351,85 +437,17 @@ namespace BuildingModels.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Contributors", x => x.Id);
+                    table.PrimaryKey("PK_Livings", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Contributors_Staff_StaffId",
-                        column: x => x.StaffId,
-                        principalTable: "Staff",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Contributors_ThirdParties_ThirdPartyId",
-                        column: x => x.ThirdPartyId,
-                        principalTable: "ThirdParties",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ThirdPartyContacts",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    StaffId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    BuildingId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: true),
-                    InsertedById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    InsertedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    UpdatedById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ThirdPartyContacts", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_ThirdPartyContacts_Buildings_BuildingId",
-                        column: x => x.BuildingId,
-                        principalTable: "Buildings",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_ThirdPartyContacts_Staff_StaffId",
-                        column: x => x.StaffId,
-                        principalTable: "Staff",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Invoices",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Amount = table.Column<int>(type: "int", nullable: true),
-                    IssueDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DueDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    TransactionDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    StatusId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ApartmentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: true),
-                    InsertedById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    InsertedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    UpdatedById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Invoices", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Invoices_Apartments_ApartmentId",
+                        name: "FK_Livings_Apartments_ApartmentId",
                         column: x => x.ApartmentId,
                         principalTable: "Apartments",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_Invoices_Statuses_StatusId",
-                        column: x => x.StatusId,
-                        principalTable: "Statuses",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        name: "FK_Livings_Residents_ResidentId",
+                        column: x => x.ResidentId,
+                        principalTable: "Residents",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -440,6 +458,7 @@ namespace BuildingModels.Migrations
                     StartDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     EndDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     ApartmentId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    ResidentId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: true),
                     InsertedById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     InsertedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -455,6 +474,11 @@ namespace BuildingModels.Migrations
                         column: x => x.ApartmentId,
                         principalTable: "Apartments",
                         principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_OwnerShips_Residents_ResidentId",
+                        column: x => x.ResidentId,
+                        principalTable: "Residents",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -462,12 +486,17 @@ namespace BuildingModels.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    RenewStatus = table.Column<bool>(type: "bit", nullable: false),
+                    Canceled = table.Column<bool>(type: "bit", nullable: false),
+                    LastRenewalDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     StartDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     EndDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Status = table.Column<int>(type: "int", nullable: true),
-                    Amount = table.Column<int>(type: "int", nullable: true),
+                    Quantity = table.Column<int>(type: "int", nullable: true),
+                    Note = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ApartmentId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     ServiceId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    PackageServiceId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: true),
                     InsertedById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     InsertedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -484,10 +513,81 @@ namespace BuildingModels.Migrations
                         principalTable: "Apartments",
                         principalColumn: "Id");
                     table.ForeignKey(
+                        name: "FK_ServiceContracts_PackageServices_PackageServiceId",
+                        column: x => x.PackageServiceId,
+                        principalTable: "PackageServices",
+                        principalColumn: "Id");
+                    table.ForeignKey(
                         name: "FK_ServiceContracts_Services_ServiceId",
                         column: x => x.ServiceId,
                         principalTable: "Services",
                         principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ThirdParties",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    NameCompany = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Status = table.Column<bool>(type: "bit", nullable: false),
+                    IsTenant = table.Column<bool>(type: "bit", nullable: false),
+                    ApartmentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    StaffId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: true),
+                    InsertedById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    InsertedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ThirdParties", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ThirdParties_Apartments_ApartmentId",
+                        column: x => x.ApartmentId,
+                        principalTable: "Apartments",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ThirdParties_Staff_StaffId",
+                        column: x => x.StaffId,
+                        principalTable: "Staff",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "HandleRequests",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    RequestionId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    AssigmentId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: true),
+                    InsertedById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    InsertedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_HandleRequests", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_HandleRequests_Assigments_AssigmentId",
+                        column: x => x.AssigmentId,
+                        principalTable: "Assigments",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_HandleRequests_RequestComplains_RequestionId",
+                        column: x => x.RequestionId,
+                        principalTable: "RequestComplains",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -523,17 +623,17 @@ namespace BuildingModels.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Residents",
+                name: "Invoices",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Username = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Password = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Fullname = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PhoneNumber = table.Column<int>(type: "int", nullable: true),
-                    Dob = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    RegistratorDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    OwnerShipId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    TotalAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    PaidStatus = table.Column<bool>(type: "bit", nullable: false),
+                    PaidDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IssueDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DueDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ServiceContractId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ResidentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: true),
                     InsertedById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     InsertedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -543,23 +643,31 @@ namespace BuildingModels.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Residents", x => x.Id);
+                    table.PrimaryKey("PK_Invoices", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Residents_OwnerShips_OwnerShipId",
-                        column: x => x.OwnerShipId,
-                        principalTable: "OwnerShips",
-                        principalColumn: "Id");
+                        name: "FK_Invoices_Residents_ResidentId",
+                        column: x => x.ResidentId,
+                        principalTable: "Residents",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Invoices_ServiceContracts_ServiceContractId",
+                        column: x => x.ServiceContractId,
+                        principalTable: "ServiceContracts",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Livings",
+                name: "ThirdPartyContacts",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     StartDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     EndDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    ResidentId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    ApartmentId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    NameService = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ThirdPartyId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: true),
                     InsertedById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     InsertedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -569,75 +677,18 @@ namespace BuildingModels.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Livings", x => x.Id);
+                    table.PrimaryKey("PK_ThirdPartyContacts", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Livings_Apartments_ApartmentId",
-                        column: x => x.ApartmentId,
-                        principalTable: "Apartments",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Livings_Residents_ResidentId",
-                        column: x => x.ResidentId,
-                        principalTable: "Residents",
+                        name: "FK_ThirdPartyContacts_ThirdParties_ThirdPartyId",
+                        column: x => x.ThirdPartyId,
+                        principalTable: "ThirdParties",
                         principalColumn: "Id");
                 });
 
-            migrationBuilder.CreateTable(
-                name: "RequestComplains",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Status = table.Column<int>(type: "int", nullable: true),
-                    DateRequest = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Note = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ResidentId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: true),
-                    InsertedById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    InsertedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    UpdatedById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_RequestComplains", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_RequestComplains_Residents_ResidentId",
-                        column: x => x.ResidentId,
-                        principalTable: "Residents",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "HandleRequests",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    RequestionId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    AssigmentId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: true),
-                    InsertedById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    InsertedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    UpdatedById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_HandleRequests", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_HandleRequests_Assigments_AssigmentId",
-                        column: x => x.AssigmentId,
-                        principalTable: "Assigments",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_HandleRequests_RequestComplains_RequestionId",
-                        column: x => x.RequestionId,
-                        principalTable: "RequestComplains",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
+            migrationBuilder.CreateIndex(
+                name: "IX_Apartments_ApartmentTypeId",
+                table: "Apartments",
+                column: "ApartmentTypeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Apartments_BuildingId",
@@ -660,16 +711,6 @@ namespace BuildingModels.Migrations
                 column: "PostionId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Contributors_StaffId",
-                table: "Contributors",
-                column: "StaffId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Contributors_ThirdPartyId",
-                table: "Contributors",
-                column: "ThirdPartyId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_FinanceBuildings_BuildingId",
                 table: "FinanceBuildings",
                 column: "BuildingId");
@@ -690,14 +731,14 @@ namespace BuildingModels.Migrations
                 column: "RequestionId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Invoices_ApartmentId",
+                name: "IX_Invoices_ResidentId",
                 table: "Invoices",
-                column: "ApartmentId");
+                column: "ResidentId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Invoices_StatusId",
+                name: "IX_Invoices_ServiceContractId",
                 table: "Invoices",
-                column: "StatusId");
+                column: "ServiceContractId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Livings_ApartmentId",
@@ -725,14 +766,14 @@ namespace BuildingModels.Migrations
                 column: "ApartmentId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_RequestComplains_ResidentId",
-                table: "RequestComplains",
+                name: "IX_OwnerShips_ResidentId",
+                table: "OwnerShips",
                 column: "ResidentId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Residents_OwnerShipId",
-                table: "Residents",
-                column: "OwnerShipId");
+                name: "IX_RequestComplains_ResidentId",
+                table: "RequestComplains",
+                column: "ResidentId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Salaries_RoleId",
@@ -745,6 +786,11 @@ namespace BuildingModels.Migrations
                 column: "ApartmentId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_ServiceContracts_PackageServiceId",
+                table: "ServiceContracts",
+                column: "PackageServiceId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ServiceContracts_ServiceId",
                 table: "ServiceContracts",
                 column: "ServiceId");
@@ -755,21 +801,23 @@ namespace BuildingModels.Migrations
                 column: "RoleId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ThirdPartyContacts_BuildingId",
-                table: "ThirdPartyContacts",
-                column: "BuildingId");
+                name: "IX_ThirdParties_ApartmentId",
+                table: "ThirdParties",
+                column: "ApartmentId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ThirdPartyContacts_StaffId",
-                table: "ThirdPartyContacts",
+                name: "IX_ThirdParties_StaffId",
+                table: "ThirdParties",
                 column: "StaffId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ThirdPartyContacts_ThirdPartyId",
+                table: "ThirdPartyContacts",
+                column: "ThirdPartyId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "Contributors");
-
             migrationBuilder.DropTable(
                 name: "FinanceBuildings");
 
@@ -786,16 +834,16 @@ namespace BuildingModels.Migrations
                 name: "Notifies");
 
             migrationBuilder.DropTable(
+                name: "OwnerShips");
+
+            migrationBuilder.DropTable(
                 name: "Salaries");
 
             migrationBuilder.DropTable(
-                name: "ServiceContracts");
+                name: "Statuses");
 
             migrationBuilder.DropTable(
                 name: "ThirdPartyContacts");
-
-            migrationBuilder.DropTable(
-                name: "ThirdParties");
 
             migrationBuilder.DropTable(
                 name: "Finances");
@@ -804,7 +852,7 @@ namespace BuildingModels.Migrations
                 name: "RequestComplains");
 
             migrationBuilder.DropTable(
-                name: "Statuses");
+                name: "ServiceContracts");
 
             migrationBuilder.DropTable(
                 name: "Assigments");
@@ -813,28 +861,34 @@ namespace BuildingModels.Migrations
                 name: "NotifyCategories");
 
             migrationBuilder.DropTable(
-                name: "Services");
+                name: "ThirdParties");
 
             migrationBuilder.DropTable(
                 name: "Residents");
 
             migrationBuilder.DropTable(
-                name: "Staff");
+                name: "PackageServices");
+
+            migrationBuilder.DropTable(
+                name: "Services");
 
             migrationBuilder.DropTable(
                 name: "Tasks");
 
             migrationBuilder.DropTable(
-                name: "OwnerShips");
-
-            migrationBuilder.DropTable(
-                name: "Roles");
-
-            migrationBuilder.DropTable(
                 name: "Apartments");
 
             migrationBuilder.DropTable(
+                name: "Staff");
+
+            migrationBuilder.DropTable(
+                name: "ApartmentTypes");
+
+            migrationBuilder.DropTable(
                 name: "Buildings");
+
+            migrationBuilder.DropTable(
+                name: "Roles");
 
             migrationBuilder.DropTable(
                 name: "Postions");

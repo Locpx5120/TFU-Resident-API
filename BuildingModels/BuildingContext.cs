@@ -19,10 +19,10 @@ public partial class BuildingContext : DbContext
         Database.SetConnectionString(connectionString);
     }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        optionsBuilder.UseSqlServer("server=.;database=DBJustBlog;Trusted_Connection=True;TrustServerCertificate=True");
-    }
+    //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    //{
+    //    optionsBuilder.UseSqlServer("server=.;database=DBJustBlog;Trusted_Connection=True;TrustServerCertificate=True");
+    //}
 
     //add-migration DB
 
@@ -33,7 +33,6 @@ public partial class BuildingContext : DbContext
 
     public virtual DbSet<Building> Buildings { get; set; }
 
-    public virtual DbSet<Contributor> Contributors { get; set; }
 
     public virtual DbSet<Finance> Finances { get; set; }
 
@@ -51,7 +50,6 @@ public partial class BuildingContext : DbContext
 
     public virtual DbSet<OwnerShip> OwnerShips { get; set; }
 
-    public virtual DbSet<Postion> Postions { get; set; }
 
     public virtual DbSet<RequestComplain> RequestComplains { get; set; }
 
@@ -77,12 +75,36 @@ public partial class BuildingContext : DbContext
 
     public virtual DbSet<ThirdPartyContact> ThirdPartyContacts { get; set; }
 
-    public virtual DbSet<OTPMail> OTPMails { get; set; }
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        // Specify precision and scale for 'LandArea' on 'ApartmentType'
+        //modelBuilder.Entity<ApartmentType>()
+        //    .Property(a => a.LandArea)
+        //    .HasPrecision(18, 2); // Adjust 18 and 2 to the precision and scale you need
+
+        //// Specify precision and scale for 'TotalAmount' on 'Invoice'
+        //modelBuilder.Entity<Invoice>()
+        //    .Property(i => i.TotalAmount)
+        //    .HasPrecision(18, 2); // Adjust as necessary
+
+        //// Specify precision and scale for 'Discount' on 'PackageService'
+        //modelBuilder.Entity<PackageService>()
+        //    .Property(p => p.Discount)
+        //    .HasPrecision(18, 2); // Adjust as necessary
+
+        //// Specify precision and scale for 'UnitPrice' on 'Service'
+        //modelBuilder.Entity<Service>()
+        //    .Property(s => s.UnitPrice)
+        //    .HasPrecision(18, 2); // Adjust as necessary
+
+        //// Specify precision and scale for 'Price' on 'ThirdPartyContact'
+        //modelBuilder.Entity<ThirdPartyContact>()
+        //    .Property(t => t.Price)
+        //    .HasPrecision(18, 2); // Adjust as necessary
         base.OnModelCreating(modelBuilder);
+
     }
 
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);

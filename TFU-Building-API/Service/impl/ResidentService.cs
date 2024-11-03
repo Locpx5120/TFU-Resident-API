@@ -43,7 +43,6 @@ namespace TFU_Building_API.Service.impl
                     Name = request.Name,
                     Email = request.Email,
                     Phone = request.Phone,
-                    OwnerShipId = request.OwnerShipId,
                     RegistratorDate = DateTime.Now,  // Ngày đăng ký hiện tại
                     IsDeleted = false,
                     IsActive = true,
@@ -138,60 +137,60 @@ namespace TFU_Building_API.Service.impl
             }
         }
 
-        public async Task<ResponseData<PagedResidentListResponseDto>> GetResidentsByOwnershipId(ResidentSearchRequestDto request)
-        {
-            try
-            {
-                // Lấy danh sách Resident dựa trên OwnershipId và tìm kiếm theo tên nếu có
-                var residentQuery = _unitOfWork.ResidentRepository.GetQuery(r => r.OwnerShipId == request.OwnershipId && r.IsDeleted == false);
+        //public async Task<ResponseData<PagedResidentListResponseDto>> GetResidentsByOwnershipId(ResidentSearchRequestDto request)
+        //{
+        //    try
+        //    {
+        //        // Lấy danh sách Resident dựa trên OwnershipId và tìm kiếm theo tên nếu có
+        //        var residentQuery = _unitOfWork.ResidentRepository.GetQuery(r => r.OwnerShipId == request.OwnershipId && r.IsDeleted == false);
 
-                // Nếu có tìm kiếm theo tên
-                if (!string.IsNullOrEmpty(request.Name))
-                {
-                    residentQuery = residentQuery.Where(r => r.Name.Contains(request.Name));
-                }
+        //        // Nếu có tìm kiếm theo tên
+        //        if (!string.IsNullOrEmpty(request.Name))
+        //        {
+        //            residentQuery = residentQuery.Where(r => r.Name.Contains(request.Name));
+        //        }
 
-                // Tính tổng số bản ghi trước khi phân trang
-                var totalRecords = await residentQuery.CountAsync();
+        //        // Tính tổng số bản ghi trước khi phân trang
+        //        var totalRecords = await residentQuery.CountAsync();
 
-                // Áp dụng phân trang
-                var residents = await residentQuery
-                    .OrderBy(r => r.Name)
-                    .Skip((request.PageNumber - 1) * request.PageSize)
-                    .Take(request.PageSize)
-                    .Select(r => new ResidentListResponseDto
-                    {
-                        Id = r.Id,
-                        Name = r.Name,
-                        Email = r.Email,
-                        Phone = r.Phone,
-                        RegistratorDate = r.RegistratorDate
-                    }).ToListAsync();
+        //        // Áp dụng phân trang
+        //        var residents = await residentQuery
+        //            .OrderBy(r => r.Name)
+        //            .Skip((request.PageNumber - 1) * request.PageSize)
+        //            .Take(request.PageSize)
+        //            .Select(r => new ResidentListResponseDto
+        //            {
+        //                Id = r.Id,
+        //                Name = r.Name,
+        //                Email = r.Email,
+        //                Phone = r.Phone,
+        //                RegistratorDate = r.RegistratorDate
+        //            }).ToListAsync();
 
-                // Trả về kết quả
-                return new ResponseData<PagedResidentListResponseDto>
-                {
-                    Success = true,
-                    Message = "Residents retrieved successfully.",
-                    Data = new PagedResidentListResponseDto
-                    {
-                        Residents = residents,
-                        TotalRecords = totalRecords
-                    },
-                    Code = (int)ErrorCodeAPI.OK
-                };
-            }
-            catch (Exception ex)
-            {
-                // Xử lý lỗi và trả về thông báo lỗi chi tiết
-                return new ResponseData<PagedResidentListResponseDto>
-                {
-                    Success = false,
-                    Message = ex.Message,  // Hoặc log lỗi chi tiết và trả về thông báo chung
-                    Code = (int)ErrorCodeAPI.SystemIsError
-                };
-            }
-        }
+        //        // Trả về kết quả
+        //        return new ResponseData<PagedResidentListResponseDto>
+        //        {
+        //            Success = true,
+        //            Message = "Residents retrieved successfully.",
+        //            Data = new PagedResidentListResponseDto
+        //            {
+        //                Residents = residents,
+        //                TotalRecords = totalRecords
+        //            },
+        //            Code = (int)ErrorCodeAPI.OK
+        //        };
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        // Xử lý lỗi và trả về thông báo lỗi chi tiết
+        //        return new ResponseData<PagedResidentListResponseDto>
+        //        {
+        //            Success = false,
+        //            Message = ex.Message,  // Hoặc log lỗi chi tiết và trả về thông báo chung
+        //            Code = (int)ErrorCodeAPI.SystemIsError
+        //        };
+        //    }
+        //}
 
         public async Task<ResponseData<ResidentResponseDto>> DeleteResident(ResidentDeleteRequestDto request)
         {

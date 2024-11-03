@@ -2,6 +2,7 @@
 using TFU_Building_API.Configure;
 using TFU_Building_API.Dto;
 using TFU_Building_API.Service;
+using TFU_Building_API.Service.impl;
 
 namespace TFU_Building_API.Controllers
 {
@@ -11,10 +12,14 @@ namespace TFU_Building_API.Controllers
     public class ResidentController : ControllerBase
     {
         private readonly IResidentService _residentService;
+        private readonly IResidentPayment _residentPayment;
 
-        public ResidentController(IResidentService residentService)
+        public ResidentController(
+            IResidentService residentService,
+            IResidentPayment residentPayment)
         {
             _residentService = residentService;
+            _residentPayment = residentPayment;
         }
 
         [HttpPost("addResident")]
@@ -51,18 +56,18 @@ namespace TFU_Building_API.Controllers
             return Ok(response);
         }
 
-        [HttpPost("GetByOwnershipId")]
-        public async Task<IActionResult> GetResidentsByOwnershipId(ResidentSearchRequestDto request)
-        {
-            var response = await _residentService.GetResidentsByOwnershipId(request);
+        //[HttpPost("GetByOwnershipId")]
+        //public async Task<IActionResult> GetResidentsByOwnershipId(ResidentSearchRequestDto request)
+        //{
+        //    var response = await _residentService.GetResidentsByOwnershipId(request);
 
-            if (!response.Success)
-            {
-                return BadRequest(response);
-            }
+        //    if (!response.Success)
+        //    {
+        //        return BadRequest(response);
+        //    }
 
-            return Ok(response);
-        }
+        //    return Ok(response);
+        //}
 
         [HttpPost("deleteResident")]
         public async Task<IActionResult> DeleteResident(ResidentDeleteRequestDto request)
@@ -88,6 +93,19 @@ namespace TFU_Building_API.Controllers
             }
 
             return Ok(response.Data);
+        }
+
+        [HttpGet("get-resident-payments")]
+        public async Task<IActionResult> GetResidentPayments([FromQuery] ResidentPaymentRequestDto request)
+        {
+            var response = await _residentPayment.GetResidentPayments(request);
+
+            if (response.Success)
+            {
+                return Ok(response);
+            }
+
+            return BadRequest(response);
         }
 
     }

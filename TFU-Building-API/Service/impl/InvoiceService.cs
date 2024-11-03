@@ -45,10 +45,10 @@ namespace TFU_Building_API.Service.impl
                     };
                 }
 
-                var userId = ownership.UserId;
+                var userId = ownership.ResidentId;
 
                 // Kiểm tra xem đã có Invoice tồn tại cho các dịch vụ của căn hộ trong tháng hiện tại không
-                var existingInvoices = await _unitOfWork.InvoiceRepository.GetQuery(x => x.UserId == userId && x.IssueDate.HasValue
+                var existingInvoices = await _unitOfWork.InvoiceRepository.GetQuery(x => x.ResidentId == userId && x.IssueDate.HasValue
                                                                                       && x.IssueDate.Value.Month == currentMonth
                                                                                       && x.IssueDate.Value.Year == currentYear
                                                                                       && (x.IsDeleted == false))
@@ -105,7 +105,7 @@ namespace TFU_Building_API.Service.impl
                         PaidStatus = false,
                         ServiceContractId = serviceContract.Id,
                         TotalAmount = totalAmount,
-                        UserId = userId ?? new Guid(),
+                        ResidentId = userId ?? new Guid(),
                         IsDeleted = false,
                         InsertedAt = DateTime.Now,
                         UpdatedAt = DateTime.Now,

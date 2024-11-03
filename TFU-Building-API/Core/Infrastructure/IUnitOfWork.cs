@@ -8,12 +8,12 @@ namespace TFU_Building_API.Core.Infrastructure
         BuildingContext buildingContext { get; }
 
         #region Authen
-        IMasterDataRepository<User> UserRepository { get; }
+        //IMasterDataRepository<User> UserRepository { get; }
         IMasterDataRepository<Role> RoleRepository { get; }
         #endregion
 
         #region Others
-        IMasterDataRepository<OTPMail> OTPMailRepository { get; }
+        //IMasterDataRepository<OTPMail> OTPMailRepository { get; }
         #endregion
 
         #region Staff
@@ -22,6 +22,10 @@ namespace TFU_Building_API.Core.Infrastructure
 
         #region Building
         IMasterDataRepository<Building> BuildingRepository { get; }
+        #endregion
+
+        #region Living
+        IMasterDataRepository<Living> LivingRepository { get; }
         #endregion
 
         #region OwnerShip

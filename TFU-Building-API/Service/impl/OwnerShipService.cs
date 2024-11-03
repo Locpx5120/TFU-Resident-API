@@ -47,7 +47,7 @@ namespace TFU_Building_API.Service.impl
                 }
 
                 // Tìm kiếm User theo email
-                var user = await _unitOfWork.UserRepository.GetQuery(u => u.Email == request.Email && u.IsDeleted == false).FirstOrDefaultAsync();
+                var user = await _unitOfWork.ResidentRepository.GetQuery(u => u.Email == request.Email && u.IsDeleted == false).FirstOrDefaultAsync();
                 if (user == null)
                 {
                     return new ResponseData<OwnerShipResponseDto>
@@ -62,7 +62,7 @@ namespace TFU_Building_API.Service.impl
                 var newOwnerShip = new OwnerShip
                 {
                     ApartmentId = apartment.Id,
-                    UserId = user.Id,
+                    ResidentId = user.Id,
                     StartDate = DateTime.Now,
                     EndDate = DateTime.Now.AddYears(50),
                     InsertedAt = DateTime.Now,
@@ -135,7 +135,7 @@ namespace TFU_Building_API.Service.impl
                 }
 
                 // Tìm kiếm User theo email
-                var user = await _unitOfWork.UserRepository.GetQuery(u => u.Email == request.Email && u.IsDeleted == false).FirstOrDefaultAsync();
+                var user = await _unitOfWork.ResidentRepository.GetQuery(u => u.Email == request.Email && u.IsDeleted == false).FirstOrDefaultAsync();
                 if (user == null)
                 {
                     return new ResponseData<OwnerShipResponseDto>
@@ -148,7 +148,7 @@ namespace TFU_Building_API.Service.impl
 
                 // Cập nhật các thông tin của OwnerShip
                 ownerShip.ApartmentId = apartment.Id;
-                ownerShip.UserId = user.Id;
+                ownerShip.ResidentId = user.Id;
                 ownerShip.UpdatedAt = DateTime.Now; // Cập nhật thời gian update
                 ownerShip.EndDate = DateTime.Now.AddYears(50); // Update EndDate thêm 50 năm
 
@@ -222,16 +222,16 @@ namespace TFU_Building_API.Service.impl
             {
                 // Lấy danh sách ownership kết hợp với bảng User và Apartment
                 var ownerShipQuery = from ownership in _unitOfWork.OwnerShipRepository.GetQuery(x => x.IsDeleted == false)
-                                     join user in _unitOfWork.UserRepository.GetQuery(u => u.IsDeleted == false)
-                                        on ownership.UserId equals user.Id
+                                     join user in _unitOfWork.ResidentRepository.GetQuery(u => u.IsDeleted == false)
+                                        on ownership.ResidentId equals user.Id
                                      join apartment in _unitOfWork.ApartmentRepository.GetQuery(a => a.IsDeleted == false)
                                         on ownership.ApartmentId equals apartment.Id
                                      select new OwnerShipListResponseDto
                                      {
-                                         FullName = user.FullName,
-                                         FloorNumber = apartment.FloorNumber.GetValueOrDefault(),
-                                         RoomNumber = apartment.RoomNumber.GetValueOrDefault(),
-                                         PhoneNumber = user.PhoneNumber,
+                                         FullName = user.Name,
+                                         FloorNumber = apartment.FloorNumber,
+                                         RoomNumber = apartment.RoomNumber,
+                                         PhoneNumber = user.Phone,
                                          Email = user.Email,
                                          Id = ownership.Id
                                      };
@@ -296,7 +296,7 @@ namespace TFU_Building_API.Service.impl
                 }
 
                 // Lấy thông tin từ bảng User dựa trên UserId
-                var user = await _unitOfWork.UserRepository.GetQuery(u => u.Id == ownership.UserId && u.IsDeleted == false)
+                var user = await _unitOfWork.ResidentRepository.GetQuery(u => u.Id == ownership.ResidentId && u.IsDeleted == false)
                     .FirstOrDefaultAsync();
 
                 if (user == null)
@@ -328,8 +328,8 @@ namespace TFU_Building_API.Service.impl
                 {
                     Id = ownership.Id,
                     Email = user.Email,
-                    FloorNumber = apartment.FloorNumber.GetValueOrDefault(),
-                    RoomNumber = apartment.RoomNumber.GetValueOrDefault()
+                    FloorNumber = apartment.FloorNumber,
+                    RoomNumber = apartment.RoomNumber
                 };
 
                 // Trả về kết quả thành công

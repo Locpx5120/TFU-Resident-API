@@ -10,7 +10,6 @@ public partial class OwnerShip : MasterDataEntityBase
     public Guid? ApartmentId { get; set; }
 
     public virtual Apartment? Apartment { get; set; }
-    public virtual ICollection<Resident> Residents { get; set; } = new List<Resident>();
-    public Guid? UserId { get; set; }
-    public virtual User? User { get; set; } = null!;
+    public Guid? ResidentId { get; set; }
+    public virtual Resident Resident { get; set; } = null!;
 }

@@ -21,7 +21,7 @@ namespace TFU_Building_API.Service.impl
             try
             {
                 // Kiểm tra xem tên tòa nhà đã tồn tại chưa
-                var existingBuilding = await _unitOfWork.BuildingRepository.GetQuery(x => x.BuildingName == request.BuildingName && x.IsDeleted == false).FirstOrDefaultAsync();
+                var existingBuilding = await _unitOfWork.BuildingRepository.GetQuery(x => x.Name == request.BuildingName && x.IsDeleted == false).FirstOrDefaultAsync();
 
                 if (existingBuilding != null)
                 {
@@ -37,10 +37,9 @@ namespace TFU_Building_API.Service.impl
                 var newBuilding = new Building
                 {
                     Id = Guid.NewGuid(),
-                    BuildingName = request.BuildingName,
+                    Name = request.BuildingName,
                     NumberFloor = request.NumberFloor,
                     NumberApartment = request.NumberApartment,
-                    PostionId = request.PositionId,
                     IsDeleted = false,
                     IsActive = true,
                     InsertedAt = DateTime.Now,
@@ -53,7 +52,7 @@ namespace TFU_Building_API.Service.impl
                 var response = new BuildingResponseDto
                 {
                     Id = newBuilding.Id,
-                    BuildingName = newBuilding.BuildingName
+                    BuildingName = newBuilding.Name
                 };
 
                 return new ResponseData<BuildingResponseDto>
@@ -94,10 +93,9 @@ namespace TFU_Building_API.Service.impl
                 }
 
                 // Cập nhật thông tin building
-                existingBuilding.BuildingName = request.BuildingName;
+                existingBuilding.Name = request.BuildingName;
                 existingBuilding.NumberFloor = request.NumberFloor;
                 existingBuilding.NumberApartment = request.NumberApartment;
-                existingBuilding.PostionId = request.PositionId;
                 existingBuilding.IsActive = request.IsActive;
                 existingBuilding.UpdatedAt = DateTime.Now;
 

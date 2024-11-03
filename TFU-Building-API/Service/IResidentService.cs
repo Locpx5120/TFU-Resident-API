@@ -7,7 +7,7 @@ namespace TFU_Building_API.Service
     {
         Task<ResponseData<ResidentResponseDto>> AddResident(ResidentRequestDto request);
         Task<ResponseData<ResidentUpdateRequestDto>> UpdateResident(ResidentUpdateRequestDto request);
-        Task<ResponseData<PagedResidentListResponseDto>> GetResidentsByOwnershipId(ResidentSearchRequestDto request);
+        //Task<ResponseData<PagedResidentListResponseDto>> GetResidentsByOwnershipId(ResidentSearchRequestDto request);
         Task<ResponseData<ResidentResponseDto>> DeleteResident(ResidentDeleteRequestDto request);
         Task<ResponseData<ResidentInfoResponseDto>> GetResidentById(Guid residentId);
     }

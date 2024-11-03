@@ -21,7 +21,7 @@ namespace TFU_Building_API.Service.impl
             try
             {
                 // Tìm kiếm user dựa trên email (nếu không tìm thấy thì báo lỗi)
-                var existingUser = await _unitOfWork.UserRepository.GetQuery(x => x.Email == request.Email && x.IsDeleted == false).FirstOrDefaultAsync();
+                var existingUser = await _unitOfWork.StaffRepository.GetQuery(x => x.Email == request.Email && x.IsDeleted == false).FirstOrDefaultAsync();
 
                 if (existingUser == null)
                 {
@@ -39,7 +39,7 @@ namespace TFU_Building_API.Service.impl
                 {
                     //Id = Guid.NewGuid(),              
                     HireDate = DateTime.Now,            
-                    UserId = existingUser.Id,          
+                    //UserId = existingUser.Id,          
                     RoleId = request.RoleId,           
                     InsertedAt = DateTime.Now,        
                     UpdatedAt = DateTime.Now,         
@@ -167,141 +167,141 @@ namespace TFU_Building_API.Service.impl
             }
         }
 
-        public async Task<ResponseData<List<StaffListResponseDto>>> GetStaffList(StaffSearchRequestDto request)
-        {
-            try
-            {
-                // Lấy danh sách nhân viên và join với bảng User và Role để lấy thông tin cần thiết
-                var staffQuery = from staff in UnitOfWork.StaffRepository.GetQuery(x => x.IsDeleted == false)
-                                 join user in UnitOfWork.UserRepository.GetQuery(u => u.IsDeleted == false)
-                                    on staff.UserId equals user.Id
-                                 join role in UnitOfWork.RoleRepository.GetQuery(r => r.IsDeleted == false)
-                                    on staff.RoleId equals role.Id
-                                 select new StaffListResponseDto
-                                 {
-                                     FullName = user.FullName,
-                                     Department = role.Name,
-                                     Email = user.Email,
-                                     Phone = user.PhoneNumber,
-                                     HireDate = staff.HireDate.GetValueOrDefault(),
-                                     Id = staff.Id
-                                 };
+        //public async Task<ResponseData<List<StaffListResponseDto>>> GetStaffList(StaffSearchRequestDto request)
+        //{
+        //    try
+        //    {
+        //        // Lấy danh sách nhân viên và join với bảng User và Role để lấy thông tin cần thiết
+        //        var staffQuery = from staff in UnitOfWork.StaffRepository.GetQuery(x => x.IsDeleted == false)
+        //                         join user in UnitOfWork.UserRepository.GetQuery(u => u.IsDeleted == false)
+        //                            on staff.UserId equals user.Id
+        //                         join role in UnitOfWork.RoleRepository.GetQuery(r => r.IsDeleted == false)
+        //                            on staff.RoleId equals role.Id
+        //                         select new StaffListResponseDto
+        //                         {
+        //                             FullName = user.FullName,
+        //                             Department = role.Name,
+        //                             Email = user.Email,
+        //                             Phone = user.PhoneNumber,
+        //                             HireDate = staff.HireDate.GetValueOrDefault(),
+        //                             Id = staff.Id
+        //                         };
 
-                // Thêm điều kiện tìm kiếm nếu có
-                if (!string.IsNullOrEmpty(request.Name))
-                {
-                    staffQuery = staffQuery.Where(x => x.FullName.Contains(request.Name)); // Tìm kiếm theo tên chứa chuỗi 'SearchTerm'
-                }
+        //        // Thêm điều kiện tìm kiếm nếu có
+        //        if (!string.IsNullOrEmpty(request.Name))
+        //        {
+        //            staffQuery = staffQuery.Where(x => x.FullName.Contains(request.Name)); // Tìm kiếm theo tên chứa chuỗi 'SearchTerm'
+        //        }
 
-                // Tính tổng số bản ghi trước khi phân trang
-                var totalRecords = await staffQuery.CountAsync();
+        //        // Tính tổng số bản ghi trước khi phân trang
+        //        var totalRecords = await staffQuery.CountAsync();
 
-                // Áp dụng phân trang
-                var staffList = await staffQuery
-                    .Skip((request.PageNumber - 1) * request.PageSize)
-                    .Take(request.PageSize)
-                    .ToListAsync();
+        //        // Áp dụng phân trang
+        //        var staffList = await staffQuery
+        //            .Skip((request.PageNumber - 1) * request.PageSize)
+        //            .Take(request.PageSize)
+        //            .ToListAsync();
 
 
-                // Gán giá trị TotalRecords cho mỗi StaffListResponseDto
-                foreach (var staff in staffList)
-                {
-                    staff.TotalRecords = totalRecords; // Gán tổng số bản ghi cho mỗi item trong danh sách
-                }
+        //        // Gán giá trị TotalRecords cho mỗi StaffListResponseDto
+        //        foreach (var staff in staffList)
+        //        {
+        //            staff.TotalRecords = totalRecords; // Gán tổng số bản ghi cho mỗi item trong danh sách
+        //        }
 
-                return new ResponseData<List<StaffListResponseDto>>
-                {
-                    Success = true,
-                    Message = "Staff list retrieved successfully",
-                    Data = staffList,
-                    Code = (int)ErrorCodeAPI.OK
-                };
-            }
-            catch (Exception ex)
-            {
-                return new ResponseData<List<StaffListResponseDto>>
-                {
-                    Success = false,
-                    Message = ex.Message,
-                    Code = (int)ErrorCodeAPI.SystemIsError
-                };
-            }
-        }
+        //        return new ResponseData<List<StaffListResponseDto>>
+        //        {
+        //            Success = true,
+        //            Message = "Staff list retrieved successfully",
+        //            Data = staffList,
+        //            Code = (int)ErrorCodeAPI.OK
+        //        };
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return new ResponseData<List<StaffListResponseDto>>
+        //        {
+        //            Success = false,
+        //            Message = ex.Message,
+        //            Code = (int)ErrorCodeAPI.SystemIsError
+        //        };
+        //    }
+        //}
 
-        public async Task<ResponseData<StaffInfoResponseDto>> GetStaffById(Guid staffId)
-        {
-            try
-            {
-                // Lấy thông tin nhân viên dựa trên Id
-                var staff = await _unitOfWork.StaffRepository.GetQuery(x => x.Id == staffId && x.IsDeleted == false)
-                    .FirstOrDefaultAsync();
+        //public async Task<ResponseData<StaffInfoResponseDto>> GetStaffById(Guid staffId)
+        //{
+        //    try
+        //    {
+        //        // Lấy thông tin nhân viên dựa trên Id
+        //        var staff = await _unitOfWork.StaffRepository.GetQuery(x => x.Id == staffId && x.IsDeleted == false)
+        //            .FirstOrDefaultAsync();
 
-                if (staff == null)
-                {
-                    return new ResponseData<StaffInfoResponseDto>
-                    {
-                        Success = false,
-                        Message = "Staff not found.",
-                        Code = (int)ErrorCodeAPI.NotFound
-                    };
-                }
+        //        if (staff == null)
+        //        {
+        //            return new ResponseData<StaffInfoResponseDto>
+        //            {
+        //                Success = false,
+        //                Message = "Staff not found.",
+        //                Code = (int)ErrorCodeAPI.NotFound
+        //            };
+        //        }
 
-                // Lấy thông tin từ bảng User dựa trên UserId của nhân viên
-                var user = await _unitOfWork.UserRepository.GetQuery(u => u.Id == staff.UserId && u.IsDeleted == false)
-                    .FirstOrDefaultAsync();
+        //        // Lấy thông tin từ bảng User dựa trên UserId của nhân viên
+        //        var user = await _unitOfWork.UserRepository.GetQuery(u => u.Id == staff.UserId && u.IsDeleted == false)
+        //            .FirstOrDefaultAsync();
 
-                if (user == null)
-                {
-                    return new ResponseData<StaffInfoResponseDto>
-                    {
-                        Success = false,
-                        Message = "User not found.",
-                        Code = (int)ErrorCodeAPI.UserNotFound
-                    };
-                }
+        //        if (user == null)
+        //        {
+        //            return new ResponseData<StaffInfoResponseDto>
+        //            {
+        //                Success = false,
+        //                Message = "User not found.",
+        //                Code = (int)ErrorCodeAPI.UserNotFound
+        //            };
+        //        }
 
-                // Lấy thông tin từ bảng Role (bộ phận) dựa trên RoleId của nhân viên
-                var role = await _unitOfWork.RoleRepository.GetQuery(r => r.Id == staff.RoleId && r.IsDeleted == false)
-                    .FirstOrDefaultAsync();
+        //        // Lấy thông tin từ bảng Role (bộ phận) dựa trên RoleId của nhân viên
+        //        var role = await _unitOfWork.RoleRepository.GetQuery(r => r.Id == staff.RoleId && r.IsDeleted == false)
+        //            .FirstOrDefaultAsync();
 
-                if (role == null)
-                {
-                    return new ResponseData<StaffInfoResponseDto>
-                    {
-                        Success = false,
-                        Message = "Role not found.",
-                        Code = (int)ErrorCodeAPI.RoleNotFound
-                    };
-                }
+        //        if (role == null)
+        //        {
+        //            return new ResponseData<StaffInfoResponseDto>
+        //            {
+        //                Success = false,
+        //                Message = "Role not found.",
+        //                Code = (int)ErrorCodeAPI.RoleNotFound
+        //            };
+        //        }
 
-                // Tạo đối tượng response với các trường cần thiết
-                var response = new StaffInfoResponseDto
-                {
-                    Id = staff.Id,
-                    Email = user.Email,
-                    Department = role.Name
-                };
+        //        // Tạo đối tượng response với các trường cần thiết
+        //        var response = new StaffInfoResponseDto
+        //        {
+        //            Id = staff.Id,
+        //            Email = user.Email,
+        //            Department = role.Name
+        //        };
 
-                // Trả về kết quả thành công
-                return new ResponseData<StaffInfoResponseDto>
-                {
-                    Success = true,
-                    Message = "Staff found successfully.",
-                    Data = response,
-                    Code = (int)ErrorCodeAPI.OK
-                };
-            }
-            catch (Exception ex)
-            {
-                // Xử lý lỗi và trả về thông báo lỗi chi tiết
-                return new ResponseData<StaffInfoResponseDto>
-                {
-                    Success = false,
-                    Message = ex.Message,
-                    Code = (int)ErrorCodeAPI.SystemIsError
-                };
-            }
-        }
+        //        // Trả về kết quả thành công
+        //        return new ResponseData<StaffInfoResponseDto>
+        //        {
+        //            Success = true,
+        //            Message = "Staff found successfully.",
+        //            Data = response,
+        //            Code = (int)ErrorCodeAPI.OK
+        //        };
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        // Xử lý lỗi và trả về thông báo lỗi chi tiết
+        //        return new ResponseData<StaffInfoResponseDto>
+        //        {
+        //            Success = false,
+        //            Message = ex.Message,
+        //            Code = (int)ErrorCodeAPI.SystemIsError
+        //        };
+        //    }
+        //}
 
 
     }

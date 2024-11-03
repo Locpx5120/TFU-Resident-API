@@ -12,9 +12,9 @@ public partial class Invoice : MasterDataEntityBase
 
     public Guid ServiceContractId { get; set; }
 
-    public Guid UserId { get; set; }
+    public Guid ResidentId { get; set; }
 
-    public virtual User User { get; set; }
+    public virtual Resident Resident { get; set; }
 
     public virtual ServiceContract ServiceContract { get; set; }
 }

@@ -16,23 +16,23 @@ namespace TFU_Building_API.Controllers
             this.buildingContext = buildingContext;
         }
 
-        [HttpGet("Test")]
-        public IActionResult Test()
-        {
-            var a = this.HttpContext.RequestServices.GetService<BuildingContext>();
-            return Ok(a.Statuses.FirstOrDefault().StatusName);
-        }
+        //[HttpGet("Test")]
+        //public IActionResult Test()
+        //{
+        //    var a = this.HttpContext.RequestServices.GetService<BuildingContext>();
+        //    return Ok(a.Statuses.FirstOrDefault().StatusName);
+        //}
 
-        [HttpPost("TestPost")]
-        public IActionResult TestPost(String a)
-        {
-            var aa = this.HttpContext.RequestServices.GetService<BuildingContext>();
-            Status status = new BuildingModels.Status();
-            status.StatusName = a;
-            aa.Statuses.Add(status);
-            aa.SaveChanges();
+        //[HttpPost("TestPost")]
+        //public IActionResult TestPost(String a)
+        //{
+        //    var aa = this.HttpContext.RequestServices.GetService<BuildingContext>();
+        //    Status status = new BuildingModels.Status();
+        //    status.StatusName = a;
+        //    aa.Statuses.Add(status);
+        //    aa.SaveChanges();
 
-            return Ok(status);
-        }
+        //    return Ok(status);
+        //}
     }
 }
