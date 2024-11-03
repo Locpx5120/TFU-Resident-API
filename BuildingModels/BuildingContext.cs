@@ -74,6 +74,8 @@ public partial class BuildingContext : DbContext
     public virtual DbSet<ThirdParty> ThirdParties { get; set; }
 
     public virtual DbSet<ThirdPartyContact> ThirdPartyContacts { get; set; }
+    public virtual DbSet<ServiceCategory> ServiceCategories { get; set; }
+    public virtual DbSet<Vehicle> Vehicles { get; set; }
 
 
 

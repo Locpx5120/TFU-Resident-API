@@ -52,9 +52,6 @@ namespace TFU_Building_API.Service.impl
                     InsertedAt = DateTime.Now,
                     UpdatedAt = DateTime.Now,
                     IsActive = true,
-                    Canceled = false,
-                    LastRenewalDate = null,
-                    RenewStatus = false,
                     Note = request.Note,
                     PackageServiceId = request.PackageServiceId
                 };

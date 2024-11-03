@@ -10,4 +10,7 @@ public partial class Service : MasterDataEntityBase
     public decimal UnitPrice { get; set; }
     public string Unit { get; set; }
     public bool IsPackageAllowed { get; set; }
+
+    public Guid ServiceCategoryID { get; set; }
+    public virtual ServiceCategory ServiceCategory { get; set; }
 }
