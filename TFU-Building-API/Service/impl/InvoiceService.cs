@@ -1,13 +1,11 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using TFU_Building_API.Dto;
-using TFU_Building_API.Core.Infrastructure;
-using Core.Model;
-using BuildingModels;
+﻿using BuildingModels;
 using Core.Enums;
+using Core.Model;
+using Microsoft.EntityFrameworkCore;
+using QRCoder;
 using TFU_Building_API.Core.Handler;
+using TFU_Building_API.Core.Infrastructure;
+using TFU_Building_API.Dto;
 
 namespace TFU_Building_API.Service.impl
 {
@@ -135,6 +133,76 @@ namespace TFU_Building_API.Service.impl
                     Message = ex.Message,
                     Code = (int)ErrorCodeAPI.SystemIsError
                 };
+            }
+        }
+
+        public async Task<ResponseData<InvoicePaymentResponseDto>> ProcessInvoicePaymentAsync(InvoicePaymentRequestDto request)
+        {
+            try
+            {
+                // Tìm invoice dựa vào InvoiceId
+                var invoice = await _unitOfWork.InvoiceRepository.GetByIdAsync(request.InvoiceId);
+                if (invoice == null || invoice.IsDeleted ==  true)
+                {
+                    return new ResponseData<InvoicePaymentResponseDto>
+                    {
+                        Success = false,
+                        Message = "Invoice not found.",
+                        Code = (int)ErrorCodeAPI.NotFound
+                    };
+                }
+
+                // Cập nhật thông tin thanh toán
+                invoice.PaidStatus = true;
+                invoice.PaidDate = DateTime.Now;
+                invoice.UpdatedAt = DateTime.Now;
+
+                _unitOfWork.InvoiceRepository.Update(invoice);
+                await _unitOfWork.SaveChangesAsync();
+
+                // Tạo QR Code
+                var qrCodeData = GenerateQRCode(request.BankAccountName, request.BankAccountNumber, request.BankName, request.Amount, request.TransactionContent);
+                var qrCodeUrl = $"data:image/png;base64,{Convert.ToBase64String(qrCodeData)}";
+
+                return new ResponseData<InvoicePaymentResponseDto>
+                {
+                    Success = true,
+                    Message = "Payment processed successfully.",
+                    Data = new InvoicePaymentResponseDto
+                    {
+                        Success = true,
+                        QRCodeUrl = qrCodeUrl,
+                        Message = "Please scan the QR code with your banking app to proceed with payment."
+                    },
+                    Code = (int)ErrorCodeAPI.OK
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResponseData<InvoicePaymentResponseDto>
+                {
+                    Success = false,
+                    Message = ex.Message,
+                    Code = (int)ErrorCodeAPI.SystemIsError
+                };
+            }
+        }
+
+        private byte[] GenerateQRCode(string accountName, string accountNumber, string bankName, decimal amount, string transactionContent)
+        {
+            using (var qrGenerator = new QRCodeGenerator())
+            {
+                string qrContent = $"BankAccountName={accountName}&BankAccountNumber={accountNumber}&BankName={bankName}&Amount={amount}&TransactionContent={transactionContent}";
+                var qrCodeData = qrGenerator.CreateQrCode(qrContent, QRCodeGenerator.ECCLevel.Q);
+
+                // Use the fully qualified name here to avoid conflicts
+                using (var qrCode = new QRCoder.QRCode(qrCodeData))
+                using (var bitmap = qrCode.GetGraphic(20))
+                using (var stream = new MemoryStream())
+                {
+                    bitmap.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
+                    return stream.ToArray();
+                }
             }
         }
 

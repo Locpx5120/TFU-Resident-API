@@ -10,5 +10,7 @@ namespace TFU_Building_API.Service
         Task<ResponseData<List<ServiceContractDetailDto>>> GetServiceContractDetails(Guid apartmentId);
         Task<ResponseData<PaginatedResponseDto<ServiceContractDetailDto>>> GetServiceContractDetails(ServiceContractDetailRequestDto request);
         Task<ResponseData<List<AddVehicleServiceResponseDto>>> AddVehicleServiceAsync(AddVehicleServiceRequestDto request);
+
+
     }
 }

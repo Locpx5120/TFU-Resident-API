@@ -33,5 +33,21 @@ namespace TFU_Building_API.Controllers
 
             return Ok(response);
         }
+
+        /// <summary>
+        /// Xử lý thanh toán cho hóa đơn và tạo mã QR thanh toán.
+        /// </summary>
+        /// <param name="request">Yêu cầu thanh toán hóa đơn.</param>
+        /// <returns>Kết quả thanh toán và mã QR.</returns>
+        [HttpPost("process-payment")]
+        public async Task<IActionResult> ProcessInvoicePayment([FromBody] InvoicePaymentRequestDto request)
+        {
+            var result = await _invoiceService.ProcessInvoicePaymentAsync(request);
+            if (result.Success)
+            {
+                return Ok(result);
+            }
+            return BadRequest(result);
+        }
     }
 }
