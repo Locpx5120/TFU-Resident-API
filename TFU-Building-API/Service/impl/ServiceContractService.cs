@@ -339,7 +339,7 @@ namespace TFU_Building_API.Service.impl
                         Id = Guid.NewGuid(),
                         StartDate = serviceRequest.StartDate,
                         EndDate = endDate,
-                        Status = 1, // Assuming 1 means "Active"
+                        Status = ServiceContractStatus.Pending, // Assuming 1 means "Active"
                         Quantity = 1, // Assuming 1 for one vehicle service
                         Note = serviceRequest.Note,
                         ApartmentId = serviceRequest.ApartmentId,

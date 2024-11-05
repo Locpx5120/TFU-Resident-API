@@ -29,6 +29,26 @@
         public int PageSize { get; set; } = 10;  // Kích thước mặc định là 10
     }
 
+    public class ServiceRequestSearchDto
+    {
+        public string? ServiceName { get; set; }
+        public Guid? BuildingId { get; set; }
+        public int? Status { get; set; }
+        public int PageNumber { get; set; } = 1;
+        public int PageSize { get; set; } = 10;
+    }
+
+
+    public class ServiceRequestDto
+    {
+        public string ServiceType { get; set; }
+        public DateTime Date { get; set; }
+        public string Building { get; set; }
+        public string Status { get; set; } // Status as a descriptive string
+        public Guid ServiceContractId { get; set; }
+    }
+
+
     //public class PaginatedResponseDto<T>
     //{
     //    public int TotalRecords { get; set; }
