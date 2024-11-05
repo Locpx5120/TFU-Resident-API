@@ -10,7 +10,9 @@
         public Guid ServiceId { get; set; }
         public Guid PackageServiceId { get; set; }
         public string Note { get; set; }
+        public DateTime StartDate { get; set; }
     }
+
 
     public class AddVehicleServiceRequestDto
     {

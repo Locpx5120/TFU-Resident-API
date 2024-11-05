@@ -285,11 +285,22 @@ namespace TFU_Building_API.Service.impl
         {
             try
             {
-                // Khởi tạo danh sách response
                 var responseList = new List<AddVehicleServiceResponseDto>();
+                var minimumStartDate = DateTime.Now.AddDays(7); // Minimum allowed start date (one week from now)
 
                 foreach (var serviceRequest in request.Services)
                 {
+                    // Validate StartDate
+                    if (serviceRequest.StartDate < minimumStartDate)
+                    {
+                        responseList.Add(new AddVehicleServiceResponseDto
+                        {
+                            Success = false,
+                            Message = $"Start date for license plate {serviceRequest.LicensePlate} must be at least one week from today."
+                        });
+                        continue; // Skip to the next service request
+                    }
+
                     // Step 1: Add Vehicle to Vehicles table
                     var vehicle = new Vehicle
                     {
@@ -319,14 +330,17 @@ namespace TFU_Building_API.Service.impl
                         continue;
                     }
 
+                    // Calculate EndDate based on StartDate and package duration
+                    var endDate = serviceRequest.StartDate.AddMonths(packageService.DurationInMonth);
+
                     // Step 3: Add Service Contract to ServiceContracts table
                     var serviceContract = new ServiceContract
                     {
                         Id = Guid.NewGuid(),
-                        StartDate = DateTime.Now,
-                        EndDate = DateTime.Now.AddMonths(packageService.DurationInMonth),
-                        Status = 1,
-                        Quantity = 1,
+                        StartDate = serviceRequest.StartDate,
+                        EndDate = endDate,
+                        Status = 1, // Assuming 1 means "Active"
+                        Quantity = 1, // Assuming 1 for one vehicle service
                         Note = serviceRequest.Note,
                         ApartmentId = serviceRequest.ApartmentId,
                         ServiceId = serviceRequest.ServiceId,
@@ -340,7 +354,7 @@ namespace TFU_Building_API.Service.impl
 
                     _unitOfWork.ServiceContractRepository.Add(serviceContract);
 
-                    // Thêm response cho từng dịch vụ đã thêm thành công
+                    // Add success response for each added service
                     responseList.Add(new AddVehicleServiceResponseDto
                     {
                         Success = true,
@@ -348,7 +362,7 @@ namespace TFU_Building_API.Service.impl
                     });
                 }
 
-                // Lưu tất cả thay đổi một lần
+                // Save all changes at once
                 await _unitOfWork.SaveChangesAsync();
 
                 return new ResponseData<List<AddVehicleServiceResponseDto>>
@@ -366,18 +380,18 @@ namespace TFU_Building_API.Service.impl
                     Success = false,
                     Message = ex.Message,
                     Data = new List<AddVehicleServiceResponseDto>
-                    {
-                        new AddVehicleServiceResponseDto
-                        {
-                            Success = false,
-                            Message = ex.Message
-                        }
-                    },
+            {
+                new AddVehicleServiceResponseDto
+                {
+                    Success = false,
+                    Message = ex.Message
+                }
+            },
                     Code = (int)ErrorCodeAPI.SystemIsError
                 };
             }
         }
 
-        
+
     }
 }
