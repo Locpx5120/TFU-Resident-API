@@ -392,6 +392,56 @@ namespace TFU_Building_API.Service.impl
             }
         }
 
+        public async Task<ResponseData<VehicleServiceDetailDto>> GetVehicleServiceDetailAsync(Guid serviceContractId)
+        {
+            try
+            {
+                var serviceDetail = await (from sc in _unitOfWork.ServiceContractRepository.GetQuery(sc => sc.Id == serviceContractId && sc.IsDeleted == false)
+                                           join a in _unitOfWork.ApartmentRepository.GetQuery(a => a.IsDeleted == false) on sc.ApartmentId equals a.Id
+                                           join b in _unitOfWork.BuildingRepository.GetQuery(b => b.IsDeleted == false) on a.BuildingId equals b.Id
+                                           join s in _unitOfWork.ServiceRepository.GetQuery(s => s.IsDeleted == false) on sc.ServiceId equals s.Id
+                                           join ps in _unitOfWork.PackageServiceRepository.GetQuery(ps => ps.IsDeleted == false) on sc.PackageServiceId equals ps.Id
+                                           join v in _unitOfWork.VehicleRepository.GetQuery(v => v.IsDeleted == false) on sc.VehicleId equals v.Id
+                                           select new VehicleServiceDetailDto
+                                           {
+                                               BuildingName = b.Name,
+                                               ApartmentNumber = a.RoomNumber,
+                                               ServiceName = s.ServiceName,
+                                               Package = $"{ps.DurationInMonth} tháng",
+                                               VehicleType = v.VehicleType,
+                                               LicensePlate = v.LicensePlate,
+                                               StartDate = sc.StartDate??DateTime.Now,
+                                               EndDate = sc.EndDate??DateTime.Now,
+                                               Note = sc.Note
+                                           }).FirstOrDefaultAsync();
 
+                if (serviceDetail == null)
+                {
+                    return new ResponseData<VehicleServiceDetailDto>
+                    {
+                        Success = false,
+                        Message = "Service contract not found",
+                        Code = (int)ErrorCodeAPI.NotFound
+                    };
+                }
+
+                return new ResponseData<VehicleServiceDetailDto>
+                {
+                    Success = true,
+                    Message = "Vehicle service details retrieved successfully",
+                    Data = serviceDetail,
+                    Code = (int)ErrorCodeAPI.OK
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResponseData<VehicleServiceDetailDto>
+                {
+                    Success = false,
+                    Message = ex.Message,
+                    Code = (int)ErrorCodeAPI.SystemIsError
+                };
+            }
+        }
     }
 }

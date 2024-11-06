@@ -36,4 +36,18 @@
         public string Message { get; set; }
     }
 
+    public class VehicleServiceDetailDto
+    {
+        public string BuildingName { get; set; }
+        public int ApartmentNumber { get; set; }
+        public string ServiceName { get; set; }
+        public string Package { get; set; }
+        public string VehicleType { get; set; }
+        public string VehicleModel { get; set; }
+        public string LicensePlate { get; set; }
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
+        public string Note { get; set; }
+    }
+
 }

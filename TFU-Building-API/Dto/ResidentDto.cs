@@ -82,8 +82,11 @@ namespace TFU_Building_API.Dto
     public class AddMemberRequestDto
     {
         public Guid ApartmentId { get; set; }
+        public Guid ServiceId { get; set; } // Added to specify the service type
+        //public Guid PackageServiceId { get; set; } // Added to specify the package type
         public List<MemberInfoDto> Members { get; set; }
     }
+
 
     // Dto/MemberInfoDto.cs
     public class MemberInfoDto
@@ -100,6 +103,18 @@ namespace TFU_Building_API.Dto
     {
         public bool Success { get; set; }
         public string Message { get; set; }
+    }
+
+    public class MemberServiceDetailDto
+    {
+        public string BuildingName { get; set; }
+        public int ApartmentNumber { get; set; }
+        public string ServiceName { get; set; }
+        public string MemberName { get; set; }
+        public DateTime DateOfBirth { get; set; }
+        public string Email { get; set; }
+        public string PhoneNumber { get; set; }
+        public string Note { get; set; }
     }
 
 }

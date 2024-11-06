@@ -321,17 +321,35 @@ namespace TFU_Building_API.Service.impl
                         IsDeleted = false,
                         InsertedAt = DateTime.Now,
                         UpdatedAt = DateTime.Now,
-                        Status = ServiceContractStatus.Pending,
-                        Note = member.Note,
                         IsActive = true
                     };
                     _unitOfWork.LivingRepository.Add(living);
+
+                    // Step 3: Insert into ServiceContracts table
+                    var serviceContract = new ServiceContract
+                    {
+                        Id = Guid.NewGuid(),
+                        StartDate = DateTime.Now,
+                        EndDate = DateTime.Now.AddMonths(12), // Assuming a default 12-month contract duration
+                        Status = 0, // Assuming 0 is the default status for a new contract (e.g., pending)
+                        Quantity = 1,
+                        Note = member.Note,
+                        ApartmentId = request.ApartmentId,
+                        ServiceId = request.ServiceId, // Pass the service ID from the request
+                        //PackageServiceId = request.PackageServiceId, // Pass the package ID from the request
+                        LivingId = living.Id, // Link to the Living record
+                        IsDeleted = false,
+                        InsertedAt = DateTime.Now,
+                        UpdatedAt = DateTime.Now,
+                        IsActive = true
+                    };
+                    _unitOfWork.ServiceContractRepository.Add(serviceContract);
 
                     // Add response for each member
                     responseList.Add(new AddMemberResponseDto
                     {
                         Success = true,
-                        Message = $"Member {member.Name} added successfully."
+                        Message = $"Member {member.Name} added successfully with service contract."
                     });
                 }
 
@@ -341,7 +359,7 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<List<AddMemberResponseDto>>
                 {
                     Success = true,
-                    Message = "All members added successfully.",
+                    Message = "All members and service contracts added successfully.",
                     Data = responseList,
                     Code = (int)ErrorCodeAPI.OK
                 };
@@ -353,13 +371,84 @@ namespace TFU_Building_API.Service.impl
                     Success = false,
                     Message = ex.Message,
                     Data = new List<AddMemberResponseDto>
-                    {
-                        new AddMemberResponseDto { Success = false, Message = ex.Message }
-                    },
+            {
+                new AddMemberResponseDto { Success = false, Message = ex.Message }
+            },
                     Code = (int)ErrorCodeAPI.SystemIsError
                 };
             }
         }
+
+
+        public async Task<ResponseData<MemberServiceDetailDto>> GetMemberServiceDetailAsync(Guid serviceContractId)
+        {
+            try
+            {
+                // Step 1: Retrieve the service contract details and associated apartment
+                var serviceContract = await _unitOfWork.ServiceContractRepository
+                    .GetQuery(sc => sc.Id == serviceContractId && sc.IsDeleted == false)
+                    .Include(sc => sc.Apartment)
+                        .ThenInclude(a => a.Building)
+                    .FirstOrDefaultAsync();
+
+                if (serviceContract == null)
+                {
+                    return new ResponseData<MemberServiceDetailDto>
+                    {
+                        Success = false,
+                        Message = "Service contract not found.",
+                        Code = (int)ErrorCodeAPI.NotFound
+                    };
+                }
+
+                // Step 2: Retrieve the resident details using the Livings table associated with this service contract
+                var living = await _unitOfWork.LivingRepository
+                    .GetQuery(l => l.Id == serviceContract.LivingId && l.IsDeleted == false)
+                    .Include(l => l.Resident)
+                    .FirstOrDefaultAsync();
+
+                if (living == null || living.Resident == null)
+                {
+                    return new ResponseData<MemberServiceDetailDto>
+                    {
+                        Success = false,
+                        Message = "Resident not found for this service contract.",
+                        Code = (int)ErrorCodeAPI.NotFound
+                    };
+                }
+
+                // Step 3: Prepare response data
+                var response = new MemberServiceDetailDto
+                {
+                    BuildingName = serviceContract.Apartment.Building.Name,
+                    ApartmentNumber = serviceContract.Apartment.RoomNumber,
+                    ServiceName = "Thêm thành viên", // Assuming "Add Member" is the fixed service type for this contract
+                    MemberName = living.Resident.Name,
+                    DateOfBirth = living.Resident.Birthday ?? DateTime.MinValue,
+                    Email = living.Resident.Email,
+                    PhoneNumber = living.Resident.Phone,
+                    Note = serviceContract.Note
+                };
+
+                return new ResponseData<MemberServiceDetailDto>
+                {
+                    Success = true,
+                    Message = "Member service details retrieved successfully",
+                    Data = response,
+                    Code = (int)ErrorCodeAPI.OK
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResponseData<MemberServiceDetailDto>
+                {
+                    Success = false,
+                    Message = ex.Message,
+                    Code = (int)ErrorCodeAPI.SystemIsError
+                };
+            }
+        }
+
 
     }
 }
