@@ -259,6 +259,7 @@ namespace TFU_Building_API.Service.impl
                             where inv.IssueDate.HasValue && inv.IssueDate.Value.Month == currentMonth && inv.IssueDate.Value.Year == currentYear
                             select new
                             {
+                                InvoiceId = inv.Id,
                                 ServiceName = s.ServiceName,
                                 Description = s.Description,
                                 QuantityOrArea = s.Unit == "m2" ? $"{at.LandArea} m2" : $"x{sc.Quantity}",
@@ -282,6 +283,7 @@ namespace TFU_Building_API.Service.impl
                 // Tính toán TotalPrice sau khi dữ liệu được tải
                 var services = result.Select(item => new UnpaidServiceDetailDto
                 {
+                    InvoiceId = item.InvoiceId,
                     ServiceName = item.ServiceName,
                     Description = item.Description,
                     QuantityOrArea = item.QuantityOrArea,

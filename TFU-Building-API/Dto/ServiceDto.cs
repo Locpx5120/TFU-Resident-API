@@ -51,6 +51,7 @@ namespace TFU_Building_API.Dto
 
     public class UnpaidServiceDetailDto
     {
+        public Guid InvoiceId { get; set; }
         public string ServiceName { get; set; }     // Tên dịch vụ
         public string Description { get; set; }     // Mô tả
         public string QuantityOrArea { get; set; }  // Số lượng hoặc diện tích
