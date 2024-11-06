@@ -12,5 +12,8 @@ namespace TFU_Building_API.Service
         Task<ResponseData<List<AddVehicleServiceResponseDto>>> AddVehicleServiceAsync(AddVehicleServiceRequestDto request);
 
         Task<ResponseData<VehicleServiceDetailDto>> GetVehicleServiceDetailAsync(Guid serviceContractId);
+
+        Task<ResponseData<AddVehicleServiceResponseDto>> UpdateVehicleServiceRequestAsync(UpdateVehicleServiceRequestDto request);
+
     }
 }

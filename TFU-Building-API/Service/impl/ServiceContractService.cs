@@ -443,5 +443,54 @@ namespace TFU_Building_API.Service.impl
                 };
             }
         }
+
+        public async Task<ResponseData<AddVehicleServiceResponseDto>> UpdateVehicleServiceRequestAsync(UpdateVehicleServiceRequestDto request)
+        {
+            try
+            {
+                // Retrieve the service contract based on the provided ID
+                var serviceContract = await _unitOfWork.ServiceContractRepository
+                    .GetQuery(sc => sc.Id == request.ServiceContractId && sc.IsDeleted == false)
+                    .FirstOrDefaultAsync();
+
+                if (serviceContract == null)
+                {
+                    return new ResponseData<AddVehicleServiceResponseDto>
+                    {
+                        Success = false,
+                        Message = "Service contract not found.",
+                        Data = new AddVehicleServiceResponseDto { Success = false, Message = "Service contract not found." },
+                        Code = (int)ErrorCodeAPI.NotFound
+                    };
+                }
+
+                // Update the service contract status and note
+                serviceContract.Status = request.Status;
+                serviceContract.Note = request.Note;
+                serviceContract.UpdatedAt = DateTime.Now;
+
+                // Save the updated contract
+                _unitOfWork.ServiceContractRepository.Update(serviceContract);
+                await _unitOfWork.SaveChangesAsync();
+
+                return new ResponseData<AddVehicleServiceResponseDto>
+                {
+                    Success = true,
+                    Message = "Vehicle service request updated successfully.",
+                    Data = new AddVehicleServiceResponseDto { Success = true, Message = "Service request updated successfully." },
+                    Code = (int)ErrorCodeAPI.OK
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResponseData<AddVehicleServiceResponseDto>
+                {
+                    Success = false,
+                    Message = ex.Message,
+                    Data = new AddVehicleServiceResponseDto { Success = false, Message = ex.Message },
+                    Code = (int)ErrorCodeAPI.SystemIsError
+                };
+            }
+        }
     }
 }

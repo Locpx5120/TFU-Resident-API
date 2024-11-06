@@ -50,4 +50,10 @@
         public string Note { get; set; }
     }
 
+    public class UpdateVehicleServiceRequestDto
+    {
+        public Guid ServiceContractId { get; set; }
+        public int Status { get; set; } // Use constants from ServiceContractStatus
+        public string Note { get; set; }
+    }
 }

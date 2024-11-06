@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Core.Enums;
+using Microsoft.AspNetCore.Mvc;
 using TFU_Building_API.Configure;
 using TFU_Building_API.Dto;
 using TFU_Building_API.Service;
@@ -84,7 +85,30 @@ namespace TFU_Building_API.Controllers
             return Ok(new { result.Success, result.Message, Data = result.Data });
         }
 
-       
+        /// <summary>
+        /// Cập nhật trạng thái và ghi chú cho yêu cầu dịch vụ
+        /// </summary>
+        /// <param name="request">Thông tin yêu cầu cập nhật</param>
+        /// <returns>Kết quả cập nhật yêu cầu dịch vụ</returns>
+        [HttpPut("update-service")]
+        public async Task<IActionResult> UpdateVehicleServiceRequest([FromBody] UpdateVehicleServiceRequestDto request)
+        {
+            if (request == null || request.ServiceContractId == Guid.Empty)
+            {
+                return BadRequest(new { Success = false, Message = "Invalid request data." });
+            }
+
+            var result = await _serviceContractService.UpdateVehicleServiceRequestAsync(request);
+
+            if (result.Success)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return StatusCode(result.Code == (int)ErrorCodeAPI.NotFound ? 404 : 500, result);
+            }
+        }
 
     }
 }
