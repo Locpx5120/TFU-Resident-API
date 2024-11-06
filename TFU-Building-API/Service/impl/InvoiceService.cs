@@ -206,5 +206,65 @@ namespace TFU_Building_API.Service.impl
             }
         }
 
+        public async Task<ResponseData<List<ResidentPaymentInfoDto>>> GetResidentPaymentListAsync(PaymentFilterDto filter)
+        {
+            try
+            {
+                var query = from invoice in _unitOfWork.InvoiceRepository.GetQuery(i => i.IsDeleted == false)
+                            join resident in _unitOfWork.ResidentRepository.GetQuery(r => r.IsDeleted == false) on invoice.ResidentId equals resident.Id
+                            join apartment in _unitOfWork.ApartmentRepository.GetQuery(a => a.IsDeleted == false) on invoice.ServiceContract.ApartmentId equals apartment.Id
+                            join building in _unitOfWork.BuildingRepository.GetQuery(b => b.IsDeleted == false) on apartment.BuildingId equals building.Id
+                            select new ResidentPaymentInfoDto
+                            {
+                                BuildingId = building.Id,
+                                ResidentName = resident.Name,
+                                BuildingName = building.Name,
+                                RoomNumber = apartment.RoomNumber,
+                                TotalAmount = invoice.TotalAmount,
+                                PaymentStatus = invoice.PaidStatus ? "Đã trả" : "Chưa trả",
+                                PaymentDate = invoice.PaidDate,
+                                InvoiceId = invoice.Id,
+                                PaidStatus = invoice.PaidStatus,
+                            };
+
+                // Apply filters
+                if (!string.IsNullOrEmpty(filter.ResidentName))
+                {
+                    query = query.Where(q => EF.Functions.Like(q.ResidentName, $"%{filter.ResidentName}%"));
+                }
+                if (filter.BuildingId.HasValue)
+                {
+                    query = query.Where(q => q.BuildingId == filter.BuildingId.Value);
+                }
+                if (filter.IsPaid.HasValue)
+                {
+                    query = query.Where(q => q.PaidStatus == filter.IsPaid.Value);
+                }
+                if (filter.PaymentMonth.HasValue)
+                {
+                    query = query.Where(q => q.PaymentDate.HasValue && q.PaymentDate.Value.Month == filter.PaymentMonth.Value.Month && q.PaymentDate.Value.Year == filter.PaymentMonth.Value.Year);
+                }
+
+                var result = await query.ToListAsync();
+
+                return new ResponseData<List<ResidentPaymentInfoDto>>
+                {
+                    Success = true,
+                    Message = "Payment information retrieved successfully.",
+                    Data = result,
+                    Code = (int)ErrorCodeAPI.OK
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResponseData<List<ResidentPaymentInfoDto>>
+                {
+                    Success = false,
+                    Message = ex.Message,
+                    Code = (int)ErrorCodeAPI.SystemIsError
+                };
+            }
+        }
+
     }
 }

@@ -8,6 +8,7 @@ namespace TFU_Building_API.Service
         Task<ResponseData<string>> AddInvoicesForApartment(CreateInvoiceRequestDto request);
         Task<ResponseData<InvoicePaymentResponseDto>> ProcessInvoicePaymentAsync(InvoicePaymentRequestDto request);
 
+        Task<ResponseData<List<ResidentPaymentInfoDto>>> GetResidentPaymentListAsync(PaymentFilterDto filter);
 
     }
 }
