@@ -108,5 +108,17 @@ namespace TFU_Building_API.Controllers
             return BadRequest(response);
         }
 
+        /// <summary>
+        /// Adds multiple members to an apartment.
+        /// </summary>
+        /// <param name="request">Request containing apartment ID and member details.</param>
+        /// <returns>Response indicating success or failure of the operation.</returns>
+        [HttpPost("add-members")]
+        public async Task<IActionResult> AddMembers([FromBody] AddMemberRequestDto request)
+        {
+            var result = await _residentService.AddMembersAsync(request);
+            return StatusCode(result.Code, result);
+        }
+
     }
 }

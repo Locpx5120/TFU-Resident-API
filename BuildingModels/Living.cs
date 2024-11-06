@@ -9,6 +9,8 @@ public class Living : MasterDataEntityBase
 
     public Guid? ResidentId { get; set; }
     public Guid? ApartmentId { get; set; }
+    public int Status { get; set; }
+    public string Note { get; set; }
 
     public virtual Apartment? Apartment { get; set; }
     public virtual Resident? Resident { get; set; }

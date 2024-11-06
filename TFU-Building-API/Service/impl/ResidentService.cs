@@ -4,6 +4,7 @@ using BuildingModels;
 using Core.Enums;
 using Core.Model;
 using Microsoft.EntityFrameworkCore;
+using TFU_Building_API.Core.Helper;
 using TFU_Building_API.Core.Infrastructure;
 using TFU_Building_API.Dto;
 
@@ -286,6 +287,79 @@ namespace TFU_Building_API.Service.impl
             }
         }
 
+        public async Task<ResponseData<List<AddMemberResponseDto>>> AddMembersAsync(AddMemberRequestDto request)
+        {
+            try
+            {
+                var responseList = new List<AddMemberResponseDto>();
+
+                foreach (var member in request.Members)
+                {
+                    // Step 1: Insert into Residents table
+                    var resident = new Resident
+                    {
+                        Id = Guid.NewGuid(),
+                        Name = member.Name,
+                        Email = member.Email,
+                        Birthday = member.Birthday,
+                        Phone = member.Phone,
+                        IsOwner = false,
+                        IsDeleted = false,
+                        InsertedAt = DateTime.Now,
+                        UpdatedAt = DateTime.Now,
+                        IsActive = true
+                    };
+                    _unitOfWork.ResidentRepository.Add(resident);
+
+                    // Step 2: Insert into Livings table
+                    var living = new Living
+                    {
+                        Id = Guid.NewGuid(),
+                        StartDate = DateTime.Now,
+                        ResidentId = resident.Id,
+                        ApartmentId = request.ApartmentId,
+                        IsDeleted = false,
+                        InsertedAt = DateTime.Now,
+                        UpdatedAt = DateTime.Now,
+                        Status = ServiceContractStatus.Pending,
+                        Note = member.Note,
+                        IsActive = true
+                    };
+                    _unitOfWork.LivingRepository.Add(living);
+
+                    // Add response for each member
+                    responseList.Add(new AddMemberResponseDto
+                    {
+                        Success = true,
+                        Message = $"Member {member.Name} added successfully."
+                    });
+                }
+
+                // Commit all changes at once
+                await _unitOfWork.SaveChangesAsync();
+
+                return new ResponseData<List<AddMemberResponseDto>>
+                {
+                    Success = true,
+                    Message = "All members added successfully.",
+                    Data = responseList,
+                    Code = (int)ErrorCodeAPI.OK
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResponseData<List<AddMemberResponseDto>>
+                {
+                    Success = false,
+                    Message = ex.Message,
+                    Data = new List<AddMemberResponseDto>
+                    {
+                        new AddMemberResponseDto { Success = false, Message = ex.Message }
+                    },
+                    Code = (int)ErrorCodeAPI.SystemIsError
+                };
+            }
+        }
 
     }
 }

@@ -10,5 +10,7 @@ namespace TFU_Building_API.Service
         //Task<ResponseData<PagedResidentListResponseDto>> GetResidentsByOwnershipId(ResidentSearchRequestDto request);
         Task<ResponseData<ResidentResponseDto>> DeleteResident(ResidentDeleteRequestDto request);
         Task<ResponseData<ResidentInfoResponseDto>> GetResidentById(Guid residentId);
+        Task<ResponseData<List<AddMemberResponseDto>>> AddMembersAsync(AddMemberRequestDto request);
+
     }
 }

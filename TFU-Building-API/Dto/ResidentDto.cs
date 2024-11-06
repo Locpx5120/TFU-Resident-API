@@ -77,4 +77,29 @@ namespace TFU_Building_API.Dto
         public string Email { get; set; }
         public string Phone { get; set; }
     }
+
+    // Dto/AddMemberRequestDto.cs
+    public class AddMemberRequestDto
+    {
+        public Guid ApartmentId { get; set; }
+        public List<MemberInfoDto> Members { get; set; }
+    }
+
+    // Dto/MemberInfoDto.cs
+    public class MemberInfoDto
+    {
+        public string Name { get; set; }
+        public string Email { get; set; }
+        public DateTime Birthday { get; set; }
+        public string Phone { get; set; }
+        public string Note { get; set; }
+    }
+
+    // Dto/AddMemberResponseDto.cs
+    public class AddMemberResponseDto
+    {
+        public bool Success { get; set; }
+        public string Message { get; set; }
+    }
+
 }
