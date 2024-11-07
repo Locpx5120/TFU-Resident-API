@@ -201,16 +201,24 @@ namespace TFU_Building_API.Service.impl
         {
             try
             {
+                // Building the query with additional filters for service name, building, and service type
                 var query = from sc in _unitOfWork.ServiceContractRepository.GetQuery(x => (x.IsDeleted == false))
                             join s in _unitOfWork.ServiceRepository.GetQuery(x => (x.IsDeleted == false))
                                 on sc.ServiceId equals s.Id
                             join a in _unitOfWork.ApartmentRepository.GetQuery(x => (x.IsDeleted == false))
                                 on sc.ApartmentId equals a.Id
+                            join b in _unitOfWork.BuildingRepository.GetQuery(x => (x.IsDeleted == false))
+                                on a.BuildingId equals b.Id
                             join at in _unitOfWork.ApartmentTypeRepository.GetQuery(x => x.IsActive && (x.IsDeleted == false))
                                 on a.ApartmentTypeId equals at.Id
+                            where (string.IsNullOrEmpty(request.ServiceName) || s.ServiceName.Contains(request.ServiceName)) &&
+                                  (request.BuildingId == null || b.Id == request.BuildingId) &&
+                                  (request.ServiceTypeId == null || s.ServiceCategoryID == request.ServiceTypeId)
                             select new
                             {
+                                ServiceContractId = sc.Id,
                                 Apartment = a.RoomNumber,
+                                Building = b.Name,
                                 ServiceName = s.ServiceName,
                                 Purpose = s.Description,
                                 CreatedDate = sc.StartDate ?? DateTime.Now,
@@ -222,19 +230,21 @@ namespace TFU_Building_API.Service.impl
                                     ? sc.UpdatedAt : (DateTime?)null
                             };
 
-                // Lấy tổng số bản ghi trước khi phân trang
+                // Get the total record count before pagination
                 var totalRecords = await query.CountAsync();
 
-                // Áp dụng phân trang
+                // Apply pagination
                 var pagedData = await query
                     .Skip((request.PageNumber - 1) * request.PageSize)
                     .Take(request.PageSize)
                     .ToListAsync();
 
-                // Áp dụng xử lý Status bên ngoài truy vấn
+                // Process the data outside of the query for additional formatting
                 var result = pagedData.Select(item => new ServiceContractDetailDto
                 {
+                    ServiceContractId = item.ServiceContractId,
                     Apartment = item.Apartment,
+                    Building = item.Building,
                     ServiceName = item.ServiceName,
                     Purpose = item.Purpose,
                     CreatedDate = item.CreatedDate,
@@ -269,6 +279,7 @@ namespace TFU_Building_API.Service.impl
                 };
             }
         }
+
 
         private static string GetStatusDescription(int? status)
         {
