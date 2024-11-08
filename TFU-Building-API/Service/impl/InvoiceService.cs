@@ -4,6 +4,7 @@ using Core.Model;
 using Microsoft.EntityFrameworkCore;
 using QRCoder;
 using TFU_Building_API.Core.Handler;
+using TFU_Building_API.Core.Helper;
 using TFU_Building_API.Core.Infrastructure;
 using TFU_Building_API.Dto;
 
@@ -55,7 +56,7 @@ namespace TFU_Building_API.Service.impl
 
                 // Lấy tất cả các hợp đồng dịch vụ cho căn hộ, bao gồm Service, Apartment và ApartmentType
                 var serviceContracts = await _unitOfWork.ServiceContractRepository
-                    .GetQuery(x => x.ApartmentId == request.ApartmentId && x.IsActive && (x.IsDeleted == false))
+                    .GetQuery(x => x.ApartmentId == request.ApartmentId && x.Status == ServiceContractStatus.Approved  && x.IsActive && (x.IsDeleted == false))
                     .Include(sc => sc.Service) // Eager-load bảng Service
                     .Include(sc => sc.Apartment) // Eager-load bảng Apartment
                     .ThenInclude(a => a.ApartmentType) // Eager-load bảng ApartmentType thông qua Apartment
