@@ -2,6 +2,7 @@
 using Entity;
 using SuperOwnerModels;
 using TFU_Resident_API.Dto;
+using TFU_Resident_API.Model;
 
 namespace Core.Mapper
 {
@@ -11,6 +12,7 @@ namespace Core.Mapper
         {
             //this.CreateMap<SuperOwnerModels.Investor, InvestorDto>();
             this.CreateMap<CreateInvestorDto, SuperOwnerModels.Investor>();
+            this.CreateMap<UserInfoResponse, User>().ReverseMap();
             //this.CreateMap<SuperOwnerModels.Project, ProjectDto>();
             this.CreateMap<CreateProjectDto, SuperOwnerModels.Project>();
             //this.CreateMap<SuperOwnerModels.Building, BuildingDto>();
