@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Core.Enums;
+using Microsoft.AspNetCore.Mvc;
 using TFU_Building_API.Configure;
 using TFU_Building_API.Dto;
 using TFU_Building_API.Service;
@@ -48,6 +49,26 @@ namespace TFU_Building_API.Controllers
                 return Ok(result);
             }
             return BadRequest(result);
+        }
+
+        /// <summary>
+        /// Lấy danh sách tiền thu từ cư dân
+        /// </summary>
+        /// <param name="filter">Bộ lọc thanh toán</param>
+        /// <returns>Danh sách thông tin thanh toán</returns>
+        [HttpGet("resident-payments")]
+        public async Task<IActionResult> GetResidentPayments([FromQuery] PaymentFilterDto filter)
+        {
+            var result = await _invoiceService.GetResidentPaymentListAsync(filter);
+
+            if (result.Success)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return StatusCode(result.Code == (int)ErrorCodeAPI.SystemIsError ? 500 : 404, result);
+            }
         }
     }
 }

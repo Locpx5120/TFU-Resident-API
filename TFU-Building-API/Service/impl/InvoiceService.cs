@@ -4,6 +4,7 @@ using Core.Model;
 using Microsoft.EntityFrameworkCore;
 using QRCoder;
 using TFU_Building_API.Core.Handler;
+using TFU_Building_API.Core.Helper;
 using TFU_Building_API.Core.Infrastructure;
 using TFU_Building_API.Dto;
 
@@ -55,7 +56,7 @@ namespace TFU_Building_API.Service.impl
 
                 // Lấy tất cả các hợp đồng dịch vụ cho căn hộ, bao gồm Service, Apartment và ApartmentType
                 var serviceContracts = await _unitOfWork.ServiceContractRepository
-                    .GetQuery(x => x.ApartmentId == request.ApartmentId && x.IsActive && (x.IsDeleted == false))
+                    .GetQuery(x => x.ApartmentId == request.ApartmentId && x.Status == ServiceContractStatus.Approved  && x.IsActive && (x.IsDeleted == false))
                     .Include(sc => sc.Service) // Eager-load bảng Service
                     .Include(sc => sc.Apartment) // Eager-load bảng Apartment
                     .ThenInclude(a => a.ApartmentType) // Eager-load bảng ApartmentType thông qua Apartment
@@ -203,6 +204,66 @@ namespace TFU_Building_API.Service.impl
                     bitmap.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
                     return stream.ToArray();
                 }
+            }
+        }
+
+        public async Task<ResponseData<List<ResidentPaymentInfoDto>>> GetResidentPaymentListAsync(PaymentFilterDto filter)
+        {
+            try
+            {
+                var query = from invoice in _unitOfWork.InvoiceRepository.GetQuery(i => i.IsDeleted == false)
+                            join resident in _unitOfWork.ResidentRepository.GetQuery(r => r.IsDeleted == false) on invoice.ResidentId equals resident.Id
+                            join apartment in _unitOfWork.ApartmentRepository.GetQuery(a => a.IsDeleted == false) on invoice.ServiceContract.ApartmentId equals apartment.Id
+                            join building in _unitOfWork.BuildingRepository.GetQuery(b => b.IsDeleted == false) on apartment.BuildingId equals building.Id
+                            select new ResidentPaymentInfoDto
+                            {
+                                BuildingId = building.Id,
+                                ResidentName = resident.Name,
+                                BuildingName = building.Name,
+                                RoomNumber = apartment.RoomNumber,
+                                TotalAmount = invoice.TotalAmount,
+                                PaymentStatus = invoice.PaidStatus ? "Đã trả" : "Chưa trả",
+                                PaymentDate = invoice.PaidDate,
+                                InvoiceId = invoice.Id,
+                                PaidStatus = invoice.PaidStatus,
+                            };
+
+                // Apply filters
+                if (!string.IsNullOrEmpty(filter.ResidentName))
+                {
+                    query = query.Where(q => EF.Functions.Like(q.ResidentName, $"%{filter.ResidentName}%"));
+                }
+                if (filter.BuildingId.HasValue)
+                {
+                    query = query.Where(q => q.BuildingId == filter.BuildingId.Value);
+                }
+                if (filter.IsPaid.HasValue)
+                {
+                    query = query.Where(q => q.PaidStatus == filter.IsPaid.Value);
+                }
+                if (filter.PaymentMonth.HasValue)
+                {
+                    query = query.Where(q => q.PaymentDate.HasValue && q.PaymentDate.Value.Month == filter.PaymentMonth.Value.Month && q.PaymentDate.Value.Year == filter.PaymentMonth.Value.Year);
+                }
+
+                var result = await query.ToListAsync();
+
+                return new ResponseData<List<ResidentPaymentInfoDto>>
+                {
+                    Success = true,
+                    Message = "Payment information retrieved successfully.",
+                    Data = result,
+                    Code = (int)ErrorCodeAPI.OK
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResponseData<List<ResidentPaymentInfoDto>>
+                {
+                    Success = false,
+                    Message = ex.Message,
+                    Code = (int)ErrorCodeAPI.SystemIsError
+                };
             }
         }
 

@@ -120,5 +120,17 @@ namespace TFU_Building_API.Controllers
             return StatusCode(result.Code, result);
         }
 
+        [HttpGet("member-service-details/{serviceContractId}")]
+        public async Task<IActionResult> GetMemberServiceDetails(Guid serviceContractId)
+        {
+            var result = await _residentService.GetMemberServiceDetailAsync(serviceContractId);
+
+            if (!result.Success)
+            {
+                return StatusCode(result.Code, new { result.Success, result.Message });
+            }
+
+            return Ok(new { result.Success, result.Message, Data = result.Data });
+        }
     }
 }

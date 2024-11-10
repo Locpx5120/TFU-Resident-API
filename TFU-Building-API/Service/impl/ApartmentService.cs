@@ -199,7 +199,38 @@ namespace TFU_Building_API.Service.impl
             }
         }
 
+        public async Task<ResponseData<List<ApartmentDto>>> GetApartmentsByBuildingIdAsync(Guid buildingId)
+        {
+            try
+            {
+                var apartments = await _unitOfWork.ApartmentRepository
+                    .GetQuery(a => a.BuildingId == buildingId && a.IsDeleted == false)
+                    .Select(a => new ApartmentDto
+                    {
+                        Id = a.Id,
+                        RoomNumber = a.RoomNumber
+                    })
+                    .ToListAsync();
 
+                return new ResponseData<List<ApartmentDto>>
+                {
+                    Success = true,
+                    Message = "Apartments retrieved successfully.",
+                    Data = apartments,
+                    Code = (int)ErrorCodeAPI.OK
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResponseData<List<ApartmentDto>>
+                {
+                    Success = false,
+                    Message = ex.Message,
+                    Data = null,
+                    Code = (int)ErrorCodeAPI.SystemIsError
+                };
+            }
+        }
 
 
     }

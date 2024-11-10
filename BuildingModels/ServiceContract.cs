@@ -13,6 +13,8 @@ public partial class ServiceContract : MasterDataEntityBase
     public Guid? ServiceId { get; set; }
     public Guid? VehicleId { get; set; }
     public Guid? PackageServiceId { get; set; }
+    public Guid? LivingId { get; set; }
+    public virtual Living Living { get; set; }
 
     public virtual PackageService? PackageService { get; set; }
 

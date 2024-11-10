@@ -201,16 +201,24 @@ namespace TFU_Building_API.Service.impl
         {
             try
             {
+                // Building the query with additional filters for service name, building, and service type
                 var query = from sc in _unitOfWork.ServiceContractRepository.GetQuery(x => (x.IsDeleted == false))
                             join s in _unitOfWork.ServiceRepository.GetQuery(x => (x.IsDeleted == false))
                                 on sc.ServiceId equals s.Id
                             join a in _unitOfWork.ApartmentRepository.GetQuery(x => (x.IsDeleted == false))
                                 on sc.ApartmentId equals a.Id
+                            join b in _unitOfWork.BuildingRepository.GetQuery(x => (x.IsDeleted == false))
+                                on a.BuildingId equals b.Id
                             join at in _unitOfWork.ApartmentTypeRepository.GetQuery(x => x.IsActive && (x.IsDeleted == false))
                                 on a.ApartmentTypeId equals at.Id
+                            where (string.IsNullOrEmpty(request.ServiceName) || s.ServiceName.Contains(request.ServiceName)) &&
+                                  (request.BuildingId == null || b.Id == request.BuildingId) &&
+                                  (request.ServiceTypeId == null || s.ServiceCategoryID == request.ServiceTypeId)
                             select new
                             {
+                                ServiceContractId = sc.Id,
                                 Apartment = a.RoomNumber,
+                                Building = b.Name,
                                 ServiceName = s.ServiceName,
                                 Purpose = s.Description,
                                 CreatedDate = sc.StartDate ?? DateTime.Now,
@@ -222,19 +230,21 @@ namespace TFU_Building_API.Service.impl
                                     ? sc.UpdatedAt : (DateTime?)null
                             };
 
-                // Lấy tổng số bản ghi trước khi phân trang
+                // Get the total record count before pagination
                 var totalRecords = await query.CountAsync();
 
-                // Áp dụng phân trang
+                // Apply pagination
                 var pagedData = await query
                     .Skip((request.PageNumber - 1) * request.PageSize)
                     .Take(request.PageSize)
                     .ToListAsync();
 
-                // Áp dụng xử lý Status bên ngoài truy vấn
+                // Process the data outside of the query for additional formatting
                 var result = pagedData.Select(item => new ServiceContractDetailDto
                 {
+                    ServiceContractId = item.ServiceContractId,
                     Apartment = item.Apartment,
+                    Building = item.Building,
                     ServiceName = item.ServiceName,
                     Purpose = item.Purpose,
                     CreatedDate = item.CreatedDate,
@@ -269,6 +279,7 @@ namespace TFU_Building_API.Service.impl
                 };
             }
         }
+
 
         private static string GetStatusDescription(int? status)
         {
@@ -392,6 +403,105 @@ namespace TFU_Building_API.Service.impl
             }
         }
 
+        public async Task<ResponseData<VehicleServiceDetailDto>> GetVehicleServiceDetailAsync(Guid serviceContractId)
+        {
+            try
+            {
+                var serviceDetail = await (from sc in _unitOfWork.ServiceContractRepository.GetQuery(sc => sc.Id == serviceContractId && sc.IsDeleted == false)
+                                           join a in _unitOfWork.ApartmentRepository.GetQuery(a => a.IsDeleted == false) on sc.ApartmentId equals a.Id
+                                           join b in _unitOfWork.BuildingRepository.GetQuery(b => b.IsDeleted == false) on a.BuildingId equals b.Id
+                                           join s in _unitOfWork.ServiceRepository.GetQuery(s => s.IsDeleted == false) on sc.ServiceId equals s.Id
+                                           join ps in _unitOfWork.PackageServiceRepository.GetQuery(ps => ps.IsDeleted == false) on sc.PackageServiceId equals ps.Id
+                                           join v in _unitOfWork.VehicleRepository.GetQuery(v => v.IsDeleted == false) on sc.VehicleId equals v.Id
+                                           select new VehicleServiceDetailDto
+                                           {
+                                               BuildingName = b.Name,
+                                               ApartmentNumber = a.RoomNumber,
+                                               ServiceName = s.ServiceName,
+                                               Package = $"{ps.DurationInMonth} tháng",
+                                               VehicleType = v.VehicleType,
+                                               LicensePlate = v.LicensePlate,
+                                               StartDate = sc.StartDate??DateTime.Now,
+                                               EndDate = sc.EndDate??DateTime.Now,
+                                               Note = sc.Note
+                                           }).FirstOrDefaultAsync();
 
+                if (serviceDetail == null)
+                {
+                    return new ResponseData<VehicleServiceDetailDto>
+                    {
+                        Success = false,
+                        Message = "Service contract not found",
+                        Code = (int)ErrorCodeAPI.NotFound
+                    };
+                }
+
+                return new ResponseData<VehicleServiceDetailDto>
+                {
+                    Success = true,
+                    Message = "Vehicle service details retrieved successfully",
+                    Data = serviceDetail,
+                    Code = (int)ErrorCodeAPI.OK
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResponseData<VehicleServiceDetailDto>
+                {
+                    Success = false,
+                    Message = ex.Message,
+                    Code = (int)ErrorCodeAPI.SystemIsError
+                };
+            }
+        }
+
+        public async Task<ResponseData<AddVehicleServiceResponseDto>> UpdateVehicleServiceRequestAsync(UpdateVehicleServiceRequestDto request)
+        {
+            try
+            {
+                // Retrieve the service contract based on the provided ID
+                var serviceContract = await _unitOfWork.ServiceContractRepository
+                    .GetQuery(sc => sc.Id == request.ServiceContractId && sc.IsDeleted == false)
+                    .FirstOrDefaultAsync();
+
+                if (serviceContract == null)
+                {
+                    return new ResponseData<AddVehicleServiceResponseDto>
+                    {
+                        Success = false,
+                        Message = "Service contract not found.",
+                        Data = new AddVehicleServiceResponseDto { Success = false, Message = "Service contract not found." },
+                        Code = (int)ErrorCodeAPI.NotFound
+                    };
+                }
+
+                // Update the service contract status and note
+                serviceContract.Status = request.Status;
+                serviceContract.Note = request.Note;
+                serviceContract.UpdatedAt = DateTime.Now;
+
+                // Save the updated contract
+                _unitOfWork.ServiceContractRepository.Update(serviceContract);
+                await _unitOfWork.SaveChangesAsync();
+
+                return new ResponseData<AddVehicleServiceResponseDto>
+                {
+                    Success = true,
+                    Message = "Vehicle service request updated successfully.",
+                    Data = new AddVehicleServiceResponseDto { Success = true, Message = "Service request updated successfully." },
+                    Code = (int)ErrorCodeAPI.OK
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResponseData<AddVehicleServiceResponseDto>
+                {
+                    Success = false,
+                    Message = ex.Message,
+                    Data = new AddVehicleServiceResponseDto { Success = false, Message = ex.Message },
+                    Code = (int)ErrorCodeAPI.SystemIsError
+                };
+            }
+        }
     }
 }

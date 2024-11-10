@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Core.Enums;
+using Microsoft.AspNetCore.Mvc;
 using TFU_Building_API.Configure;
 using TFU_Building_API.Dto;
 using TFU_Building_API.Service;
@@ -51,6 +52,31 @@ public class ApartmentController : ControllerBase
         if (result.Success)
             return Ok(result);
         return BadRequest(result);
+    }
+
+    /// <summary>
+    /// Lấy danh sách căn hộ theo tòa nhà
+    /// </summary>
+    /// <param name="buildingId">ID của tòa nhà</param>
+    /// <returns>Danh sách căn hộ</returns>
+    [HttpGet("by-building")]
+    public async Task<IActionResult> GetApartmentsByBuildingId([FromQuery] Guid buildingId)
+    {
+        if (buildingId == Guid.Empty)
+        {
+            return BadRequest(new { Success = false, Message = "Invalid building ID." });
+        }
+
+        var result = await _apartmentService.GetApartmentsByBuildingIdAsync(buildingId);
+
+        if (result.Success)
+        {
+            return Ok(result);
+        }
+        else
+        {
+            return StatusCode(result.Code == (int)ErrorCodeAPI.SystemIsError ? 500 : 404, result);
+        }
     }
 
 }
