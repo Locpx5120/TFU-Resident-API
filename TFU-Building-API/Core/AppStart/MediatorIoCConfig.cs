@@ -48,6 +48,7 @@ namespace TFU_Building_API.Core.AppStart
 
             services.AddScoped<IServiceCategoryService, ServiceCategoryService>();
             services.AddScoped<IServiceRequestService, ServiceRequestService>();
+            services.AddScoped<IApartmentType, ApartmentTypeService>();
 
 
             //Singleton
