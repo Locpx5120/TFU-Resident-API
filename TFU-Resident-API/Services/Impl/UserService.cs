@@ -216,7 +216,7 @@ namespace TFU_Resident_API.Services.Impl
 
             if (!String.IsNullOrEmpty(request.Name))
             {
-                users = users.Where(x => x.UserName == request.Name).ToList();
+                users = users.Where(x => x.UserName.StartsWith(request.Name)).ToList();
             }
 
             if (request.RoleId != null && request.RoleId != Guid.Empty)
