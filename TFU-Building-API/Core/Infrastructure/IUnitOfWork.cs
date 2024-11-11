@@ -65,6 +65,12 @@ namespace TFU_Building_API.Core.Infrastructure
         IMasterDataRepository<ServiceCategory> ServiceCategoryRepository { get; }
 
         #endregion
+
+        #region ThirdParty
+        IMasterDataRepository<ThirdParty> ThirdPartyRepository { get; } 
+        IMasterDataRepository<ThirdPartyContact> ThirdPartyContractRepository { get; }
+
+        #endregion
         Task<int> SaveChangesAsync();
     }
 }

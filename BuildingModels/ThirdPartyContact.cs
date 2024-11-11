@@ -12,4 +12,7 @@ public partial class ThirdPartyContact : MasterDataEntityBase
     public Guid? ThirdPartyId { get; set; }
 
     public virtual ThirdParty ThirdParty { get; set; } = null!;
+
+    public Guid? ApartmentId { get; set; }
+    public virtual Apartment Apartment { get; set; }
 }

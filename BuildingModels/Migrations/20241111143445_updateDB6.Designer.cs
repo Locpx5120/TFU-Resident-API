@@ -4,6 +4,7 @@ using BuildingModels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BuildingModels.Migrations
 {
     [DbContext(typeof(BuildingContext))]
-    partial class BuildingContextModelSnapshot : ModelSnapshot
+    [Migration("20241111143445_updateDB6")]
+    partial class updateDB6
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1095,7 +1097,7 @@ namespace BuildingModels.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("ApartmentId")
+                    b.Property<Guid>("ApartmentId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("EndDate")
@@ -1405,7 +1407,9 @@ namespace BuildingModels.Migrations
                 {
                     b.HasOne("BuildingModels.Apartment", "Apartment")
                         .WithMany()
-                        .HasForeignKey("ApartmentId");
+                        .HasForeignKey("ApartmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("BuildingModels.ThirdParty", "ThirdParty")
                         .WithMany()

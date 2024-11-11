@@ -4,6 +4,7 @@ using BuildingModels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BuildingModels.Migrations
 {
     [DbContext(typeof(BuildingContext))]
-    partial class BuildingContextModelSnapshot : ModelSnapshot
+    [Migration("20241111143017_updateDB5")]
+    partial class updateDB5
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1070,7 +1072,7 @@ namespace BuildingModels.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid?>("StaffId")
+                    b.Property<Guid>("StaffId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("Status")
@@ -1080,6 +1082,9 @@ namespace BuildingModels.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<Guid?>("UpdatedById")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("UserId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
@@ -1095,7 +1100,7 @@ namespace BuildingModels.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("ApartmentId")
+                    b.Property<Guid>("ApartmentId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("EndDate")
@@ -1396,7 +1401,9 @@ namespace BuildingModels.Migrations
                 {
                     b.HasOne("BuildingModels.Staff", "Staff")
                         .WithMany()
-                        .HasForeignKey("StaffId");
+                        .HasForeignKey("StaffId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Staff");
                 });
@@ -1405,7 +1412,9 @@ namespace BuildingModels.Migrations
                 {
                     b.HasOne("BuildingModels.Apartment", "Apartment")
                         .WithMany()
-                        .HasForeignKey("ApartmentId");
+                        .HasForeignKey("ApartmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("BuildingModels.ThirdParty", "ThirdParty")
                         .WithMany()

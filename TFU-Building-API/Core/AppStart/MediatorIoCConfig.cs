@@ -50,6 +50,8 @@ namespace TFU_Building_API.Core.AppStart
             services.AddScoped<IServiceRequestService, ServiceRequestService>();
             services.AddScoped<IApartmentType, ApartmentTypeService>();
 
+            services.AddScoped<IThirdPartyService, ThirdPartyService>();
+
 
             //Singleton
             services.AddSingleton<DapperDbContext>();

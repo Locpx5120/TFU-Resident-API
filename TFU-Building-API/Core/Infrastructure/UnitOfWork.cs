@@ -137,7 +137,19 @@ namespace TFU_Building_API.Core.Infrastructure
             get { return _serviceCategoryRepository ??= new MasterDataRepository<ServiceCategory>(_context, _currentUser); }
         }
         #endregion
+        #region ThirdParty
+        private IMasterDataRepository<ThirdParty> _thirdPartyRepository;
+        public IMasterDataRepository<ThirdParty> ThirdPartyRepository
+        {
+            get { return _thirdPartyRepository ??= new MasterDataRepository<ThirdParty>(_context, _currentUser); }
+        }
 
+        private IMasterDataRepository<ThirdPartyContact> _thirdPartyContractRepository;
+        public IMasterDataRepository<ThirdPartyContact> ThirdPartyContractRepository
+        {
+            get { return _thirdPartyContractRepository ??= new MasterDataRepository<ThirdPartyContact>(_context, _currentUser); }
+        }
+        #endregion
 
 
         public async Task<int> SaveChangesAsync()
