@@ -21,18 +21,34 @@ namespace TFU_Building_API.Service.impl
         {
             try
             {
-                // Step 1: Generate a random password
+                // Kiểm tra xem email đã tồn tại trong bảng Staff hay chưa
+                var existingStaff = await _unitOfWork.StaffRepository
+                    .GetQuery(s => s.Email == request.ContactInfo && s.IsDeleted == false)
+                    .FirstOrDefaultAsync();
+
+                if (existingStaff != null)
+                {
+                    // Nếu email đã tồn tại, trả về thông báo lỗi
+                    return new ResponseData<AddThirdPartyResponseDto>
+                    {
+                        Success = false,
+                        Message = "Email đã tồn tại. Vui lòng sử dụng một email khác.",
+                        Code = (int)ErrorCodeAPI.EmailUsed
+                    };
+                }
+
+                // Bước 1: Tạo mật khẩu ngẫu nhiên
                 string generatedPassword = GenerateRandomPassword();
 
-                // Step 2: Create a staff account for third-party login without hashing the password
+                // Bước 2: Tạo tài khoản staff cho đăng nhập bên thứ ba mà không băm mật khẩu
                 var staff = new Staff
                 {
                     Id = Guid.NewGuid(),
                     FullName = request.CompanyName,
                     Email = request.ContactInfo,
-                    Password = generatedPassword, // Plain password, not hashed
-                    PhoneNumber = "", // Optional, as not provided in the request
-                    RoleId = RoleConstants.TenantRoleId, // Assign a specific role ID for third-party tenants
+                    Password = generatedPassword, // Plain password, không băm mật khẩu
+                    PhoneNumber = "", // Không bắt buộc, không có trong yêu cầu
+                    RoleId = RoleConstants.TenantRoleId, // Gán ID role cụ thể cho bên thuê thứ ba
                     IsDeleted = false,
                     InsertedAt = DateTime.Now,
                     UpdatedAt = DateTime.Now,
@@ -41,7 +57,7 @@ namespace TFU_Building_API.Service.impl
                 };
                 _unitOfWork.StaffRepository.Add(staff);
 
-                // Step 3: Add entry to ThirdParties table
+                // Bước 3: Thêm vào bảng ThirdParties
                 var thirdParty = new ThirdParty
                 {
                     Id = Guid.NewGuid(),
@@ -57,20 +73,20 @@ namespace TFU_Building_API.Service.impl
                 };
                 _unitOfWork.ThirdPartyRepository.Add(thirdParty);
 
-                // Commit all changes
+                // Lưu tất cả thay đổi
                 await _unitOfWork.SaveChangesAsync();
 
-                // Return response with generated credentials
+                // Trả về response với thông tin tài khoản đã tạo
                 return new ResponseData<AddThirdPartyResponseDto>
                 {
                     Success = true,
-                    Message = "Third-party tenant added successfully.",
+                    Message = "Thêm bên thuê thứ ba thành công.",
                     Data = new AddThirdPartyResponseDto
                     {
                         Success = true,
-                        Message = "Account created successfully.",
+                        Message = "Tài khoản đã được tạo thành công.",
                         Username = staff.Email,
-                        Password = generatedPassword // Return plain password for user notification
+                        Password = generatedPassword // Trả về mật khẩu để thông báo cho người dùng
                     },
                     Code = (int)ErrorCodeAPI.OK
                 };
@@ -85,6 +101,7 @@ namespace TFU_Building_API.Service.impl
                 };
             }
         }
+
 
         private string GenerateRandomPassword()
         {
