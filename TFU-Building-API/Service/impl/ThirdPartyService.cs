@@ -252,6 +252,59 @@ namespace TFU_Building_API.Service.impl
             }
         }
 
+
+        public async Task<ResponseData<ThirdPartyContractDetailDto>> GetThirdPartyContractDetailAsync(Guid thirdPartyId)
+        {
+            try
+            {
+                var contractDetail = await (from tp in _unitOfWork.ThirdPartyRepository.GetQuery(x => x.IsDeleted == false && x.Id == thirdPartyId)
+                                            join tpc in _unitOfWork.ThirdPartyContractRepository.GetQuery(x => x.IsDeleted == false)
+                                                on tp.Id equals tpc.ThirdPartyId
+                                            join a in _unitOfWork.ApartmentRepository.GetQuery(x => x.IsDeleted == false)
+                                                on tpc.ApartmentId equals a.Id into apartmentJoin
+                                            from a in apartmentJoin.DefaultIfEmpty()
+                                            join b in _unitOfWork.BuildingRepository.GetQuery(x => x.IsDeleted == false)
+                                                on a.BuildingId equals b.Id into buildingJoin
+                                            from b in buildingJoin.DefaultIfEmpty()
+                                            select new ThirdPartyContractDetailDto
+                                            {
+                                                CompanyName = tp.NameCompany,
+                                                BuildingName = b != null ? b.Name : null,
+                                                FloorNumber = a != null ? a.FloorNumber : null,
+                                                RoomNumber = a != null ? a.RoomNumber : null,
+                                                StartDate = tpc.StartDate,
+                                                EndDate = tpc.EndDate,
+                                                Price = tpc.Price
+                                            }).FirstOrDefaultAsync();
+
+                if (contractDetail == null)
+                {
+                    return new ResponseData<ThirdPartyContractDetailDto>
+                    {
+                        Success = false,
+                        Message = "Không tìm thấy hợp đồng.",
+                        Code = (int)ErrorCodeAPI.NotFound
+                    };
+                }
+
+                return new ResponseData<ThirdPartyContractDetailDto>
+                {
+                    Success = true,
+                    Message = "Lấy chi tiết hợp đồng thành công.",
+                    Data = contractDetail,
+                    Code = (int)ErrorCodeAPI.OK
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResponseData<ThirdPartyContractDetailDto>
+                {
+                    Success = false,
+                    Message = ex.Message,
+                    Code = (int)ErrorCodeAPI.SystemIsError
+                };
+            }
+        }
     }
 
 }

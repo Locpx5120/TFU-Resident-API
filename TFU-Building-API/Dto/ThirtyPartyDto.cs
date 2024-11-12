@@ -52,4 +52,16 @@
         public DateTime? EndDate { get; set; }
     }
 
+    public class ThirdPartyContractDetailDto
+    {
+        public string CompanyName { get; set; }      // Tên công ty
+        public string BuildingName { get; set; }     // Tên tòa nhà
+        public int? FloorNumber { get; set; }        // Số tầng
+        public int? RoomNumber { get; set; }         // Số phòng
+        public DateTime? StartDate { get; set; }      // Ngày thuê
+        public DateTime? EndDate { get; set; }        // Ngày hết hạn
+        public decimal Price { get; set; }           // Giá dịch vụ (VNĐ)
+    }
+
+    
 }

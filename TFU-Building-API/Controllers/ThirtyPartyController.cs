@@ -58,4 +58,20 @@ public class ThirdPartyController : ControllerBase
         }
         return BadRequest(result);
     }
+
+    /// <summary>
+    /// Lấy chi tiết hợp đồng của bên thứ ba
+    /// </summary>
+    /// <param name="thirdPartyId">ID của bên thứ ba</param>
+    /// <returns>Thông tin chi tiết hợp đồng</returns>
+    [HttpGet("contract-detail/{thirdPartyId}")]
+    public async Task<IActionResult> GetThirdPartyContractDetail(Guid thirdPartyId)
+    {
+        var result = await _thirdPartyService.GetThirdPartyContractDetailAsync(thirdPartyId);
+        if (result.Success)
+        {
+            return Ok(result);
+        }
+        return BadRequest(result);
+    }
 }
