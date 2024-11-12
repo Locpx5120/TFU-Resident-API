@@ -4,7 +4,7 @@ using TFU_Building_API.Configure;
 using TFU_Building_API.Dto;
 using TFU_Building_API.Service;
 
-[Route("api/thirtyparty")]
+[Route("api/thirdparty")]
 [ApiController]
 [CustomFilter]
 public class ThirdPartyController : ControllerBase
