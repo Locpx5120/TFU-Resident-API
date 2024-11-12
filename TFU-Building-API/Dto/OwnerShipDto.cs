@@ -13,6 +13,8 @@ namespace TFU_Building_API.Dto
 
         [Required]
         public int FloorNumber { get; set; }
+
+        public Guid BuildingId { get; set; }
     }
 
     public class OwnerShipResponseDto
@@ -34,6 +36,8 @@ namespace TFU_Building_API.Dto
 
         [Required]
         public int FloorNumber { get; set; }
+
+        public Guid BuildingId { get; set; }
     }
 
     public class OwnerShipDeleteRequestDto
