@@ -63,5 +63,15 @@
         public decimal Price { get; set; }           // Giá dịch vụ (VNĐ)
     }
 
-    
+    public class ThirdPartyContractInfoDto
+    {
+        public string BuildingName { get; set; }      // Tên building
+        public int? FloorNumber { get; set; }         // Số tầng
+        public int? RoomNumber { get; set; }          // Số phòng
+        public decimal Area { get; set; }             // Diện tích mặt bằng (m2)
+        public DateTime? StartDate { get; set; }       // Ngày thuê
+        public DateTime? EndDate { get; set; }         // Ngày hết hạn
+        public decimal Price { get; set; }            // Giá thuê (VNĐ)
+        public string Status { get; set; }            // Trạng thái hợp đồng (trong thời hạn/chuẩn bị hết hạn)
+    }
 }

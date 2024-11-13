@@ -305,6 +305,67 @@ namespace TFU_Building_API.Service.impl
                 };
             }
         }
+
+        public async Task<ResponseData<List<ThirdPartyContractInfoDto>>> GetContractDetailsForThirdPartyAsync(Guid staffId)
+        {
+            try
+            {
+                // Tìm bên thứ ba dựa trên staffId
+                var thirdParty = await _unitOfWork.ThirdPartyRepository
+                    .GetQuery(tp => tp.StaffId == staffId && tp.IsDeleted == false)
+                    .FirstOrDefaultAsync();
+
+                if (thirdParty == null)
+                {
+                    return new ResponseData<List<ThirdPartyContractInfoDto>>
+                    {
+                        Success = false,
+                        Message = "Không tìm thấy bên thứ ba.",
+                        Code = (int)ErrorCodeAPI.NotFound
+                    };
+                }
+
+                // Lấy danh sách hợp đồng
+                var contractDetails = await (from tpc in _unitOfWork.ThirdPartyContractRepository.GetQuery(c => c.IsDeleted == false && c.ThirdPartyId == thirdParty.Id)
+                                             join a in _unitOfWork.ApartmentRepository.GetQuery(a => a.IsDeleted == false)
+                                                 on tpc.ApartmentId equals a.Id into apartmentJoin
+                                             from a in apartmentJoin.DefaultIfEmpty()
+                                             join at in _unitOfWork.ApartmentTypeRepository.GetQuery(at => at.IsDeleted == false)
+                                                 on a.ApartmentTypeId equals at.Id into apartmentTypeJoin
+                                             from at in apartmentTypeJoin.DefaultIfEmpty()
+                                             join b in _unitOfWork.BuildingRepository.GetQuery(b => b.IsDeleted == false)
+                                                 on a.BuildingId equals b.Id into buildingJoin
+                                             from b in buildingJoin.DefaultIfEmpty()
+                                             select new ThirdPartyContractInfoDto
+                                             {
+                                                 BuildingName = b != null ? b.Name : null,
+                                                 FloorNumber = a != null ? a.FloorNumber : null,
+                                                 RoomNumber = a != null ? a.RoomNumber : null,
+                                                 Area = at != null ? at.LandArea : 0, // Diện tích từ bảng ApartmentType
+                                                 StartDate = tpc.StartDate,
+                                                 EndDate = tpc.EndDate,
+                                                 Price = tpc.Price,
+                                                 Status = tpc.EndDate <= DateTime.Now.AddMonths(1) ? "Chuẩn bị hết hạn" : "Trong thời hạn"
+                                             }).ToListAsync();
+
+                return new ResponseData<List<ThirdPartyContractInfoDto>>
+                {
+                    Success = true,
+                    Message = "Lấy thông tin hợp đồng thành công.",
+                    Data = contractDetails,
+                    Code = (int)ErrorCodeAPI.OK
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResponseData<List<ThirdPartyContractInfoDto>>
+                {
+                    Success = false,
+                    Message = ex.Message,
+                    Code = (int)ErrorCodeAPI.SystemIsError
+                };
+            }
+        }
     }
 
 }

@@ -1,5 +1,6 @@
 ﻿using Core.Enums;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using TFU_Building_API.Configure;
 using TFU_Building_API.Dto;
 using TFU_Building_API.Service;
@@ -68,6 +69,23 @@ public class ThirdPartyController : ControllerBase
     public async Task<IActionResult> GetThirdPartyContractDetail(Guid thirdPartyId)
     {
         var result = await _thirdPartyService.GetThirdPartyContractDetailAsync(thirdPartyId);
+        if (result.Success)
+        {
+            return Ok(result);
+        }
+        return BadRequest(result);
+    }
+
+    /// <summary>
+    /// Lấy thông tin hợp đồng của bên thứ ba theo StaffId từ token
+    /// </summary>
+    [HttpGet("contracts")]
+    public async Task<IActionResult> GetContractDetails()
+    {
+        // Giả sử StaffId lấy từ token
+        var staffId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+        var result = await _thirdPartyService.GetContractDetailsForThirdPartyAsync(staffId);
         if (result.Success)
         {
             return Ok(result);
