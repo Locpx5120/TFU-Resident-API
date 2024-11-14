@@ -229,43 +229,124 @@ namespace TFU_Building_API.Service.impl
 
 
 
-        public async Task<ResponseData<PaginatedResponseDto<UnpaidServiceSummaryDto>>> GetUnpaidServiceSummaryByUserId(Guid userId, int pageSize, int pageNumber)
+        //public async Task<ResponseData<PaginatedResponseDto<UnpaidServiceSummaryDto>>> GetUnpaidServiceSummaryByUserId(Guid userId, int pageSize, int pageNumber)
+        //{
+        //    try
+        //    {
+        //        var currentMonth = DateTime.Now.Month;
+        //        var currentYear = DateTime.Now.Year;
+
+        //        var query = from inv in _unitOfWork.InvoiceRepository.GetQuery(x => x.PaidStatus == false && x.IsDeleted == false)
+        //                    join sc in _unitOfWork.ServiceContractRepository.GetQuery(x => x.IsActive && x.IsDeleted == false)
+        //                        on inv.ServiceContractId equals sc.Id
+        //                    join o in _unitOfWork.OwnerShipRepository.GetQuery(x => x.ResidentId == userId && x.IsDeleted == false)
+        //                        on sc.ApartmentId equals o.ApartmentId
+        //                    join a in _unitOfWork.ApartmentRepository.GetQuery(x => x.IsDeleted == false)
+        //                        on sc.ApartmentId equals a.Id
+        //                    where inv.IssueDate.HasValue && inv.IssueDate.Value.Month == currentMonth && inv.IssueDate.Value.Year == currentYear
+        //                    group new { inv, sc } by new { a.Id, a.RoomNumber } into apartmentGroup
+        //                    select new UnpaidServiceSummaryDto
+        //                    {
+        //                        ApartmentId = apartmentGroup.Key.Id, // Trả về ApartmentId
+        //                        RoomNumber = apartmentGroup.Key.RoomNumber,
+        //                        TotalServices = apartmentGroup.Sum(x => x.sc.Quantity ?? 1), // Tổng số lượng từ cột Quantity của bảng ServiceContract
+        //                        Month = currentMonth,
+        //                        PaymentStatus = "Chưa thanh toán"
+        //                    };
+
+
+
+        //        // Tính tổng số bản ghi trước khi phân trang
+        //        var totalRecords = await query.CountAsync();
+
+        //        // Áp dụng phân trang
+        //        var data = await query
+        //            .Skip((pageNumber - 1) * pageSize)
+        //            .Take(pageSize)
+        //            .ToListAsync();
+
+        //        // Đóng gói kết quả vào PaginatedResponseDto
+        //        var response = new PaginatedResponseDto<UnpaidServiceSummaryDto>
+        //        {
+        //            TotalRecords = totalRecords,
+        //            Data = data
+        //        };
+
+        //        return new ResponseData<PaginatedResponseDto<UnpaidServiceSummaryDto>>
+        //        {
+        //            Success = true,
+        //            Message = "Successfully retrieved unpaid service summary.",
+        //            Data = response,
+        //            Code = (int)ErrorCodeAPI.OK
+        //        };
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return new ResponseData<PaginatedResponseDto<UnpaidServiceSummaryDto>>
+        //        {
+        //            Success = false,
+        //            Message = ex.Message,
+        //            Code = (int)ErrorCodeAPI.SystemIsError
+        //        };
+        //    }
+        //}
+
+        public async Task<ResponseData<PaginatedResponseDto<UnpaidServiceSummaryDto>>> GetServiceSummaryByUserId(
+      Guid userId, ServiceSummaryRequestDto request)
         {
             try
             {
-                var currentMonth = DateTime.Now.Month;
-                var currentYear = DateTime.Now.Year;
-
-                var query = from inv in _unitOfWork.InvoiceRepository.GetQuery(x => x.PaidStatus == false && x.IsDeleted == false)
+                var query = from inv in _unitOfWork.InvoiceRepository.GetQuery(x => x.IsDeleted == false)
                             join sc in _unitOfWork.ServiceContractRepository.GetQuery(x => x.IsActive && x.IsDeleted == false)
                                 on inv.ServiceContractId equals sc.Id
                             join o in _unitOfWork.OwnerShipRepository.GetQuery(x => x.ResidentId == userId && x.IsDeleted == false)
                                 on sc.ApartmentId equals o.ApartmentId
                             join a in _unitOfWork.ApartmentRepository.GetQuery(x => x.IsDeleted == false)
                                 on sc.ApartmentId equals a.Id
-                            where inv.IssueDate.HasValue && inv.IssueDate.Value.Month == currentMonth && inv.IssueDate.Value.Year == currentYear
-                            group new { inv, sc } by new { a.Id, a.RoomNumber } into apartmentGroup
+                            join b in _unitOfWork.BuildingRepository.GetQuery(x => x.IsDeleted == false)
+                                on a.BuildingId equals b.Id
                             select new UnpaidServiceSummaryDto
                             {
-                                ApartmentId = apartmentGroup.Key.Id, // Trả về ApartmentId
-                                RoomNumber = apartmentGroup.Key.RoomNumber,
-                                TotalServices = apartmentGroup.Sum(x => x.sc.Quantity ?? 1), // Tổng số lượng từ cột Quantity của bảng ServiceContract
-                                Month = currentMonth,
-                                PaymentStatus = "Chưa thanh toán"
+                                ApartmentId = a.Id,
+                                RoomNumber = a.RoomNumber,
+                                BuildingId = b.Id,
+                                BuildingName = b.Name,
+                                TotalServices = sc.Quantity ?? 1,
+                                Month = inv.IssueDate.HasValue ? inv.IssueDate.Value.Month : 0,
+                                PaymentStatus = inv.PaidStatus ? "Đã thanh toán" : "Chưa thanh toán"
                             };
 
+                // Apply filters from request
+                if (request.BuildingIdFilter.HasValue)
+                {
+                    query = query.Where(x => x.BuildingId == request.BuildingIdFilter.Value);
+                }
+                if (request.ApartmentIdFilter.HasValue)
+                {
+                    query = query.Where(x => x.ApartmentId == request.ApartmentIdFilter.Value);
+                }
+                if (!string.IsNullOrEmpty(request.PaymentStatusFilter))
+                {
+                    query = query.Where(x => x.PaymentStatus == request.PaymentStatusFilter);
+                }
+                if (request.MonthFilter.HasValue)
+                {
+                    query = query.Where(x => x.Month == request.MonthFilter.Value);
+                }
 
+                // Sort by month
+                query = query.OrderByDescending(x => x.Month);
 
-                // Tính tổng số bản ghi trước khi phân trang
+                // Calculate total records before pagination
                 var totalRecords = await query.CountAsync();
 
-                // Áp dụng phân trang
+                // Apply pagination
                 var data = await query
-                    .Skip((pageNumber - 1) * pageSize)
-                    .Take(pageSize)
+                    .Skip((request.PageNumber - 1) * request.PageSize)
+                    .Take(request.PageSize)
                     .ToListAsync();
 
-                // Đóng gói kết quả vào PaginatedResponseDto
+                // Wrap the result in PaginatedResponseDto
                 var response = new PaginatedResponseDto<UnpaidServiceSummaryDto>
                 {
                     TotalRecords = totalRecords,
@@ -275,7 +356,7 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<PaginatedResponseDto<UnpaidServiceSummaryDto>>
                 {
                     Success = true,
-                    Message = "Successfully retrieved unpaid service summary.",
+                    Message = "Successfully retrieved service summary.",
                     Data = response,
                     Code = (int)ErrorCodeAPI.OK
                 };
@@ -291,7 +372,8 @@ namespace TFU_Building_API.Service.impl
             }
         }
 
-       
+
+
 
         public async Task<ResponseData<UnpaidServiceDetailResponseDto>> GetUnpaidServiceDetailsByApartmentId(UnpaidServiceDetailRequestDto request)
         {

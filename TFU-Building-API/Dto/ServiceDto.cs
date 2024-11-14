@@ -45,11 +45,27 @@ namespace TFU_Building_API.Dto
     public class UnpaidServiceSummaryDto
     {
         public Guid ApartmentId { get; set; }
+        public Guid BuildingId { get; set; } // Added for building ID
+        public string BuildingName { get; set; }
         public int RoomNumber { get; set; }
         public int TotalServices { get; set; }
         public int Month { get; set; }
         public string PaymentStatus { get; set; }
     }
+
+
+    public class ServiceSummaryRequestDto
+    {
+        public int PageSize { get; set; } = 10;
+        public int PageNumber { get; set; } = 1;
+        public Guid? BuildingIdFilter { get; set; } // Filter by Building ID
+        public Guid? ApartmentIdFilter { get; set; } // Filter by Apartment ID
+        public string? PaymentStatusFilter { get; set; }
+        public int? MonthFilter { get; set; }
+    }
+
+
+
 
     public class UnpaidServiceDetailDto
     {
