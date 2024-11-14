@@ -15,6 +15,59 @@ namespace TFU_Building_API.Service.impl
             _unitOfWork = unitOfWork;
         }
 
+        //public async Task<ResponseData<PaginatedResponseDto<ApartmentServiceSummaryDto>>> GetApartmentServiceSummaryByUserId(Guid userId, int pageSize, int pageNumber)
+        //{
+        //    try
+        //    {
+        //        var query = from sc in _unitOfWork.ServiceContractRepository.GetQuery(x => x.IsActive && x.IsDeleted == false)
+        //                    join s in _unitOfWork.ServiceRepository.GetQuery(x => x.IsDeleted == false)
+        //                        on sc.ServiceId equals s.Id
+        //                    join o in _unitOfWork.OwnerShipRepository.GetQuery(x => x.ResidentId == userId && x.IsDeleted == false)
+        //                        on sc.ApartmentId equals o.ApartmentId
+        //                    group new { sc, s } by new { sc.ApartmentId, RoomNumber = sc.Apartment.RoomNumber } into apartmentGroup
+        //                    select new ApartmentServiceSummaryDto
+        //                    {
+        //                        ApartmentId = apartmentGroup.Key.ApartmentId ?? new Guid(),
+        //                        RoomNumber = apartmentGroup.Key.RoomNumber,
+        //                        TotalServices = apartmentGroup.Sum(x => x.s.Unit == "m2" ? 1 : x.sc.Quantity ?? 0)
+        //                    };
+
+
+        //        // Tính tổng số bản ghi trước khi phân trang
+        //        var totalRecords = await query.CountAsync();
+
+        //        // Áp dụng phân trang
+        //        var data = await query
+        //            .Skip((pageNumber - 1) * pageSize)
+        //            .Take(pageSize)
+        //            .ToListAsync();
+
+        //        // Đóng gói kết quả vào PaginatedResponseDto
+        //        var response = new PaginatedResponseDto<ApartmentServiceSummaryDto>
+        //        {
+        //            TotalRecords = totalRecords,
+        //            Data = data
+        //        };
+
+        //        return new ResponseData<PaginatedResponseDto<ApartmentServiceSummaryDto>>
+        //        {
+        //            Success = true,
+        //            Message = "Successfully retrieved apartment service summary.",
+        //            Data = response,
+        //            Code = (int)ErrorCodeAPI.OK
+        //        };
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return new ResponseData<PaginatedResponseDto<ApartmentServiceSummaryDto>>
+        //        {
+        //            Success = false,
+        //            Message = ex.Message,
+        //            Code = (int)ErrorCodeAPI.SystemIsError
+        //        };
+        //    }
+        //}
+
         public async Task<ResponseData<PaginatedResponseDto<ApartmentServiceSummaryDto>>> GetApartmentServiceSummaryByUserId(Guid userId, int pageSize, int pageNumber)
         {
             try
@@ -24,25 +77,29 @@ namespace TFU_Building_API.Service.impl
                                 on sc.ServiceId equals s.Id
                             join o in _unitOfWork.OwnerShipRepository.GetQuery(x => x.ResidentId == userId && x.IsDeleted == false)
                                 on sc.ApartmentId equals o.ApartmentId
-                            group new { sc, s } by new { sc.ApartmentId, RoomNumber = sc.Apartment.RoomNumber } into apartmentGroup
+                            join a in _unitOfWork.ApartmentRepository.GetQuery(x => x.IsDeleted == false)
+                                on sc.ApartmentId equals a.Id
+                            join b in _unitOfWork.BuildingRepository.GetQuery(x => x.IsDeleted == false)
+                                on a.BuildingId equals b.Id
+                            group new { sc, s } by new { sc.ApartmentId, a.RoomNumber, b.Name } into apartmentGroup
                             select new ApartmentServiceSummaryDto
                             {
                                 ApartmentId = apartmentGroup.Key.ApartmentId ?? new Guid(),
                                 RoomNumber = apartmentGroup.Key.RoomNumber,
+                                BuildingName = apartmentGroup.Key.Name,
                                 TotalServices = apartmentGroup.Sum(x => x.s.Unit == "m2" ? 1 : x.sc.Quantity ?? 0)
                             };
 
-
-                // Tính tổng số bản ghi trước khi phân trang
+                // Calculate total records before pagination
                 var totalRecords = await query.CountAsync();
 
-                // Áp dụng phân trang
+                // Apply pagination
                 var data = await query
                     .Skip((pageNumber - 1) * pageSize)
                     .Take(pageSize)
                     .ToListAsync();
 
-                // Đóng gói kết quả vào PaginatedResponseDto
+                // Wrap the result in PaginatedResponseDto
                 var response = new PaginatedResponseDto<ApartmentServiceSummaryDto>
                 {
                     TotalRecords = totalRecords,
@@ -68,7 +125,6 @@ namespace TFU_Building_API.Service.impl
             }
         }
 
-       
 
         public async Task<ResponseData<List<ServiceDetailDto>>> GetServiceDetailsByApartmentId(ServiceDetailRequestDto request)
         {

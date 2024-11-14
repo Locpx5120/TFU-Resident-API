@@ -5,9 +5,11 @@ namespace TFU_Building_API.Dto
     public class ApartmentServiceSummaryDto
     {
         public Guid ApartmentId { get; set; }
+        public string BuildingName { get; set; }  // Added for building name
         public int RoomNumber { get; set; }
         public int TotalServices { get; set; }
     }
+
 
     public class ApartmentServiceRequestDto
     {
