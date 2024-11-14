@@ -141,24 +141,29 @@ namespace TFU_Building_API.Service.impl
         {
             try
             {
-                // Tìm invoice dựa vào InvoiceId
-                var invoice = await _unitOfWork.InvoiceRepository.GetByIdAsync(request.InvoiceId);
-                if (invoice == null || invoice.IsDeleted ==  true)
+                foreach (var invoiceId in request.InvoiceIds)
                 {
-                    return new ResponseData<InvoicePaymentResponseDto>
+                    // Tìm invoice dựa vào từng InvoiceId
+                    var invoice = await _unitOfWork.InvoiceRepository.GetByIdAsync(invoiceId);
+                    if (invoice == null || invoice.IsDeleted == true)
                     {
-                        Success = false,
-                        Message = "Invoice not found.",
-                        Code = (int)ErrorCodeAPI.NotFound
-                    };
+                        return new ResponseData<InvoicePaymentResponseDto>
+                        {
+                            Success = false,
+                            Message = $"Invoice with ID {invoiceId} not found.",
+                            Code = (int)ErrorCodeAPI.NotFound
+                        };
+                    }
+
+                    // Cập nhật thông tin thanh toán
+                    invoice.PaidStatus = true;
+                    invoice.PaidDate = DateTime.Now;
+                    invoice.UpdatedAt = DateTime.Now;
+
+                    _unitOfWork.InvoiceRepository.Update(invoice);
                 }
 
-                // Cập nhật thông tin thanh toán
-                invoice.PaidStatus = true;
-                invoice.PaidDate = DateTime.Now;
-                invoice.UpdatedAt = DateTime.Now;
-
-                _unitOfWork.InvoiceRepository.Update(invoice);
+                // Lưu tất cả thay đổi một lần
                 await _unitOfWork.SaveChangesAsync();
 
                 // Tạo QR Code
@@ -168,7 +173,7 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<InvoicePaymentResponseDto>
                 {
                     Success = true,
-                    Message = "Payment processed successfully.",
+                    Message = "All payments processed successfully.",
                     Data = new InvoicePaymentResponseDto
                     {
                         Success = true,
@@ -184,10 +189,16 @@ namespace TFU_Building_API.Service.impl
                 {
                     Success = false,
                     Message = ex.Message,
-                    Code = (int)ErrorCodeAPI.SystemIsError
+                    Code = (int)ErrorCodeAPI.SystemIsError,
+                    Data = new InvoicePaymentResponseDto
+                    {
+                        Success = false,
+                        Message = ex.Message
+                    }
                 };
             }
         }
+
 
         private byte[] GenerateQRCode(string accountName, string accountNumber, string bankName, decimal amount, string transactionContent)
         {
