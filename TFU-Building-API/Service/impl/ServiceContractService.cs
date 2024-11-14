@@ -90,6 +90,7 @@ namespace TFU_Building_API.Service.impl
                             from ps in psJoin.DefaultIfEmpty()
                             select new
                             {
+                                ServiceContractId = sc.Id,
                                 ServiceName = s.ServiceName,
                                 Purpose = s.Description,
                                 CreatedDate = sc.StartDate ?? DateTime.Now,
@@ -106,6 +107,7 @@ namespace TFU_Building_API.Service.impl
                 // Áp dụng xử lý Status bên ngoài truy vấn
                 var result = rawData.Select(item => new ServiceContractDetailDto
                 {
+                    ServiceContractId = item.ServiceContractId,
                     ServiceName = item.ServiceName,
                     Purpose = item.Purpose,
                     CreatedDate = item.CreatedDate,
