@@ -29,16 +29,18 @@ public class ApartmentController : ControllerBase
     }
 
     /// <summary>
-    /// Lấy thông tin chi tiết thành viên của căn hộ dựa trên ApartmentId.
+    /// Lấy thông tin chi tiết thành viên của căn hộ dựa trên ApartmentId và tên thành viên (nếu có).
     /// </summary>
     /// <param name="apartmentId">Id của căn hộ.</param>
+    /// <param name="memberName">Tên thành viên để tìm kiếm (tùy chọn).</param>
     /// <returns>Danh sách thông tin thành viên căn hộ.</returns>
     [HttpGet("resident/details/{apartmentId}")]
-    public async Task<IActionResult> GetApartmentDetails(Guid apartmentId)
+    public async Task<IActionResult> GetApartmentDetails(Guid apartmentId, [FromQuery] string? memberName = null)
     {
-        var result = await _apartmentService.GetApartmentDetailsByApartmentIdAsync(apartmentId);
+        var result = await _apartmentService.GetApartmentDetailsByApartmentIdAsync(apartmentId, memberName);
         return StatusCode(result.Code, result);
     }
+
 
     /// <summary>
     /// Thêm thành viên vào căn hộ.

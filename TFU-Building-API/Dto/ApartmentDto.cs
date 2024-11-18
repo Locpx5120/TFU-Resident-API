@@ -10,7 +10,9 @@
         public int NumberOfMembers { get; set; }
         public string Email { get; set; }
         public string PhoneNumber { get; set; }
+        public string BuildingName { get; set; } // Add Building Name
     }
+
 
     public class ApartmentMemberDetailDto
     {
