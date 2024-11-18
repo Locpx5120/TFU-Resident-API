@@ -56,6 +56,7 @@
     {
         public string CompanyName { get; set; }      // Tên công ty
         public string BuildingName { get; set; }     // Tên tòa nhà
+        public Guid ApartmentId { get; set; }
         public int? FloorNumber { get; set; }        // Số tầng
         public int? RoomNumber { get; set; }         // Số phòng
         public DateTime? StartDate { get; set; }      // Ngày thuê

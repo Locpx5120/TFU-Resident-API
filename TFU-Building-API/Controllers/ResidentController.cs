@@ -6,7 +6,7 @@ using TFU_Building_API.Service.impl;
 
 namespace TFU_Building_API.Controllers
 {
-    [Route("api/ceo")]
+    [Route("api/resident")]
     [ApiController]
     [CustomFilter]
     public class ResidentController : ControllerBase

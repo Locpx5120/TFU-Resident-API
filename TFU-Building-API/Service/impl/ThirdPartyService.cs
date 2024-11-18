@@ -268,6 +268,7 @@ namespace TFU_Building_API.Service.impl
                                             from b in buildingJoin.DefaultIfEmpty()
                                             select new ThirdPartyContractDetailDto
                                             {
+                                                ApartmentId = a.Id,
                                                 CompanyName = tp.NameCompany,
                                                 BuildingName = b != null ? b.Name : null,
                                                 FloorNumber = a != null ? a.FloorNumber : null,

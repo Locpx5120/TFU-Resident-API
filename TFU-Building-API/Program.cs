@@ -8,6 +8,7 @@ using System.Text;
 using TFU_Building_API.AppStart;
 using TFU_Building_API.Core.AppStart;
 using TFU_Resident_API.Data;
+using Tun_Decor.Api.AppStart;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -64,6 +65,7 @@ builder.Services.AddControllers
 builder.Services.AddEndpointsApiExplorer();
 MediatorIoCConfig.ConfigureService(builder.Services);
 SwaggerConfig.ConfigureService(builder.Services, builder.Configuration);
+CorsConfig.ConfigureService(builder.Services, builder.Configuration);
 
 //SignalR
 builder.Services.AddSignalR(options =>
@@ -114,6 +116,8 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
+
+CorsConfig.Configure(app, builder.Configuration);
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

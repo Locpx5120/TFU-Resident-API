@@ -318,10 +318,10 @@ namespace TFU_Building_API.Service.impl
                         StartDate = DateTime.Now,
                         ResidentId = resident.Id,
                         ApartmentId = request.ApartmentId,
-                        IsDeleted = false,
+                        IsDeleted = true,
                         InsertedAt = DateTime.Now,
                         UpdatedAt = DateTime.Now,
-                        IsActive = true
+                        IsActive = false
                     };
                     _unitOfWork.LivingRepository.Add(living);
 
@@ -331,7 +331,7 @@ namespace TFU_Building_API.Service.impl
                         Id = Guid.NewGuid(),
                         StartDate = DateTime.Now,
                         EndDate = DateTime.Now.AddMonths(12), // Assuming a default 12-month contract duration
-                        Status = 0, // Assuming 0 is the default status for a new contract (e.g., pending)
+                        Status = ServiceContractStatus.Pending, // Assuming 0 is the default status for a new contract (e.g., pending)
                         Quantity = 1,
                         Note = member.Note,
                         ApartmentId = request.ApartmentId,

@@ -321,10 +321,10 @@ namespace TFU_Building_API.Service.impl
                         ResidentId = serviceRequest.ResidentId,
                         VehicleType = serviceRequest.VehicleType,
                         LicensePlate = serviceRequest.LicensePlate,
-                        IsDeleted = false,
+                        IsDeleted = true,
                         InsertedAt = DateTime.Now,
                         UpdatedAt = DateTime.Now,
-                        IsActive = true
+                        IsActive = false
                     };
                     _unitOfWork.VehicleRepository.Add(vehicle);
 
@@ -457,6 +457,8 @@ namespace TFU_Building_API.Service.impl
             }
         }
 
+       
+
         public async Task<ResponseData<AddVehicleServiceResponseDto>> UpdateVehicleServiceRequestAsync(UpdateVehicleServiceRequestDto request)
         {
             try
@@ -482,7 +484,41 @@ namespace TFU_Building_API.Service.impl
                 serviceContract.Note = request.Note;
                 serviceContract.UpdatedAt = DateTime.Now;
 
-                // Save the updated contract
+                // If Status = 1, determine which field to update
+                if (request.Status == ServiceContractStatus.Approved)
+                {
+                    if (serviceContract.VehicleId.HasValue)
+                    {
+                        // Update the corresponding record in Vehicles
+                        var vehicle = await _unitOfWork.VehicleRepository
+                            .GetByIdAsync(serviceContract.VehicleId.Value);
+
+                        if (vehicle != null)
+                        {
+                            vehicle.IsActive = true;
+                            vehicle.IsDeleted = false;
+                            vehicle.UpdatedAt = DateTime.Now;
+                            _unitOfWork.VehicleRepository.Update(vehicle);
+                        }
+                    }
+                    else if (serviceContract.LivingId.HasValue)
+                    {
+                        // Update the corresponding record in Livings
+                        var living = await _unitOfWork.LivingRepository
+                            .GetByIdAsync(serviceContract.LivingId ?? new Guid());
+                            
+
+                        if (living != null)
+                        {
+                            living.IsActive = true;
+                            living.IsDeleted = false;
+                            living.UpdatedAt = DateTime.Now;
+                            _unitOfWork.LivingRepository.Update(living);
+                        }
+                    }
+                }
+
+                // Save changes
                 _unitOfWork.ServiceContractRepository.Update(serviceContract);
                 await _unitOfWork.SaveChangesAsync();
 
@@ -505,5 +541,6 @@ namespace TFU_Building_API.Service.impl
                 };
             }
         }
+
     }
 }
