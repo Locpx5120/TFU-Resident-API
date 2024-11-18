@@ -414,7 +414,7 @@ namespace TFU_Building_API.Service.impl
                                            join b in _unitOfWork.BuildingRepository.GetQuery(b => b.IsDeleted == false) on a.BuildingId equals b.Id
                                            join s in _unitOfWork.ServiceRepository.GetQuery(s => s.IsDeleted == false) on sc.ServiceId equals s.Id
                                            join ps in _unitOfWork.PackageServiceRepository.GetQuery(ps => ps.IsDeleted == false) on sc.PackageServiceId equals ps.Id
-                                           join v in _unitOfWork.VehicleRepository.GetQuery(v => v.IsDeleted == false) on sc.VehicleId equals v.Id
+                                           join v in _unitOfWork.VehicleRepository.GetQuery(v => v.IsDeleted == false && v.IsActive) on sc.VehicleId equals v.Id
                                            select new VehicleServiceDetailDto
                                            {
                                                BuildingName = b.Name,

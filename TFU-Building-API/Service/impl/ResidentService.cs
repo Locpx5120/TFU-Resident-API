@@ -243,7 +243,7 @@ namespace TFU_Building_API.Service.impl
             try
             {
                 // Tìm kiếm Resident dựa trên residentId
-                var resident = await _unitOfWork.ResidentRepository.GetQuery(r => r.Id == residentId && r.IsDeleted == false)
+                var resident = await _unitOfWork.ResidentRepository.GetQuery(r => r.Id == residentId && r.IsDeleted == false && r.IsActive)
                     .FirstOrDefaultAsync();
 
                 if (resident == null)
