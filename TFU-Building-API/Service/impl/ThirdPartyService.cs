@@ -367,6 +367,65 @@ namespace TFU_Building_API.Service.impl
                 };
             }
         }
+
+        public async Task<ResponseData<string>> AddThirdPartyHireAsync(AddThirdPartyHireRequestDto request)
+        {
+            try
+            {
+                // Step 1: Add staff record with the company name
+                var newStaff = new Staff
+                {
+                    Id = Guid.NewGuid(),
+                    FullName = request.NameCompany,
+                    Email = request.ContactInfo,
+                    Password = GenerateRandomPassword(), // No password needed
+                    PhoneNumber = null,
+                    RoleId = RoleConstants.TenantRoleId, // Define the role for staff if required
+                    IsChangePassword = false,
+                    IsDeleted = false,
+                    IsActive = true,
+                    InsertedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now
+                };
+
+                 _unitOfWork.StaffRepository.Add(newStaff);
+
+                // Step 2: Add third party record with the StaffId
+                var newThirdParty = new ThirdParty
+                {
+                    Id = Guid.NewGuid(),
+                    NameCompany = request.NameCompany,
+                    Status = false, // Assuming false means chưa thanh toán
+                    IsTenant = false, // Not a tenant, you're hiring them
+                    StaffId = newStaff.Id,
+                    IsDeleted = false,
+                    IsActive = true,
+                    Description = "Thuê dịch vụ bên thứ 3",
+                    InsertedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now
+                };
+
+                 _unitOfWork.ThirdPartyRepository.Add(newThirdParty);
+                await _unitOfWork.SaveChangesAsync();
+
+                return new ResponseData<string>
+                {
+                    Success = true,
+                    Message = "Third party and staff added successfully.",
+                    Data = $"Third party {request.NameCompany} added successfully.",
+                    Code = (int)ErrorCodeAPI.OK
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResponseData<string>
+                {
+                    Success = false,
+                    Message = ex.Message,
+                    Code = (int)ErrorCodeAPI.SystemIsError
+                };
+            }
+        }
     }
 
 }

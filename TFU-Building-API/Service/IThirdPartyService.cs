@@ -13,6 +13,8 @@ namespace TFU_Building_API.Service
         Task<ResponseData<ThirdPartyContractDetailDto>> GetThirdPartyContractDetailAsync(Guid thirdPartyId);
 
         Task<ResponseData<List<ThirdPartyContractInfoDto>>> GetContractDetailsForThirdPartyAsync(Guid staffId);
+
+        Task<ResponseData<string>> AddThirdPartyHireAsync(AddThirdPartyHireRequestDto request);
     }
 
 }

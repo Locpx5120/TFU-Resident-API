@@ -92,4 +92,16 @@ public class ThirdPartyController : ControllerBase
         }
         return BadRequest(result);
     }
+
+    /// <summary>
+    /// Thêm bên thứ ba thuê dịch vụ.
+    /// </summary>
+    /// <param name="request">Thông tin của bên thứ ba cần thêm.</param>
+    /// <returns>Phản hồi kết quả thêm bên thứ ba.</returns>
+    [HttpPost("hire-thirdParty")]
+    public async Task<IActionResult> AddThirdPartyHire([FromBody] AddThirdPartyHireRequestDto request)
+    {
+        var result = await _thirdPartyService.AddThirdPartyHireAsync(request);
+        return StatusCode(result.Code, result);
+    }
 }

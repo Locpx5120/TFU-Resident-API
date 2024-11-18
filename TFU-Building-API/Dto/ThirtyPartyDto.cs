@@ -75,4 +75,11 @@
         public decimal Price { get; set; }            // Giá thuê (VNĐ)
         public string Status { get; set; }            // Trạng thái hợp đồng (trong thời hạn/chuẩn bị hết hạn)
     }
+
+    public class AddThirdPartyHireRequestDto
+    {
+        public string NameCompany { get; set; }
+        public string ContactInfo { get; set; }
+    }
+
 }
