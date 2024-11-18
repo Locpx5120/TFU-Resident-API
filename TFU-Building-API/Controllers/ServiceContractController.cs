@@ -110,5 +110,17 @@ namespace TFU_Building_API.Controllers
             }
         }
 
+        /// <summary>
+        /// Add a new service contract for a third party.
+        /// </summary>
+        /// <param name="request">Request data for adding a service contract.</param>
+        /// <returns>Response indicating the result of the operation.</returns>
+        [HttpPost]
+        [Route("extend-contract")]
+        public async Task<IActionResult> AddServiceContract([FromBody] AddServiceContractThirdPartyRequestDto request)
+        {
+            var result = await _serviceContractService.AddServiceContractThirdPartyAsync(request);
+            return StatusCode(result.Code, result);
+        }
     }
 }

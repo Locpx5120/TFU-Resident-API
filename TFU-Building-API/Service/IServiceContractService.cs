@@ -15,5 +15,7 @@ namespace TFU_Building_API.Service
 
         Task<ResponseData<AddVehicleServiceResponseDto>> UpdateVehicleServiceRequestAsync(UpdateVehicleServiceRequestDto request);
 
+
+        Task<ResponseData<string>> AddServiceContractThirdPartyAsync(AddServiceContractThirdPartyRequestDto request);
     }
 }

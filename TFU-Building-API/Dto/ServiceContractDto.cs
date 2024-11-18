@@ -64,4 +64,15 @@
     //}
 
 
+    public class AddServiceContractThirdPartyRequestDto
+    {
+        public Guid ApartmentId { get; set; }
+        public Guid ServiceId { get; set; }
+        public Guid PackageServiceId { get; set; }
+        public string Purpose { get; set; }
+    }
+
+  
+
+
 }

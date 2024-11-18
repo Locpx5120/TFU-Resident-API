@@ -542,5 +542,86 @@ namespace TFU_Building_API.Service.impl
             }
         }
 
+
+        public async Task<ResponseData<string>> AddServiceContractThirdPartyAsync(AddServiceContractThirdPartyRequestDto request)
+        {
+            try
+            {
+                // Step 1: Get the latest end date from ThirdPartyContacts for the given ApartmentId
+                var latestContract = await _unitOfWork.ThirdPartyContractRepository
+                    .GetQuery(tpc => tpc.ApartmentId == request.ApartmentId && tpc.IsDeleted == false)
+                    .OrderByDescending(tpc => tpc.EndDate)
+                    .FirstOrDefaultAsync();
+
+                if (latestContract == null)
+                {
+                    return new ResponseData<string>
+                    {
+                        Success = false,
+                        Message = "No existing contracts found for the apartment.",
+                        Code = (int)ErrorCodeAPI.NotFound
+                    };
+                }
+
+                // Step 2: Get the package duration (in months) from PackageService
+                var packageService = await _unitOfWork.PackageServiceRepository
+                    .GetQuery(ps => ps.Id == request.PackageServiceId && ps.IsDeleted == false)
+                    .FirstOrDefaultAsync();
+
+                if (packageService == null)
+                {
+                    return new ResponseData<string>
+                    {
+                        Success = false,
+                        Message = "Package service not found.",
+                        Code = (int)ErrorCodeAPI.NotFound
+                    };
+                }
+
+                // Step 3: Calculate StartDate and EndDate
+                var startDate = latestContract.EndDate??DateTime.Now;
+                var endDate = startDate.AddMonths(packageService.DurationInMonth);
+
+                // Step 4: Add new record in ServiceContracts
+                var newServiceContract = new ServiceContract
+                {
+                    Id = Guid.NewGuid(),
+                    StartDate = startDate,
+                    EndDate = endDate,
+                    Status = 0, // Default status
+                    Quantity = 1, // Default quantity
+                    Note = request.Purpose, // Purpose provided by the user
+                    ApartmentId = request.ApartmentId,
+                    ServiceId = request.ServiceId,
+                    PackageServiceId = request.PackageServiceId,
+                    LivingId = null, // Set LivingId to null
+                    IsDeleted = false,
+                    IsActive = true,
+                    InsertedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now
+                };
+
+                 _unitOfWork.ServiceContractRepository.Add(newServiceContract);
+                await _unitOfWork.SaveChangesAsync();
+
+                return new ResponseData<string>
+                {
+                    Success = true,
+                    Message = "Service contract added successfully.",
+                    Data = $"Service contract for apartment {request.ApartmentId} added successfully.",
+                    Code = (int)ErrorCodeAPI.OK
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResponseData<string>
+                {
+                    Success = false,
+                    Message = ex.Message,
+                    Code = (int)ErrorCodeAPI.SystemIsError
+                };
+            }
+        }
+
     }
 }
