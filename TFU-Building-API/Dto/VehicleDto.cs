@@ -38,6 +38,7 @@
 
     public class VehicleServiceDetailDto
     {
+        public Guid ContractId { get; set; }
         public string BuildingName { get; set; }
         public int ApartmentNumber { get; set; }
         public string ServiceName { get; set; }
@@ -48,6 +49,7 @@
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         public string Note { get; set; }
+        public int? Status { get; set; }
     }
 
     public class UpdateVehicleServiceRequestDto

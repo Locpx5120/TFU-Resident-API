@@ -414,9 +414,10 @@ namespace TFU_Building_API.Service.impl
                                            join b in _unitOfWork.BuildingRepository.GetQuery(b => b.IsDeleted == false) on a.BuildingId equals b.Id
                                            join s in _unitOfWork.ServiceRepository.GetQuery(s => s.IsDeleted == false) on sc.ServiceId equals s.Id
                                            join ps in _unitOfWork.PackageServiceRepository.GetQuery(ps => ps.IsDeleted == false) on sc.PackageServiceId equals ps.Id
-                                           join v in _unitOfWork.VehicleRepository.GetQuery(v => v.IsDeleted == false && v.IsActive) on sc.VehicleId equals v.Id
+                                           join v in _unitOfWork.VehicleRepository.GetQueryWithInactive(v => v.IsDeleted == false) on sc.VehicleId equals v.Id
                                            select new VehicleServiceDetailDto
                                            {
+                                               ContractId = sc.Id,
                                                BuildingName = b.Name,
                                                ApartmentNumber = a.RoomNumber,
                                                ServiceName = s.ServiceName,
@@ -425,7 +426,8 @@ namespace TFU_Building_API.Service.impl
                                                LicensePlate = v.LicensePlate,
                                                StartDate = sc.StartDate??DateTime.Now,
                                                EndDate = sc.EndDate??DateTime.Now,
-                                               Note = sc.Note
+                                               Note = sc.Note,
+                                               Status = sc.Status
                                            }).FirstOrDefaultAsync();
 
                 if (serviceDetail == null)
@@ -622,6 +624,102 @@ namespace TFU_Building_API.Service.impl
                 };
             }
         }
+
+
+        public async Task<ResponseData<string>> AddMonthlyFixedServiceContractsAsync(Guid userId)
+        {
+            try
+            {
+                // Lấy danh sách các căn hộ mà user đang sở hữu
+                var ownerships = await _unitOfWork.OwnerShipRepository
+                    .GetQuery(o => o.ResidentId == userId && o.IsDeleted == false)
+                    .ToListAsync();
+
+                if (!ownerships.Any())
+                {
+                    return new ResponseData<string>
+                    {
+                        Success = false,
+                        Message = "User does not own any apartments.",
+                        Code = (int)ErrorCodeAPI.NotFound
+                    };
+                }
+
+                // Lấy danh sách ApartmentId từ quyền sở hữu
+                var apartmentIds = ownerships.Select(o => o.ApartmentId).ToList();
+
+                // Lấy danh sách các Service Contract đã tồn tại trong tháng hiện tại
+                var currentMonth = DateTime.Now.Month;
+                var currentYear = DateTime.Now.Year;
+
+                var existingContracts = await _unitOfWork.ServiceContractRepository
+                    .GetQuery(sc => apartmentIds.Contains(sc.ApartmentId) &&
+                                    sc.ServiceId == Guid.Parse("f517bef7-d325-487b-9f76-eb4d20413634") &&
+                                    sc.PackageServiceId == Guid.Parse("520e4b8e-8592-4e2d-b2fd-f3a804dee6e9") &&
+                                    sc.StartDate.HasValue &&
+                                    sc.StartDate.Value.Month == currentMonth &&
+                                    sc.StartDate.Value.Year == currentYear &&
+                                    sc.IsDeleted == false)
+                    .Select(sc => sc.ApartmentId)
+                    .ToListAsync();
+
+                // Lọc ra các căn hộ chưa có Service Contract cho tháng hiện tại
+                var newApartments = apartmentIds.Except(existingContracts).ToList();
+
+                if (!newApartments.Any())
+                {
+                    return new ResponseData<string>
+                    {
+                        Success = true,
+                        Message = "Service contracts already exist for all apartments.",
+                        Code = (int)ErrorCodeAPI.OK
+                    };
+                }
+
+                // Tạo Service Contract cho từng căn hộ chưa có
+                foreach (var apartmentId in newApartments)
+                {
+                    var newContract = new ServiceContract
+                    {
+                        Id = Guid.NewGuid(),
+                        StartDate = new DateTime(currentYear, currentMonth, 1),
+                        EndDate = new DateTime(currentYear, currentMonth, DateTime.DaysInMonth(currentYear, currentMonth)),
+                        Status = ServiceContractStatus.Approved,
+                        Quantity = 1,
+                        Note = "Monthly fixed room service",
+                        ApartmentId = apartmentId,
+                        ServiceId = Guid.Parse("f517bef7-d325-487b-9f76-eb4d20413634"),
+                        PackageServiceId = Guid.Parse("520e4b8e-8592-4e2d-b2fd-f3a804dee6e9"),
+                        IsDeleted = false,
+                        InsertedAt = DateTime.Now,
+                        UpdatedAt = DateTime.Now,
+                        IsActive = true
+                    };
+
+                    _unitOfWork.ServiceContractRepository.Add(newContract);
+                }
+
+                // Lưu thay đổi
+                await _unitOfWork.SaveChangesAsync();
+
+                return new ResponseData<string>
+                {
+                    Success = true,
+                    Message = "Service contracts successfully created for all applicable apartments.",
+                    Code = (int)ErrorCodeAPI.OK
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResponseData<string>
+                {
+                    Success = false,
+                    Message = $"An error occurred: {ex.Message}",
+                    Code = (int)ErrorCodeAPI.SystemIsError
+                };
+            }
+        }
+
 
     }
 }

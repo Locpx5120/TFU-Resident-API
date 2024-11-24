@@ -303,6 +303,55 @@ namespace TFU_Building_API.Service.impl
         //    }
         //}
 
+        public async Task<ResponseData<List<GetStaffResponseDto>>> GetStaffListAsync(string searchName)
+        {
+            try
+            {
+                // Query để lấy danh sách Staff không bị xóa
+                var query = _unitOfWork.StaffRepository.GetQuery(x => x.IsDeleted == false);
+
+                // Lọc theo tên nếu có
+                if (!string.IsNullOrEmpty(searchName))
+                {
+                    query = query.Where(x => x.FullName.Contains(searchName));
+                }
+
+                // Lấy danh sách Staff
+                var data = await query
+                    .OrderBy(x => x.FullName) // Sắp xếp theo tên
+                    .Select(x => new GetStaffResponseDto
+                    {
+                        Id = x.Id,
+                        FullName = x.FullName,
+                        Email = x.Email,
+                        PhoneNumber = x.PhoneNumber,
+                        HireDate = x.HireDate,
+                        Birthday = x.Birthday,
+                        IsActive = x.IsActive,
+                        RoleId = x.RoleId,
+                        InsertedAt = x.InsertedAt,
+                        UpdatedAt = x.UpdatedAt
+                    })
+                    .ToListAsync();
+
+                return new ResponseData<List<GetStaffResponseDto>>
+                {
+                    Success = true,
+                    Message = "Successfully retrieved staff.",
+                    Data = data,
+                    Code = (int)ErrorCodeAPI.OK
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResponseData<List<GetStaffResponseDto>>
+                {
+                    Success = false,
+                    Message = $"An error occurred: {ex.Message}",
+                    Code = (int)ErrorCodeAPI.SystemIsError
+                };
+            }
+        }
 
     }
 }

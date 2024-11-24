@@ -548,7 +548,8 @@ namespace TFU_Building_API.Service.impl
                 var currentMonth = DateTime.Now.Month;
                 var currentYear = DateTime.Now.Year;
 
-                var query = from inv in _unitOfWork.InvoiceRepository.GetQuery(x => x.PaidStatus == false && (x.IsDeleted == false))
+                //var query = from inv in _unitOfWork.InvoiceRepository.GetQuery(x => x.PaidStatus == false && (x.IsDeleted == false))   
+                var query = from inv in _unitOfWork.InvoiceRepository.GetQuery(x => (x.IsDeleted == false))
                             join sc in _unitOfWork.ServiceContractRepository.GetQuery(x => x.IsActive && (x.IsDeleted == false) && x.ApartmentId == request.ApartmentId)
                                 on inv.ServiceContractId equals sc.Id
                             join s in _unitOfWork.ServiceRepository.GetQuery(x => (x.IsDeleted == false))

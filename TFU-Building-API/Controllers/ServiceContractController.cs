@@ -1,5 +1,7 @@
 ﻿using Core.Enums;
+using Core.Model;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using TFU_Building_API.Configure;
 using TFU_Building_API.Dto;
 using TFU_Building_API.Service;
@@ -122,5 +124,24 @@ namespace TFU_Building_API.Controllers
             var result = await _serviceContractService.AddServiceContractThirdPartyAsync(request);
             return StatusCode(result.Code, result);
         }
+
+        [HttpPost("add-monthly-fixed-service-contracts")]
+        public async Task<IActionResult> AddMonthlyFixedServiceContracts()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier); // Lấy UserId từ token
+            if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out var userGuid))
+            {
+                return Unauthorized(new ResponseData<string>
+                {
+                    Success = false,
+                    Message = "User ID not found or invalid in token.",
+                    Code = 401
+                });
+            }
+
+            var result = await _serviceContractService.AddMonthlyFixedServiceContractsAsync(userGuid);
+            return StatusCode(result.Code, result);
+        }
+
     }
 }

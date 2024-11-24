@@ -17,5 +17,7 @@ namespace TFU_Building_API.Service
 
 
         Task<ResponseData<string>> AddServiceContractThirdPartyAsync(AddServiceContractThirdPartyRequestDto request);
+
+        Task<ResponseData<string>> AddMonthlyFixedServiceContractsAsync(Guid userId);
     }
 }

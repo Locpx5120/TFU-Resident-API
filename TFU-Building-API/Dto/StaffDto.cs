@@ -50,4 +50,19 @@ namespace TFU_Building_API.Dto
         public string Email { get; set; }
         public string Department { get; set; }
     }
+
+    public class GetStaffResponseDto
+    {
+        public Guid Id { get; set; }
+        public string FullName { get; set; }
+        public string Email { get; set; }
+        public string PhoneNumber { get; set; }
+        public DateTime? HireDate { get; set; }
+        public DateTime? Birthday { get; set; }
+        public bool IsActive { get; set; }
+        public Guid? RoleId { get; set; }
+        public DateTime? InsertedAt { get; set; }
+        public DateTime? UpdatedAt { get; set; }
+    }
+
 }

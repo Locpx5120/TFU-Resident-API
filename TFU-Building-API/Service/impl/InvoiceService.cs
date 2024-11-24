@@ -197,7 +197,7 @@ namespace TFU_Building_API.Service.impl
                         int months = ((serviceContract.EndDate.Value.Year - serviceContract.StartDate.Value.Year) * 12) +
                                      serviceContract.EndDate.Value.Month - serviceContract.StartDate.Value.Month + 1;
 
-                        // Tính giá cơ bản cho mỗi tháng và áp dụng chiết khấu
+                        // Tính giá dịch vụ phòng mặc định
                         totalAmount = baseUnitPrice * months;
                     }
                     else

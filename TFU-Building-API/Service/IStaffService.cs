@@ -10,5 +10,7 @@ namespace TFU_Building_API.Service
         Task<ResponseData<StaffResponseDto>> UpdateStaff(StaffUpdateRequestDto request);
         //Task<ResponseData<List<StaffListResponseDto>>> GetStaffList(StaffSearchRequestDto request);
         //Task<ResponseData<StaffInfoResponseDto>> GetStaffById(Guid staffId);
+
+        Task<ResponseData<List<GetStaffResponseDto>>> GetStaffListAsync(string searchName);
     }
 }

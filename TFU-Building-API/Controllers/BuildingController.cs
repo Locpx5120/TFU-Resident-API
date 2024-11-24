@@ -39,6 +39,7 @@ namespace TFU_Building_API.Controllers
             return BadRequest(response);
         }
 
+
         [HttpGet("get")]
         public async Task<IActionResult> GetBuildings()
         {

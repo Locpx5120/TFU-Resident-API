@@ -58,6 +58,14 @@ namespace TFU_Building_API.Controllers
             return BadRequest(response);
         }
 
+        [HttpGet("list")]
+        public async Task<IActionResult> GetStaffList([FromQuery] string? searchName)
+        {
+            var result = await _staffService.GetStaffListAsync(searchName);
+            return StatusCode(result.Code, result);
+        }
+
+
         //[HttpGet("listEmployee")]
         //public async Task<IActionResult> GetStaffList([FromQuery] StaffSearchRequestDto request)
         //{

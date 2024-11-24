@@ -420,6 +420,7 @@ namespace TFU_Building_API.Service.impl
                 // Step 3: Prepare response data
                 var response = new MemberServiceDetailDto
                 {
+                    ContractId = serviceContractId,
                     BuildingName = serviceContract.Apartment.Building.Name,
                     ApartmentNumber = serviceContract.Apartment.RoomNumber,
                     ServiceName = "Thêm thành viên", // Assuming "Add Member" is the fixed service type for this contract
@@ -427,7 +428,8 @@ namespace TFU_Building_API.Service.impl
                     DateOfBirth = living.Resident.Birthday ?? DateTime.MinValue,
                     Email = living.Resident.Email,
                     PhoneNumber = living.Resident.Phone,
-                    Note = serviceContract.Note
+                    Note = serviceContract.Note,
+                    Status = serviceContract.Status
                 };
 
                 return new ResponseData<MemberServiceDetailDto>
