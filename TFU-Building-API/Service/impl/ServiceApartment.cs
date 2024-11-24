@@ -193,6 +193,83 @@ namespace TFU_Building_API.Service.impl
         //    }
         //}
 
+        //public async Task<ResponseData<List<ServiceDetailDto>>> GetServiceDetailsByApartmentId(ServiceDetailRequestDto request)
+        //{
+        //    try
+        //    {
+        //        var query = from sc in _unitOfWork.ServiceContractRepository.GetQuery(x => x.ApartmentId == request.ApartmentId && x.IsActive && (x.IsDeleted == false))
+        //                    join s in _unitOfWork.ServiceRepository.GetQuery(x => (x.IsDeleted == false))
+        //                        on sc.ServiceId equals s.Id
+        //                    join a in _unitOfWork.ApartmentRepository.GetQuery(x => (x.IsDeleted == false))
+        //                        on sc.ApartmentId equals a.Id
+        //                    join at in _unitOfWork.ApartmentTypeRepository.GetQuery(x => x.IsActive && (x.IsDeleted == false))
+        //                        on a.ApartmentTypeId equals at.Id
+        //                    join ps in _unitOfWork.PackageServiceRepository.GetQuery(x => x.IsActive && (x.IsDeleted == false))
+        //                        on sc.PackageServiceId equals ps.Id into psJoin
+        //                    from ps in psJoin.DefaultIfEmpty()
+        //                    select new
+        //                    {
+        //                        ServiceName = s.ServiceName,
+        //                        Description = s.Description,
+        //                        QuantityOrArea = s.Unit == "m2" ? $"{at.LandArea} m2" : $"x{sc.Quantity}",
+        //                        UnitPrice = s.UnitPrice,
+        //                        StartDate = sc.StartDate ?? DateTime.Now,
+        //                        EndDate = sc.EndDate ?? DateTime.Now,
+        //                        Discount = ps.Discount ?? 0,
+        //                        Unit = s.Unit,
+        //                        LandArea = at.LandArea,
+        //                        Quantity = sc.Quantity
+        //                    };
+
+        //        // Filter by service type if provided
+        //        if (!string.IsNullOrEmpty(request.ServiceType))
+        //        {
+        //            query = query.Where(x => x.ServiceName.Contains(request.ServiceType));
+        //        }
+
+        //        // Sort by StartDate descending
+        //        query = query.OrderByDescending(x => x.StartDate);
+
+        //        var result = await query.ToListAsync();
+
+        //        // Map and filter data
+        //        var data = result
+        //            .Select(item =>
+        //            {
+        //                var totalPrice = CalculateTotalPrice(item.UnitPrice, item.StartDate, item.EndDate, item.Discount, item.Unit, item.LandArea, item.Quantity);
+        //                return new ServiceDetailDto
+        //                {
+        //                    ServiceName = item.ServiceName,
+        //                    Description = item.Description,
+        //                    QuantityOrArea = item.QuantityOrArea,
+        //                    UnitPrice = item.UnitPrice == 0 ? null : item.UnitPrice, // Set to null if 0
+        //                    StartDate = item.StartDate,
+        //                    EndDate = item.EndDate,
+        //                    TotalPrice = totalPrice == 0 ? null : totalPrice // Set to null if 0
+        //                };
+        //            })
+        //            .Where(x => x.UnitPrice != null || x.TotalPrice != null) // Exclude items with both prices null
+        //            .ToList();
+
+        //        return new ResponseData<List<ServiceDetailDto>>
+        //        {
+        //            Success = true,
+        //            Message = "Successfully retrieved service details.",
+        //            Data = data,
+        //            Code = (int)ErrorCodeAPI.OK
+        //        };
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return new ResponseData<List<ServiceDetailDto>>
+        //        {
+        //            Success = false,
+        //            Message = ex.Message,
+        //            Code = (int)ErrorCodeAPI.SystemIsError
+        //        };
+        //    }
+        //}
+
         public async Task<ResponseData<List<ServiceDetailDto>>> GetServiceDetailsByApartmentId(ServiceDetailRequestDto request)
         {
             try
@@ -225,6 +302,16 @@ namespace TFU_Building_API.Service.impl
                 if (!string.IsNullOrEmpty(request.ServiceType))
                 {
                     query = query.Where(x => x.ServiceName.Contains(request.ServiceType));
+                }
+
+                // Filter by StartDate range
+                if (request.StartDateFrom.HasValue)
+                {
+                    query = query.Where(x => x.StartDate >= request.StartDateFrom.Value);
+                }
+                if (request.StartDateTo.HasValue)
+                {
+                    query = query.Where(x => x.StartDate <= request.StartDateTo.Value);
                 }
 
                 // Sort by StartDate descending
@@ -269,6 +356,7 @@ namespace TFU_Building_API.Service.impl
                 };
             }
         }
+
 
 
         // Helper method to calculate TotalPrice

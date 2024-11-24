@@ -7,5 +7,7 @@ namespace TFU_Building_API.Service
     {
         Task<ResponseData<BuildingResponseDto>> AddBuilding(BuildingRequestDto request);
         Task<ResponseData<BuildingUpdateResponseDto>> UpdateBuilding(BuildingUpdateRequestDto request);
+
+        Task<ResponseData<List<BuildingResponseDto>>> GetBuildingsAsync();
     }
 }

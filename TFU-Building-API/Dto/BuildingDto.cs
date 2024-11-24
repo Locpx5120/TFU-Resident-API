@@ -49,4 +49,5 @@ namespace TFU_Building_API.Dto
         public string Message { get; set; }
     }
 
+
 }

@@ -38,5 +38,13 @@ namespace TFU_Building_API.Controllers
             }
             return BadRequest(response);
         }
+
+        [HttpGet("get")]
+        public async Task<IActionResult> GetBuildings()
+        {
+            var result = await _buildingService.GetBuildingsAsync();
+            return StatusCode(result.Code, result);
+        }
+
     }
 }

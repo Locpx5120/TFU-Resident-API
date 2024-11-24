@@ -122,5 +122,40 @@ namespace TFU_Building_API.Service.impl
                 };
             }
         }
+
+        public async Task<ResponseData<List<BuildingResponseDto>>> GetBuildingsAsync()
+        {
+            try
+            {
+                // Lấy danh sách các tòa nhà không bị xóa
+                var query = _unitOfWork.BuildingRepository.GetQuery(x => x.IsDeleted == false)
+                    .Select(b => new BuildingResponseDto
+                    {
+                        Id = b.Id,
+                        BuildingName = b.Name,
+                       
+                    });
+
+                var buildings = await query.ToListAsync();
+
+                return new ResponseData<List<BuildingResponseDto>>
+                {
+                    Success = true,
+                    Message = "Successfully retrieved buildings.",
+                    Data = buildings,
+                    Code = (int)ErrorCodeAPI.OK
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResponseData<List<BuildingResponseDto>>
+                {
+                    Success = false,
+                    Message = $"An error occurred: {ex.Message}",
+                    Code = (int)ErrorCodeAPI.SystemIsError
+                };
+            }
+        }
+
     }
 }

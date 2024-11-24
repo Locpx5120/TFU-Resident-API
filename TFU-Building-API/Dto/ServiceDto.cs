@@ -40,6 +40,9 @@ namespace TFU_Building_API.Dto
         public Guid ApartmentId { get; set; }
 
         public string ServiceType { get; set; } // Loại dịch vụ (ví dụ: "Gửi xe", "Dịch vụ phòng")
+
+        public DateTime? StartDateFrom { get; set; } // Ngày bắt đầu từ
+        public DateTime? StartDateTo { get; set; }   // Ngày bắt đầu đến
     }
 
     public class UnpaidServiceSummaryDto
