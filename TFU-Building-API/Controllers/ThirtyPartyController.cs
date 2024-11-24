@@ -1,4 +1,5 @@
 ﻿using Core.Enums;
+using Core.Model;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using TFU_Building_API.Configure;
@@ -102,6 +103,83 @@ public class ThirdPartyController : ControllerBase
     public async Task<IActionResult> AddThirdPartyHire([FromBody] AddThirdPartyHireRequestDto request)
     {
         var result = await _thirdPartyService.AddThirdPartyHireAsync(request);
+        return StatusCode(result.Code, result);
+    }
+
+    /// <summary>
+    /// Lấy lịch sử thu tiền bên thuê.
+    /// </summary>
+    /// <param name="request">Yêu cầu để lấy danh sách.</param>
+    /// <returns>Danh sách tiền thuê từ bên thuê.</returns>
+    [HttpPost("rent-history")]
+    public async Task<IActionResult> GetTenantRentHistory([FromBody] GetTenantRentRequestDto request)
+    {
+        var result = await _thirdPartyService.GetTenantRentHistoryAsync(request);
+        return StatusCode(result.Code, result);
+    }
+
+    /// <summary>
+    /// Lấy danh sách bên thứ ba thuê dịch vụ.
+    /// </summary>
+    /// <param name="request">Yêu cầu để lấy danh sách bên thứ ba.</param>
+    /// <returns>Danh sách bên thứ ba.</returns>
+    [HttpPost("list-hire")]
+    public async Task<IActionResult> GetThirdParties([FromBody] GetThirdPartyHireRequestDto request)
+    {
+        var result = await _thirdPartyService.GetThirdPartiesAsync(request);
+        return StatusCode(result.Code, result);
+    }
+
+    /// <summary>
+    /// Retrieve contract details for a specific third party.
+    /// </summary>
+    /// <param name="request">The request containing ThirdPartyId.</param>
+    /// <returns>A list of contract details.</returns>
+    /// <response code="200">Returns the list of contract details.</response>
+    /// <response code="400">Invalid input provided.</response>
+    /// <response code="500">An unexpected error occurred.</response>
+    [HttpPost("details-contract")]
+    [ProducesResponseType(typeof(ResponseData<List<ContractDetailResponseDto>>), 200)]
+    [ProducesResponseType(typeof(ResponseData<string>), 400)]
+    [ProducesResponseType(typeof(ResponseData<string>), 500)]
+    public async Task<IActionResult> GetContractDetails([FromBody] ContractDetailRequestDto request)
+    {
+        if (request == null || request.ThirdPartyId == Guid.Empty)
+        {
+            return BadRequest(new ResponseData<string>
+            {
+                Success = false,
+                Message = "Invalid request. ThirdPartyId cannot be empty.",
+                Code = 400
+            });
+        }
+
+        var result = await _thirdPartyService.GetContractDetailsByThirdPartyIdAsync(request);
+        return StatusCode(result.Code, result);
+    }
+
+    /// <summary>
+    /// Add a new third-party contract.
+    /// </summary>
+    /// <param name="request">The details of the new contract.</param>
+    /// <returns>The result of the contract creation.</returns>
+    [HttpPost("add-contract-hire")]
+    [ProducesResponseType(typeof(ResponseData<AddThirdPartyContractHireResponseDto>), 200)]
+    [ProducesResponseType(typeof(ResponseData<string>), 400)]
+    [ProducesResponseType(typeof(ResponseData<string>), 500)]
+    public async Task<IActionResult> AddThirdPartyContract([FromBody] AddThirdPartyContractHireRequestDto request)
+    {
+        if (request == null)
+        {
+            return BadRequest(new ResponseData<string>
+            {
+                Success = false,
+                Message = "Request cannot be null.",
+                Code = 400
+            });
+        }
+
+        var result = await _thirdPartyService.AddThirdPartyContractHireAsync(request);
         return StatusCode(result.Code, result);
     }
 }

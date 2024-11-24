@@ -28,8 +28,8 @@ namespace TFU_Building_API.Dto
         public string ServiceName { get; set; }
         public string Description { get; set; }
         public string QuantityOrArea { get; set; }
-        public decimal UnitPrice { get; set; }
-        public decimal TotalPrice { get; set; }
+        public decimal? UnitPrice { get; set; }
+        public decimal? TotalPrice { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
     }

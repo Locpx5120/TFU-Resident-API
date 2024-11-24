@@ -403,7 +403,7 @@ namespace TFU_Building_API.Service.impl
 
                 // Step 2: Retrieve the resident details using the Livings table associated with this service contract
                 var living = await _unitOfWork.LivingRepository
-                    .GetQuery(l => l.Id == serviceContract.LivingId && l.IsDeleted == false)
+                    .GetQueryWithInactive(l => l.Id == serviceContract.LivingId && l.IsDeleted == false)
                     .Include(l => l.Resident)
                     .FirstOrDefaultAsync();
 

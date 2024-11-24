@@ -38,6 +38,7 @@
     {
         public string? CompanyName { get; set; } // Tìm kiếm theo tên công ty
         public string? Status { get; set; } // Trạng thái: "Trong thời hạn" hoặc "Chuẩn bị hết hạn"
+        public bool IsTenant { get; set; }
     }
 
     public class ThirdPartyListResponseDto
@@ -67,6 +68,7 @@
     public class ThirdPartyContractInfoDto
     {
         public string BuildingName { get; set; }      // Tên building
+        public Guid? ApartmentId { get; set; }
         public int? FloorNumber { get; set; }         // Số tầng
         public int? RoomNumber { get; set; }          // Số phòng
         public decimal Area { get; set; }             // Diện tích mặt bằng (m2)
@@ -81,5 +83,73 @@
         public string NameCompany { get; set; }
         public string ContactInfo { get; set; }
     }
+
+
+    public class GetTenantRentRequestDto
+    {
+        public string? CompanyName { get; set; } // Search by company name
+        public DateTime? EndDateFilter { get; set; } // Filter by end date
+        public bool IsTenant { get; set; }
+        public int PageNumber { get; set; } = 1; // Pagination - current page
+        public int PageSize { get; set; } = 10; // Pagination - number of items per page
+    }
+
+    public class TenantRentResponseDto
+    {
+        public string CompanyName { get; set; }
+        public decimal Area { get; set; }
+        public string Description { get; set; }
+        public DateTime EndDate { get; set; }
+        public decimal RentAmount { get; set; }
+    }
+
+    public class GetThirdPartyHireRequestDto
+    {
+        public string CompanyName { get; set; } // Search by company name
+        public string StatusFilter { get; set; } // Filter by status: "chưa thanh toán", "chuẩn bị hết hạn", "trong thời hạn"
+        public int PageNumber { get; set; } = 1; // Pagination - current page
+        public int PageSize { get; set; } = 10; // Pagination - number of items per page
+    }
+
+    public class ThirdPartyHireResponseDto
+    {
+        public Guid Id { get; set; }
+        public string NameCompany { get; set; }
+        public string ContactInfo { get; set; } // Assume Email or relevant field
+        public string Status { get; set; } // Status description
+    }
+
+    public class ContractDetailRequestDto
+    {
+        public Guid ThirdPartyId { get; set; } // ID of the third party
+    }
+
+    public class ContractDetailResponseDto
+    {
+        public string CompanyName { get; set; } // Name of the third party
+        public string NameService { get; set; }
+        public int Floor { get; set; } // Floor number
+        public int Room { get; set; } // Room number
+        public decimal Area { get; set; } // Area in square meters
+        public DateTime? StartDate { get; set; } // Contract start date
+        public DateTime? EndDate { get; set; } // Contract end date
+        public decimal ServicePrice { get; set; } // Price of the service
+    }
+
+    public class AddThirdPartyContractHireRequestDto
+    {
+        public Guid ThirdPartyId { get; set; } // ID of the third party
+        public string NameService { get; set; } // Name of the service being provided
+        public DateTime StartDate { get; set; } // Start date of the contract
+        public DateTime EndDate { get; set; } // End date of the contract
+        public decimal Price { get; set; } // Price for the service
+    }
+
+    public class AddThirdPartyContractHireResponseDto
+    {
+        public Guid ContractId { get; set; } // ID of the created contract
+        public string Message { get; set; } // Success or failure message
+    }
+
 
 }

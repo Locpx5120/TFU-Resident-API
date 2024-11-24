@@ -1,5 +1,6 @@
 ﻿using Core.Enums;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using TFU_Building_API.Configure;
 using TFU_Building_API.Dto;
 using TFU_Building_API.Service;
@@ -19,14 +20,23 @@ namespace TFU_Building_API.Controllers
         }
 
         [HttpPost("add")]
-        public async Task<IActionResult> AddInvoicesForApartment([FromBody] CreateInvoiceRequestDto request)
+        public async Task<IActionResult> AddInvoicesForApartment()
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            var response = await _invoiceService.AddInvoicesForApartment(request);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier); // Lấy userId từ token
+            if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out var userGuid))
+            {
+                return Unauthorized("User ID not found in token.");
+            }
+
+            CreateInvoiceRequestDto createInvoiceRequestDto = new CreateInvoiceRequestDto();
+            createInvoiceRequestDto.UserId = userGuid;
+
+            var response = await _invoiceService.AddInvoicesForApartment(createInvoiceRequestDto);
             if (!response.Success)
             {
                 return BadRequest(response);
