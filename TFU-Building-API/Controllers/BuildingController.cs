@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using TFU_Building_API.Configure;
 using TFU_Building_API.Dto;
 using TFU_Building_API.Service;
@@ -46,6 +47,21 @@ namespace TFU_Building_API.Controllers
             var result = await _buildingService.GetBuildingsAsync();
             return StatusCode(result.Code, result);
         }
+
+        [HttpGet("buildings/getbyuser")]
+        public async Task<IActionResult> GetBuildingsByUserId()
+        {
+            // Retrieve UserId from token
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier); // Lấy userId từ token
+            if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out var userGuid))
+            {
+                return Unauthorized("User ID not found in token.");
+            }
+
+            var result = await _buildingService.GetBuildingsByUserIdAsync(userGuid);
+            return StatusCode(result.Code, result);
+        }
+
 
     }
 }

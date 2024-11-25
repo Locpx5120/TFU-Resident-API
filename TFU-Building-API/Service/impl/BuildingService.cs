@@ -157,5 +157,57 @@ namespace TFU_Building_API.Service.impl
             }
         }
 
+        public async Task<ResponseData<List<BuildingResponseDto>>> GetBuildingsByUserIdAsync(Guid userId)
+        {
+            try
+            {
+                // Lấy danh sách các căn hộ mà user sở hữu từ bảng Ownerships
+                var ownerships = await _unitOfWork.OwnerShipRepository
+                    .GetQuery(o => o.ResidentId == userId && o.IsDeleted == false)
+                    .Include(o => o.Apartment) // Bao gồm thông tin về căn hộ
+                    .ThenInclude(a => a.Building) // Bao gồm thông tin về tòa nhà liên kết với căn hộ
+                    .ToListAsync();
+
+                if (!ownerships.Any())
+                {
+                    return new ResponseData<List<BuildingResponseDto>>
+                    {
+                        Success = false,
+                        Message = "User does not own any apartments.",
+                        Code = (int)ErrorCodeAPI.NotFound
+                    };
+                }
+
+                // Lấy danh sách tòa nhà từ các căn hộ mà user sở hữu
+                var buildings = ownerships
+                    .Select(o => o.Apartment.Building)
+                    .Distinct() // Đảm bảo không có tòa nhà trùng lặp
+                    .Select(b => new BuildingResponseDto
+                    {
+                        Id = b.Id,
+                        BuildingName = b.Name,
+                    })
+                    .ToList();
+
+                return new ResponseData<List<BuildingResponseDto>>
+                {
+                    Success = true,
+                    Message = "Successfully retrieved buildings.",
+                    Data = buildings,
+                    Code = (int)ErrorCodeAPI.OK
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResponseData<List<BuildingResponseDto>>
+                {
+                    Success = false,
+                    Message = $"An error occurred: {ex.Message}",
+                    Code = (int)ErrorCodeAPI.SystemIsError
+                };
+            }
+        }
+
+
     }
 }
