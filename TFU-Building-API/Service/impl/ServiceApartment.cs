@@ -1,6 +1,7 @@
 ﻿using Core.Enums;
 using Core.Model;
 using Microsoft.EntityFrameworkCore;
+using TFU_Building_API.Core.Helper;
 using TFU_Building_API.Core.Infrastructure;
 using TFU_Building_API.Dto;
 
@@ -274,7 +275,7 @@ namespace TFU_Building_API.Service.impl
         {
             try
             {
-                var query = from sc in _unitOfWork.ServiceContractRepository.GetQuery(x => x.ApartmentId == request.ApartmentId && x.IsActive && (x.IsDeleted == false))
+                var query = from sc in _unitOfWork.ServiceContractRepository.GetQuery(x => x.ApartmentId == request.ApartmentId && x.IsActive && x.Status == ServiceContractStatus.Approved && (x.IsDeleted == false))
                             join s in _unitOfWork.ServiceRepository.GetQuery(x => (x.IsDeleted == false))
                                 on sc.ServiceId equals s.Id
                             join a in _unitOfWork.ApartmentRepository.GetQuery(x => (x.IsDeleted == false))

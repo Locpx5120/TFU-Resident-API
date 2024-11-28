@@ -9,6 +9,8 @@ namespace TFU_Building_API.Dto
         public string Email { get; set; }
         [Required]
         public Guid RoleId { get; set; }
+        public string Name { get; set; }
+        public string Phone { get; set; }
     }
 
     public class StaffResponseDto

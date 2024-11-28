@@ -92,7 +92,7 @@ namespace TFU_Building_API.Controllers
         /// </summary>
         /// <param name="request">Thông tin yêu cầu cập nhật</param>
         /// <returns>Kết quả cập nhật yêu cầu dịch vụ</returns>
-        [HttpPut("update-service")]
+        [HttpPost("update-service")]
         public async Task<IActionResult> UpdateVehicleServiceRequest([FromBody] UpdateVehicleServiceRequestDto request)
         {
             if (request == null || request.ServiceContractId == Guid.Empty)

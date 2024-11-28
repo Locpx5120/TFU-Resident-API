@@ -77,7 +77,7 @@ namespace TFU_Building_API.Service.impl
             try
             {
                 // Truy vấn lấy tất cả các role không bị xóa
-                var roles = await _unitOfWork.RoleRepository.GetQuery(x => x.IsDeleted == false)
+                var roles = await _unitOfWork.RoleRepository.GetQuery(x => x.IsDeleted == false && x.Id != new Guid("68D8B875-835C-425C-87E4-3C7929ABF8E5"))
                     .Select(role => new RoleResponseDto
                     {
                         Id = role.Id,

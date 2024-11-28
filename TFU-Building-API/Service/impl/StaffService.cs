@@ -48,10 +48,10 @@ namespace TFU_Building_API.Service.impl
                 {
                     Id = Guid.NewGuid(),
                     HireDate = DateTime.Now,
-                    FullName = request.Email.Split('@')[0],
+                    FullName = request.Name,
                     Email = request.Email,
                     Password = generatedPassword, // Lưu mật khẩu dạng plain text
-                    //PhoneNumber = request.PhoneNumber,
+                    PhoneNumber = request.Phone,
                     RoleId = request.RoleId,
                     InsertedAt = DateTime.Now,
                     UpdatedAt = DateTime.Now,
