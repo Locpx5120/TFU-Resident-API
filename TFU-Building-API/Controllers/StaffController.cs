@@ -1,9 +1,7 @@
-﻿using BuildingModels;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using TFU_Building_API.Configure;
 using TFU_Building_API.Dto;
 using TFU_Building_API.Service;
-using Status = BuildingModels.Status;
 
 namespace TFU_Building_API.Controllers
 {
@@ -20,7 +18,7 @@ namespace TFU_Building_API.Controllers
             _staffService = staffService;
         }
 
-        [HttpPost("listEmployee")]
+        [HttpPost("addStaff")]
         public async Task<IActionResult> AddStaff([FromBody] StaffRequestDto request)
         {
             var response = await _staffService.AddStaff(request);
@@ -32,7 +30,7 @@ namespace TFU_Building_API.Controllers
             return BadRequest(response);
         }
 
-        [HttpDelete("listEmployee")]
+        [HttpPost("deleteStaff")]
         public async Task<IActionResult> DeleteStaff([FromBody] StaffDeleteRequestDto request)
         {
             var response = await _staffService.DeleteStaff(request);
@@ -45,7 +43,7 @@ namespace TFU_Building_API.Controllers
             return BadRequest(response);
         }
 
-        [HttpPut("listEmployee")]
+        [HttpPost("updateStaff")]
         public async Task<IActionResult> UpdateStaff([FromBody] StaffUpdateRequestDto request)
         {
             var response = await _staffService.UpdateStaff(request);

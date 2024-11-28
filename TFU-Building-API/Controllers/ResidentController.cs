@@ -2,7 +2,6 @@
 using TFU_Building_API.Configure;
 using TFU_Building_API.Dto;
 using TFU_Building_API.Service;
-using TFU_Building_API.Service.impl;
 
 namespace TFU_Building_API.Controllers
 {
@@ -39,7 +38,7 @@ namespace TFU_Building_API.Controllers
             return Ok(response);
         }
 
-        [HttpPut("updateResident")]
+        [HttpPost("updateResident")]
         public async Task<IActionResult> UpdateResident(ResidentUpdateRequestDto request)
         {
             if (!ModelState.IsValid)

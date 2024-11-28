@@ -1,8 +1,10 @@
 ﻿using BuildingModels;
 using Core.Enums;
 using Core.Model;
+using fake_tool.Helpers;
 using Microsoft.EntityFrameworkCore;
 using TFU_Building_API.Core.Handler;
+using TFU_Building_API.Core.Helper;
 using TFU_Building_API.Core.Infrastructure;
 using TFU_Building_API.Dto;
 
@@ -10,10 +12,18 @@ namespace TFU_Building_API.Service.impl
 {
     public class StaffService : BaseHandler, IStaffService
     {
+        private readonly IConfiguration _config;
         private readonly IUnitOfWork _unitOfWork;
-        public StaffService(IUnitOfWork UnitOfWork, IHttpContextAccessor HttpContextAccessor) : base(UnitOfWork, HttpContextAccessor)
+        private readonly EmailService emailService;
+
+        public StaffService(IUnitOfWork UnitOfWork,
+            IHttpContextAccessor HttpContextAccessor,
+             IConfiguration config)
+            : base(UnitOfWork, HttpContextAccessor)
         {
+            _config = config;
             _unitOfWork = UnitOfWork;
+            emailService = new EmailService(_config);
         }
 
         public async Task<ResponseData<StaffResponseDto>> AddStaff(StaffRequestDto request)
@@ -38,14 +48,18 @@ namespace TFU_Building_API.Service.impl
                 Staff newStaff = new Staff
                 {
                     //Id = Guid.NewGuid(),              
-                    HireDate = DateTime.Now,            
+                    HireDate = DateTime.Now,
                     //UserId = existingUser.Id,          
-                    RoleId = request.RoleId,           
-                    InsertedAt = DateTime.Now,        
-                    UpdatedAt = DateTime.Now,         
-                    IsDeleted = false,                 
-                    IsActive = true                   
+                    RoleId = request.RoleId,
+                    InsertedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now,
+                    IsDeleted = false,
+                    IsActive = true,
+                    IsChangePassword = true,
+                    Password = Utill.GeneratePassword()
                 };
+
+                await emailService.SendEmailAsync(newStaff.Email, "TB Dki tai khoan", BodyMaillRegister(newStaff));
 
                 // Thêm staff mới vào cơ sở dữ liệu
                 UnitOfWork.StaffRepository.Add(newStaff);
@@ -76,6 +90,84 @@ namespace TFU_Building_API.Service.impl
                 };
             }
         }
+
+
+        private string BodyMaillRegister(Staff customer)
+        {
+            string emailBody = $@"
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+    <meta charset='UTF-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <style>
+        body {{
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }}
+        .container {{
+            background-color: #ffffff;
+            width: 100%;
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }}
+        .header {{
+            background-color: #4CAF50;
+            padding: 10px;
+            text-align: center;
+            border-radius: 10px 10px 0 0;
+            color: white;
+        }}
+        .content {{
+            margin: 20px 0;
+            text-align: left;
+        }}
+        .content p {{
+            font-size: 16px;
+            color: #333333;
+        }}
+        .content .highlight {{
+            color: #4CAF50;
+            font-weight: bold;
+        }}
+        .footer {{
+            text-align: center;
+            margin-top: 20px;
+            font-size: 12px;
+            color: #aaaaaa;
+        }}
+    </style>
+</head>
+<body>
+    <div class='container'>
+        <div class='header'>
+            <h1>Welcome to Our Service!</h1>
+        </div>
+        <div class='content'>
+            <p>Dear <span class='highlight'>{customer.FullName}</span>,</p>
+            <p>Thank you for registering with our service. Below are your account details:</p>
+            <p><strong>Username:</strong> <span class='highlight'>{customer.Email}</span></p>
+            <p><strong>Password:</strong> <span class='highlight'>{customer.Password}</span></p>
+            <p>Please keep this information safe and do not share it with anyone. You can log in to your account using the credentials provided.</p>
+            <p>If you have any questions, feel free to contact us at any time.</p>
+            <p>Best regards,<br>The Support Team</p>
+        </div>
+        <div class='footer'>
+            <p>&copy; 2024 Our Company. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>";
+
+            return emailBody;
+        }
+
 
         public async Task<ResponseData<StaffResponseDto>> DeleteStaff(StaffDeleteRequestDto request)
         {
@@ -329,6 +421,7 @@ namespace TFU_Building_API.Service.impl
                         Birthday = x.Birthday,
                         IsActive = x.IsActive,
                         RoleId = x.RoleId,
+                        RoleName = x.Role.Name,
                         InsertedAt = x.InsertedAt,
                         UpdatedAt = x.UpdatedAt
                     })
