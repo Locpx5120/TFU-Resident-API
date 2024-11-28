@@ -1,11 +1,11 @@
 ﻿using BuildingModels;
+using fake_tool.Helpers;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using TFU_Building_API.Core.Struct;
-using fake_tool.Helpers;
 
 namespace TFU_Building_API.Helpers
 {
@@ -49,11 +49,11 @@ namespace TFU_Building_API.Helpers
 
             // Khởi tạo các claim chung
             var claims = new List<Claim>
-    {
-        new Claim(ClaimTypes.Role, role),
-        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-        new Claim("BuildingPermalink", buildingPermalink.ToString())
-    };
+                    {
+                        new Claim(ClaimTypes.Role, role),
+                        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                        new Claim("BuildingPermalink", buildingPermalink.ToString())
+                    };
 
             // Thêm các claim dựa trên kiểu của account
             if (account is Resident resident)

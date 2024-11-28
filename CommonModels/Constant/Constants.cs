@@ -13,5 +13,12 @@
         //DB
         public const string SCHEMA_NAME = "software";
 
+        //Role Web 2
+        public const string ROLE_KE_TOAN = "KeToan";
+        public const string ROLE_HANH_CHINH = "HanhChinh";
+        public const string ROLE_KI_THUAT = "KiThuat";
+        public const string ROLE_LE_TAN = "LeTan";
+        public const string ROLE_BAN_QUAN_LY = "BanQuanLy";
+        public const string ROLE_BEN_THU_BA = "BenThuBa";
     }
 }

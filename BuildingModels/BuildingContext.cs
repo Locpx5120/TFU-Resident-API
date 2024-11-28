@@ -21,10 +21,11 @@ public partial class BuildingContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.UseSqlServer("server=.;database=DBJustBlog;Trusted_Connection=True;TrustServerCertificate=True");
+        optionsBuilder.UseSqlServer("Data Source= 202.92.7.204,1437;Initial Catalog=QLToaNhaDb2_1;Persist Security Info=True;User ID=QLToaNhaDb2_1;Password=qe853B5f%;TrustServerCertificate=True");
     }
 
-    //add-migration DB
+    // add-migration updateDB8 -Context BuildingContext
+    // update-database -Context BuildingContext
 
     public virtual DbSet<Apartment> Apartments { get; set; }
     public virtual DbSet<ApartmentType> ApartmentTypes { get; set; }
