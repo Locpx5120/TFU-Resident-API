@@ -13,6 +13,8 @@ namespace TFU_Building_API.Dto
 
     public class StaffResponseDto {
         public Guid Id { get; set; }
+        public string Email { get; set; }
+        public string Password { get; set; }
     }
 
     public class StaffDeleteRequestDto

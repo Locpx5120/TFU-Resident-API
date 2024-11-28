@@ -3,6 +3,7 @@ using Core.Enums;
 using Core.Model;
 using Microsoft.EntityFrameworkCore;
 using TFU_Building_API.Core.Handler;
+using TFU_Building_API.Core.Helper;
 using TFU_Building_API.Core.Infrastructure;
 using TFU_Building_API.Dto;
 
@@ -11,50 +12,77 @@ namespace TFU_Building_API.Service.impl
     public class StaffService : BaseHandler, IStaffService
     {
         private readonly IUnitOfWork _unitOfWork;
-        public StaffService(IUnitOfWork UnitOfWork, IHttpContextAccessor HttpContextAccessor) : base(UnitOfWork, HttpContextAccessor)
+        private readonly IConfiguration _config;
+        public StaffService(IUnitOfWork UnitOfWork, IHttpContextAccessor HttpContextAccessor, IConfiguration config) : base(UnitOfWork, HttpContextAccessor)
         {
             _unitOfWork = UnitOfWork;
+            _config = config;
         }
 
         public async Task<ResponseData<StaffResponseDto>> AddStaff(StaffRequestDto request)
         {
             try
             {
-                // Tìm kiếm user dựa trên email (nếu không tìm thấy thì báo lỗi)
-                var existingUser = await _unitOfWork.StaffRepository.GetQuery(x => x.Email == request.Email && x.IsDeleted == false).FirstOrDefaultAsync();
+                // Kiểm tra xem nhân viên với email này đã tồn tại hay chưa
+                var existingStaff = await _unitOfWork.StaffRepository
+                    .GetQuery(x => x.Email == request.Email && x.IsDeleted == false)
+                    .FirstOrDefaultAsync();
 
-                if (existingUser == null)
+                if (existingStaff != null)
                 {
-                    // Nếu không tìm thấy user, trả về thông báo lỗi
+                    // Nếu nhân viên đã tồn tại, trả về thông báo lỗi
                     return new ResponseData<StaffResponseDto>
                     {
                         Success = false,
-                        Message = "User with this email does not exist.",
-                        Code = (int)ErrorCodeAPI.UserNotFound
+                        Message = "A staff with this email already exists.",
+                        Code = (int)ErrorCodeAPI.DuplicateEntry
                     };
                 }
 
-                // Tạo mới staff và liên kết với user đã tìm thấy qua email
+                // Tạo mật khẩu ngẫu nhiên cho nhân viên mới
+                var generatedPassword = GenerateRandomPassword();
+
+                // Tạo mới staff và thêm thông tin tài khoản
                 Staff newStaff = new Staff
                 {
-                    //Id = Guid.NewGuid(),              
-                    HireDate = DateTime.Now,            
-                    //UserId = existingUser.Id,          
-                    RoleId = request.RoleId,           
-                    InsertedAt = DateTime.Now,        
-                    UpdatedAt = DateTime.Now,         
-                    IsDeleted = false,                 
-                    IsActive = true                   
+                    Id = Guid.NewGuid(),
+                    HireDate = DateTime.Now,
+                    FullName = request.Email.Split('@')[0],
+                    Email = request.Email,
+                    Password = generatedPassword, // Lưu mật khẩu dạng plain text
+                    //PhoneNumber = request.PhoneNumber,
+                    RoleId = request.RoleId,
+                    InsertedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now,
+                    IsDeleted = false,
+                    IsActive = true,
+                    IsChangePassword = false // Đánh dấu là người dùng cần đổi mật khẩu sau lần đăng nhập đầu tiên
                 };
 
                 // Thêm staff mới vào cơ sở dữ liệu
-                UnitOfWork.StaffRepository.Add(newStaff);
-                await UnitOfWork.SaveChangesAsync();    // Lưu thay đổi vào cơ sở dữ liệu
+                _unitOfWork.StaffRepository.Add(newStaff);
+                await _unitOfWork.SaveChangesAsync(); // Lưu thay đổi vào cơ sở dữ liệu
+
+                // Gửi email thông tin tài khoản và mật khẩu cho nhân viên
+                var emailService = new EmailService(_config);
+                string subject = "Your New Account Details";
+                string body = $@"
+            <p>Dear {newStaff.FullName},</p>
+            <p>Your new account has been created successfully. Below are your login details:</p>
+            <p><b>Email:</b> {newStaff.Email}</p>
+            <p><b>Password:</b> {generatedPassword}</p>
+            <p>Please log in and change your password as soon as possible.</p>
+            <br/>
+            <p>Best Regards,<br/>TFU Building Management Team</p>";
+
+                await emailService.SendEmailAsync(newStaff.Email, subject, body);
 
                 // Trả về kết quả thành công với thông tin StaffResponseDto
                 var response = new StaffResponseDto
                 {
-                    Id = newStaff.Id
+                    Id = newStaff.Id,
+                    Email = newStaff.Email,
+                    Password = generatedPassword // Trả về mật khẩu cho người dùng (chỉ trả về trong response này)
                 };
 
                 return new ResponseData<StaffResponseDto>
@@ -71,11 +99,22 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<StaffResponseDto>
                 {
                     Success = false,
-                    Message = ex.Message,  // Hoặc có thể log lỗi chi tiết và trả về thông báo chung
+                    Message = ex.Message, // Hoặc có thể log lỗi chi tiết và trả về thông báo chung
                     Code = (int)ErrorCodeAPI.SystemIsError
                 };
             }
         }
+
+        // Hàm tạo mật khẩu ngẫu nhiên
+        private string GenerateRandomPassword()
+        {
+            // Bạn có thể tùy chỉnh độ dài và kiểu ký tự của mật khẩu tại đây
+            const string validChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*";
+            var random = new Random();
+            return new string(Enumerable.Repeat(validChars, 12)
+                .Select(s => s[random.Next(s.Length)]).ToArray());
+        }
+
 
         public async Task<ResponseData<StaffResponseDto>> DeleteStaff(StaffDeleteRequestDto request)
         {

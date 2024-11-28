@@ -20,7 +20,7 @@ namespace TFU_Building_API.Controllers
             _staffService = staffService;
         }
 
-        [HttpPost("listEmployee")]
+        [HttpPost("add")]
         public async Task<IActionResult> AddStaff([FromBody] StaffRequestDto request)
         {
             var response = await _staffService.AddStaff(request);
