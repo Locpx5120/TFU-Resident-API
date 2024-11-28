@@ -73,6 +73,7 @@ namespace TFU_Building_API.Service.impl
         {
             try
             {
+
                 // Lấy danh sách Ownerships liên quan tới ResidentId
                 var ownerships = await _unitOfWork.OwnerShipRepository
                     .GetQuery(o => o.ResidentId == residentId && o.IsDeleted == false)
@@ -233,7 +234,7 @@ namespace TFU_Building_API.Service.impl
 
                 // Prepare the response
                 var response = new List<ApartmentMemberDetailDto>();
-      
+
 
                 response.AddRange(members.Select((l, index) => new ApartmentMemberDetailDto
                 {
