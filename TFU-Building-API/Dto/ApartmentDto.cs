@@ -16,7 +16,7 @@
 
     public class ApartmentMemberDetailDto
     {
-        public Guid Id { get; set; }
+        public Guid? Id { get; set; }
         public int STT { get; set; }
         public string MemberName { get; set; }
         public string Role { get; set; }

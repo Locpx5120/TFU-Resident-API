@@ -3,6 +3,7 @@ using Core.Enums;
 using Core.Model;
 using Microsoft.EntityFrameworkCore;
 using QRCoder;
+using System.Linq;
 using TFU_Building_API.Core.Handler;
 using TFU_Building_API.Core.Helper;
 using TFU_Building_API.Core.Infrastructure;
@@ -181,8 +182,21 @@ namespace TFU_Building_API.Service.impl
                     .Select(x => x.ServiceContractId)
                     .ToListAsync();
 
-                // Lọc các ServiceContract chưa có hóa đơn trong tháng
-                var newServiceContracts = serviceContracts.Where(sc => !existingInvoices.Contains(sc.Id)).ToList();
+                // Tạo HashSet cho các hóa đơn đã tồn tại để tối ưu việc tra cứu
+                var existingInvoiceSet = new HashSet<Guid>(existingInvoices);
+
+                // Các GUID của các ServiceId không cần thiết
+                var excludedServiceIds = new HashSet<Guid>
+                {
+                    new Guid("F517BEF7-D325-487B-9F76-EB5D20413634"),
+                    new Guid("F517BEF7-D325-487B-9F76-E66D20413634")
+                };
+
+                // Lọc các ServiceContract chưa có hóa đơn trong tháng và loại các dịch vụ không cần thiết
+                var newServiceContracts = serviceContracts
+                    .Where(sc => !existingInvoiceSet.Contains(sc.Id) && !excludedServiceIds.Contains((Guid)sc.ServiceId))
+                    .ToList();
+
 
                 // Tạo hóa đơn cho các hợp đồng dịch vụ chưa có hóa đơn
                 foreach (var serviceContract in newServiceContracts)

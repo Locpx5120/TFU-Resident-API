@@ -53,6 +53,7 @@ namespace TFU_Building_API.Dto
         public int RoomNumber { get; set; }
         public int TotalServices { get; set; }
         public int Month { get; set; }
+        public int Year { get; set; }
         public string PaymentStatus { get; set; }
     }
 
@@ -65,6 +66,7 @@ namespace TFU_Building_API.Dto
         public Guid? ApartmentIdFilter { get; set; } // Filter by Apartment ID
         public string? PaymentStatusFilter { get; set; }
         public int? MonthFilter { get; set; }
+        public int? YearFilter { get; set; }
     }
 
 
@@ -92,6 +94,8 @@ namespace TFU_Building_API.Dto
         public Guid ApartmentId { get; set; }
 
         public string ServiceType { get; set; } // Loại dịch vụ (ví dụ: "Gửi xe", "Dịch vụ phòng")
+        public int Month { get; set; }
+        public int Year { get; set; }
     }
 
     public class ServiceDto

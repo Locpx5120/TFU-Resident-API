@@ -560,6 +560,7 @@ namespace TFU_Building_API.Service.impl
                                 BuildingName = b.Name,
                                 TotalServices = sc.Quantity ?? 1,
                                 Month = inv.IssueDate.HasValue ? inv.IssueDate.Value.Month : 0,
+                                Year = inv.IssueDate.HasValue ? inv.IssueDate.Value.Year : 0,
                                 PaymentStatus = inv.PaidStatus ? "Đã thanh toán" : "Chưa thanh toán"
                             };
 
@@ -580,10 +581,14 @@ namespace TFU_Building_API.Service.impl
                 {
                     query = query.Where(x => x.Month == request.MonthFilter.Value);
                 }
+                if (request.YearFilter.HasValue)
+                {
+                    query = query.Where(x => x.Year == request.YearFilter.Value);
+                }
 
                 // Group by ApartmentId and Month, calculate sum of TotalServices
                 var groupedQuery = query
-                    .GroupBy(x => new { x.ApartmentId, x.Month })
+                    .GroupBy(x => new { x.ApartmentId, x.Month, x.Year })
                     .Select(g => new UnpaidServiceSummaryDto
                     {
                         ApartmentId = g.Key.ApartmentId,
@@ -592,6 +597,7 @@ namespace TFU_Building_API.Service.impl
                         BuildingName = g.FirstOrDefault().BuildingName,
                         TotalServices = g.Sum(x => x.TotalServices),
                         Month = g.Key.Month,
+                        Year = g.Key.Year,
                         PaymentStatus = g.Any(x => x.PaymentStatus == "Chưa thanh toán") ? "Chưa thanh toán" : "Đã thanh toán"
                     });
 
@@ -641,8 +647,8 @@ namespace TFU_Building_API.Service.impl
         {
             try
             {
-                var currentMonth = DateTime.Now.Month;
-                var currentYear = DateTime.Now.Year;
+                var currentMonth = request.Month;
+                var currentYear = request.Year;
 
                 //var query = from inv in _unitOfWork.InvoiceRepository.GetQuery(x => x.PaidStatus == false && (x.IsDeleted == false))   
                 var query = from inv in _unitOfWork.InvoiceRepository.GetQuery(x => (x.IsDeleted == false))
