@@ -33,7 +33,7 @@ namespace TFU_Building_API.Service.impl
                 // Tìm kiếm user dựa trên email (nếu không tìm thấy thì báo lỗi)
                 var existingUser = await _unitOfWork.StaffRepository.GetQuery(x => x.Email == request.Email && x.IsDeleted == false).FirstOrDefaultAsync();
 
-                if (existingUser == null)
+                if (existingUser != null)
                 {
                     // Nếu không tìm thấy user, trả về thông báo lỗi
                     return new ResponseData<StaffResponseDto>
