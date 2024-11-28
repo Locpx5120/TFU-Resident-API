@@ -14,10 +14,8 @@ namespace TFU_Building_API.Service.impl
     {
         private readonly IConfiguration _config;
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IConfiguration _config;
         public StaffService(IUnitOfWork UnitOfWork, IHttpContextAccessor HttpContextAccessor, IConfiguration config) : base(UnitOfWork, HttpContextAccessor)
         {
-            _config = config;
             _unitOfWork = UnitOfWork;
             _config = config;
         }
@@ -62,7 +60,6 @@ namespace TFU_Building_API.Service.impl
                     IsChangePassword = false // Đánh dấu là người dùng cần đổi mật khẩu sau lần đăng nhập đầu tiên
                 };
 
-                await emailService.SendEmailAsync(newStaff.Email, "TB Dki tai khoan", BodyMaillRegister(newStaff));
 
                 // Thêm staff mới vào cơ sở dữ liệu
                 _unitOfWork.StaffRepository.Add(newStaff);
