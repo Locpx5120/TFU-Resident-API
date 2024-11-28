@@ -1,4 +1,5 @@
 ﻿using BuildingModels;
+using Constant;
 using Core.Enums;
 using Core.Model;
 using Microsoft.EntityFrameworkCore;
@@ -11,10 +12,14 @@ namespace TFU_Building_API.Service.impl
     public class ApartmentService : BaseHandler, IApartmentService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IUserIdentity _userIdentity;
 
-        public ApartmentService(IUnitOfWork unitOfWork, IHttpContextAccessor httpContextAccessor) : base(unitOfWork, httpContextAccessor)
+        public ApartmentService(IUnitOfWork unitOfWork, IHttpContextAccessor httpContextAccessor,
+            IUserIdentity userIdentity)
+            : base(unitOfWork, httpContextAccessor)
         {
             _unitOfWork = unitOfWork;
+            _userIdentity = userIdentity;
         }
 
         //public async Task<ResponseData<List<ApartmentResponseDto>>> GetApartmentsByResidentIdAsync(Guid residentId)
@@ -73,14 +78,27 @@ namespace TFU_Building_API.Service.impl
         {
             try
             {
-
+                List<OwnerShip> ownerships = new List<OwnerShip>();
                 // Lấy danh sách Ownerships liên quan tới ResidentId
-                var ownerships = await _unitOfWork.OwnerShipRepository
+                if (_userIdentity.RoleName.Equals(Constants.ROLE_HANH_CHINH))
+                {
+                    ownerships = await _unitOfWork.OwnerShipRepository
+                    .GetQuery(o => o.IsDeleted == false)
+                    .Include(o => o.Apartment)  // Include Apartment để tránh phải join
+                    .ThenInclude(a => a.Building) // Include Building to fetch Building Name
+                    .Include(o => o.Resident)   // Include Resident để lấy thông tin liên quan
+                    .ToListAsync();
+                }
+                else
+                {
+                    ownerships = await _unitOfWork.OwnerShipRepository
                     .GetQuery(o => o.ResidentId == residentId && o.IsDeleted == false)
                     .Include(o => o.Apartment)  // Include Apartment để tránh phải join
                     .ThenInclude(a => a.Building) // Include Building to fetch Building Name
                     .Include(o => o.Resident)   // Include Resident để lấy thông tin liên quan
                     .ToListAsync();
+                }
+
 
                 // Lấy tất cả Living liên quan tới các ApartmentId đã lấy được
                 var apartmentIds = ownerships.Select(o => o.ApartmentId).ToList();
