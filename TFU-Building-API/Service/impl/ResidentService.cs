@@ -211,7 +211,7 @@ namespace TFU_Building_API.Service.impl
                     };
                 }
 
-                var living = await _unitOfWork.LivingRepository.GetQuery(r => r.ResidentId == resident.Id).FirstOrDefaultAsync();
+                var living = await _unitOfWork.LivingRepository.GetQuery(r => r.ResidentId == resident.Id  && r.IsDeleted == false).FirstOrDefaultAsync();
 
                 if (living == null)
                 {
