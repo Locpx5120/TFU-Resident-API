@@ -129,13 +129,22 @@ namespace TFU_Building_API.Service.impl
 
                     if (apartment == null)
                     {
-                        return new ResponseData<AddThirdPartyContactResponseDto>
-                        {
-                            Success = false,
-                            Message = "Apartment not found with the specified building, floor, and room.",
-                            Data = new AddThirdPartyContactResponseDto { Success = false, Message = "Invalid apartment details." },
-                            Code = (int)ErrorCodeAPI.InvalidData
-                        };
+                        apartment = new Apartment();
+                        apartment.Id = Guid.NewGuid();
+                        apartment.FloorNumber = (int)request.FloorNumber;
+                        apartment.RoomNumber = (int)request.RoomNumber;
+                        apartment.BuildingId = (Guid)request.BuildingId;
+                        apartment.ApartmentTypeId = Guid.Parse("0A8D67F1-5AEA-418A-97A2-BC0F5C46D511");
+                        _unitOfWork.ApartmentRepository.Add(apartment);
+                        //return new ResponseData<AddThirdPartyContactResponseDto>
+                        //{
+                        //    Success = false,
+                        //    Message = "Apartment not found with the specified building, floor, and room.",
+                        //    Data = new AddThirdPartyContactResponseDto { Success = false, Message = "Invalid apartment details." },
+                        //    Code = (int)ErrorCodeAPI.InvalidData
+                        //};
+
+                        await _unitOfWork.SaveChangesAsync();
                     }
 
                     apartmentId = apartment.Id;
@@ -278,9 +287,9 @@ namespace TFU_Building_API.Service.impl
                                 tp.NameCompany,
                                 ContactInfo = new { s.Email, s.PhoneNumber }, // Contact info from Staff table
                                 tp.Description,
-                                StartDate = tpc == null ? (DateTime?)null : tpc.StartDate, // Handle null for ThirdPartyContract
-                                EndDate = tpc == null ? (DateTime?)null : tpc.EndDate, // Handle null for ThirdPartyContract
-                                BuildingName = bj == null ? null : bj.Name, // Handle null for Building
+                                StartDate = (tpc == null) ? (DateTime?)null : tpc.StartDate, // Handle null for ThirdPartyContract
+                                EndDate = (tpc == null) ? (DateTime?)null : tpc.EndDate, // Handle null for ThirdPartyContract
+                                BuildingName = (bj == null) ? null : bj.Name, // Handle null for Building
                                 //ContractStatus = tpc == null || tpc.EndDate == null || tpc.EndDate <= now
                                 //    ? "Hết hạn" // Expired or missing EndDate
                                 //    : (tpc.EndDate <= oneMonthFromNow && tpc.EndDate > now)
@@ -459,8 +468,8 @@ namespace TFU_Building_API.Service.impl
                             {
                                 CompanyName = tp.NameCompany,
                                 Floor = aj == null ? 0 : aj.FloorNumber,
-                                                                                         Room = aj == null ? 0 : aj.RoomNumber, // Handle null apartment
-                                                                                        Area = aj == null ? 0 : aj.ApartmentType.LandArea, // Handle null apartment type
+                                Room = aj == null ? 0 : aj.RoomNumber, // Handle null apartment
+                                Area = aj == null ? 0 : aj.ApartmentType.LandArea, // Handle null apartment type
                                 NameService = tpc.NameService, // Include NameService
                                 //StartDate = (tp.Status == false && tp.IsTenant == false) ? null : tpc.StartDate, // Null if Status is false and IsTenant is false
                                 //EndDate = (tp.Status == false && tp.IsTenant == false) ? null : tpc.EndDate, // Null if Status is false and IsTenant is false
@@ -628,7 +637,7 @@ namespace TFU_Building_API.Service.impl
                     UpdatedAt = DateTime.Now
                 };
 
-                 _unitOfWork.StaffRepository.Add(newStaff);
+                _unitOfWork.StaffRepository.Add(newStaff);
 
                 // Step 2: Add third party record with the StaffId
                 var newThirdParty = new ThirdParty
@@ -645,7 +654,7 @@ namespace TFU_Building_API.Service.impl
                     UpdatedAt = DateTime.Now
                 };
 
-                 _unitOfWork.ThirdPartyRepository.Add(newThirdParty);
+                _unitOfWork.ThirdPartyRepository.Add(newThirdParty);
                 await _unitOfWork.SaveChangesAsync();
 
                 return new ResponseData<string>

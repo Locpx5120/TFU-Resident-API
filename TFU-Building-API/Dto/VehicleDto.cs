@@ -4,12 +4,12 @@
     public class VehicleServiceRequestDto
     {
         public Guid ResidentId { get; set; }
+        public Guid ServiceId { get; set; }
         public string VehicleType { get; set; }
         public string LicensePlate { get; set; }
-        public Guid ApartmentId { get; set; }
-        public Guid ServiceId { get; set; }
         public Guid PackageServiceId { get; set; }
         public string Note { get; set; }
+        public Guid ApartmentId { get; set; }
         public DateTime StartDate { get; set; }
     }
 
