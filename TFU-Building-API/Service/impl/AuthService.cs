@@ -89,11 +89,12 @@ namespace TFU_Building_API.Service.Impl
             Staff staff = new Staff();
             object user = null; // Sử dụng object để lưu thông tin người dùng (Resident hoặc Staff)
 
-            // Kiểm tra trong bảng Resident
+            // Kiểm tra trong bảng Resident,  là isowner mới cho đăng nhập
             var resident = await UnitOfWork.ResidentRepository.GetQuery(
                 x => x.Email == request.Email &&
                 x.Password == request.Password &&
                 x.IsActive == true &&
+                x.IsOwner ==  true &&
                 x.IsDeleted == false).FirstOrDefaultAsync();
 
             if (resident != null)

@@ -462,8 +462,10 @@ namespace TFU_Building_API.Service.impl
                                                                                          Room = aj == null ? 0 : aj.RoomNumber, // Handle null apartment
                                                                                         Area = aj == null ? 0 : aj.ApartmentType.LandArea, // Handle null apartment type
                                 NameService = tpc.NameService, // Include NameService
-                                StartDate = (tp.Status == false && tp.IsTenant == false) ? null : tpc.StartDate, // Null if Status is false and IsTenant is false
-                                EndDate = (tp.Status == false && tp.IsTenant == false) ? null : tpc.EndDate, // Null if Status is false and IsTenant is false
+                                //StartDate = (tp.Status == false && tp.IsTenant == false) ? null : tpc.StartDate, // Null if Status is false and IsTenant is false
+                                //EndDate = (tp.Status == false && tp.IsTenant == false) ? null : tpc.EndDate, // Null if Status is false and IsTenant is false
+                                StartDate = tpc.StartDate,
+                                EndDate = tpc.EndDate,
                                 ServicePrice = tpc.Price
                             };
 
@@ -633,7 +635,7 @@ namespace TFU_Building_API.Service.impl
                 {
                     Id = Guid.NewGuid(),
                     NameCompany = request.NameCompany,
-                    Status = false, // Assuming false means chưa thanh toán
+                    Status = true, // Assuming false means chưa thanh toán
                     IsTenant = false, // Not a tenant, you're hiring them
                     StaffId = newStaff.Id,
                     IsDeleted = false,

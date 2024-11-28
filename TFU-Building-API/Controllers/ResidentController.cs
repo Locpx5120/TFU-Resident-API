@@ -76,10 +76,10 @@ namespace TFU_Building_API.Controllers
 
             if (!response.Success)
             {
-                return BadRequest(response.Message);
+                return BadRequest(response);
             }
 
-            return Ok(response.Data);
+            return Ok(response);
         }
 
         [HttpGet("GetById/{residentId}")]

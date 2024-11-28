@@ -457,8 +457,89 @@ namespace TFU_Building_API.Service.impl
         //    }
         //}
 
+        //  public async Task<ResponseData<PaginatedResponseDto<UnpaidServiceSummaryDto>>> GetServiceSummaryByUserId(
+        //Guid userId, ServiceSummaryRequestDto request)
+        //  {
+        //      try
+        //      {
+        //          var query = from inv in _unitOfWork.InvoiceRepository.GetQuery(x => x.IsDeleted == false)
+        //                      join sc in _unitOfWork.ServiceContractRepository.GetQuery(x => x.IsActive && x.IsDeleted == false)
+        //                          on inv.ServiceContractId equals sc.Id
+        //                      join o in _unitOfWork.OwnerShipRepository.GetQuery(x => x.ResidentId == userId && x.IsDeleted == false)
+        //                          on sc.ApartmentId equals o.ApartmentId
+        //                      join a in _unitOfWork.ApartmentRepository.GetQuery(x => x.IsDeleted == false)
+        //                          on sc.ApartmentId equals a.Id
+        //                      join b in _unitOfWork.BuildingRepository.GetQuery(x => x.IsDeleted == false)
+        //                          on a.BuildingId equals b.Id
+        //                      select new UnpaidServiceSummaryDto
+        //                      {
+        //                          ApartmentId = a.Id,
+        //                          RoomNumber = a.RoomNumber,
+        //                          BuildingId = b.Id,
+        //                          BuildingName = b.Name,
+        //                          TotalServices = sc.Quantity ?? 1,
+        //                          Month = inv.IssueDate.HasValue ? inv.IssueDate.Value.Month : 0,
+        //                          PaymentStatus = inv.PaidStatus ? "Đã thanh toán" : "Chưa thanh toán"
+        //                      };
+
+        //          // Apply filters from request
+        //          if (request.BuildingIdFilter.HasValue)
+        //          {
+        //              query = query.Where(x => x.BuildingId == request.BuildingIdFilter.Value);
+        //          }
+        //          if (request.ApartmentIdFilter.HasValue)
+        //          {
+        //              query = query.Where(x => x.ApartmentId == request.ApartmentIdFilter.Value);
+        //          }
+        //          if (!string.IsNullOrEmpty(request.PaymentStatusFilter))
+        //          {
+        //              query = query.Where(x => x.PaymentStatus == request.PaymentStatusFilter);
+        //          }
+        //          if (request.MonthFilter.HasValue)
+        //          {
+        //              query = query.Where(x => x.Month == request.MonthFilter.Value);
+        //          }
+
+        //          // Sort by month
+        //          query = query.OrderByDescending(x => x.Month);
+
+        //          // Calculate total records before pagination
+        //          var totalRecords = await query.CountAsync();
+
+        //          // Apply pagination
+        //          var data = await query
+        //              .Skip((request.PageNumber - 1) * request.PageSize)
+        //              .Take(request.PageSize)
+        //              .ToListAsync();
+
+        //          // Wrap the result in PaginatedResponseDto
+        //          var response = new PaginatedResponseDto<UnpaidServiceSummaryDto>
+        //          {
+        //              TotalRecords = totalRecords,
+        //              Data = data
+        //          };
+
+        //          return new ResponseData<PaginatedResponseDto<UnpaidServiceSummaryDto>>
+        //          {
+        //              Success = true,
+        //              Message = "Successfully retrieved service summary.",
+        //              Data = response,
+        //              Code = (int)ErrorCodeAPI.OK
+        //          };
+        //      }
+        //      catch (Exception ex)
+        //      {
+        //          return new ResponseData<PaginatedResponseDto<UnpaidServiceSummaryDto>>
+        //          {
+        //              Success = false,
+        //              Message = ex.Message,
+        //              Code = (int)ErrorCodeAPI.SystemIsError
+        //          };
+        //      }
+        //  }
+
         public async Task<ResponseData<PaginatedResponseDto<UnpaidServiceSummaryDto>>> GetServiceSummaryByUserId(
-      Guid userId, ServiceSummaryRequestDto request)
+    Guid userId, ServiceSummaryRequestDto request)
         {
             try
             {
@@ -500,14 +581,28 @@ namespace TFU_Building_API.Service.impl
                     query = query.Where(x => x.Month == request.MonthFilter.Value);
                 }
 
-                // Sort by month
-                query = query.OrderByDescending(x => x.Month);
+                // Group by ApartmentId and Month, calculate sum of TotalServices
+                var groupedQuery = query
+                    .GroupBy(x => new { x.ApartmentId, x.Month })
+                    .Select(g => new UnpaidServiceSummaryDto
+                    {
+                        ApartmentId = g.Key.ApartmentId,
+                        RoomNumber = g.FirstOrDefault().RoomNumber,
+                        BuildingId = g.FirstOrDefault().BuildingId,
+                        BuildingName = g.FirstOrDefault().BuildingName,
+                        TotalServices = g.Sum(x => x.TotalServices),
+                        Month = g.Key.Month,
+                        PaymentStatus = g.Any(x => x.PaymentStatus == "Chưa thanh toán") ? "Chưa thanh toán" : "Đã thanh toán"
+                    });
+
+                // Sort by month descending
+                groupedQuery = groupedQuery.OrderByDescending(x => x.Month);
 
                 // Calculate total records before pagination
-                var totalRecords = await query.CountAsync();
+                var totalRecords = await groupedQuery.CountAsync();
 
                 // Apply pagination
-                var data = await query
+                var data = await groupedQuery
                     .Skip((request.PageNumber - 1) * request.PageSize)
                     .Take(request.PageSize)
                     .ToListAsync();
@@ -537,6 +632,7 @@ namespace TFU_Building_API.Service.impl
                 };
             }
         }
+
 
 
 

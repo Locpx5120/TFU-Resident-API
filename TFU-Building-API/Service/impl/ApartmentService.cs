@@ -237,6 +237,7 @@ namespace TFU_Building_API.Service.impl
 
                 response.AddRange(members.Select((l, index) => new ApartmentMemberDetailDto
                 {
+                    Id = l.Id,
                     STT = index + 1,
                     MemberName = l.Resident.Name,
                     Role = "Thành viên",
