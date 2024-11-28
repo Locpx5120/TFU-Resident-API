@@ -1,6 +1,7 @@
 ﻿using BuildingModels;
 using Core.Enums;
 using Core.Model;
+using fake_tool.Helpers;
 using Microsoft.EntityFrameworkCore;
 using TFU_Building_API.Core.Handler;
 using TFU_Building_API.Core.Helper;
@@ -11,10 +12,12 @@ namespace TFU_Building_API.Service.impl
 {
     public class StaffService : BaseHandler, IStaffService
     {
+        private readonly IConfiguration _config;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IConfiguration _config;
         public StaffService(IUnitOfWork UnitOfWork, IHttpContextAccessor HttpContextAccessor, IConfiguration config) : base(UnitOfWork, HttpContextAccessor)
         {
+            _config = config;
             _unitOfWork = UnitOfWork;
             _config = config;
         }
@@ -58,6 +61,8 @@ namespace TFU_Building_API.Service.impl
                     IsActive = true,
                     IsChangePassword = false // Đánh dấu là người dùng cần đổi mật khẩu sau lần đăng nhập đầu tiên
                 };
+
+                await emailService.SendEmailAsync(newStaff.Email, "TB Dki tai khoan", BodyMaillRegister(newStaff));
 
                 // Thêm staff mới vào cơ sở dữ liệu
                 _unitOfWork.StaffRepository.Add(newStaff);
@@ -368,6 +373,7 @@ namespace TFU_Building_API.Service.impl
                         Birthday = x.Birthday,
                         IsActive = x.IsActive,
                         RoleId = x.RoleId,
+                        RoleName = x.Role.Name,
                         InsertedAt = x.InsertedAt,
                         UpdatedAt = x.UpdatedAt
                     })

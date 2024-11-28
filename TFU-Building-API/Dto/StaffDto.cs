@@ -11,7 +11,8 @@ namespace TFU_Building_API.Dto
         public Guid RoleId { get; set; }
     }
 
-    public class StaffResponseDto {
+    public class StaffResponseDto
+    {
         public Guid Id { get; set; }
         public string Email { get; set; }
         public string Password { get; set; }
@@ -57,6 +58,7 @@ namespace TFU_Building_API.Dto
     {
         public Guid Id { get; set; }
         public string FullName { get; set; }
+        public string RoleName { get; set; }
         public string Email { get; set; }
         public string PhoneNumber { get; set; }
         public DateTime? HireDate { get; set; }
