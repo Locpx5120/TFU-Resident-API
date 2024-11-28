@@ -9,14 +9,16 @@ namespace SuperOwnerModels
     {
         public Project()
         {
-            Buildings = new HashSet<Building>();
+            //Buildings = new HashSet<Building>();
         }
         public string Name { get; set; } = null!;
+        public string ConnectionString { get; set; } = null!;
         public string Position { get; set; } = null!;
         //public string Permalink { get; set; } = null!;
         public Guid? InvestorId { get; set; }
         [ForeignKey(nameof(InvestorId))]
         public virtual Investor Investor { get; set; } = null!;
-        public virtual ICollection<Building> Buildings { get; set; }
+        //public virtual ICollection<Building> Buildings { get; set; }
+
     }
 }

@@ -43,7 +43,7 @@ namespace TFU_Building_API.Configure
             }
 
             // Tìm tòa nhà tương ứng với buildingPermalink
-            var building = superOwnerContext.Buildings.FirstOrDefault(x => x.Id == buildingPermalink);
+            var building = superOwnerContext.Projects.FirstOrDefault(x => x.Id == buildingPermalink);
 
             // Kiểm tra tòa nhà có tồn tại và có connection string hợp lệ không
             if (building != null && !string.IsNullOrEmpty(building.ConnectionString))

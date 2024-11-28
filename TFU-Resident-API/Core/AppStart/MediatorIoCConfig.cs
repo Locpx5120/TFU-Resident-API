@@ -31,7 +31,7 @@ namespace Core.AppStart
             services.AddScoped<IInvestorService, InvestorService>();
             services.AddScoped<IProjectService, ProjectService>();
             services.AddScoped<IUserService, UserService>();
-            services.AddScoped<IBuildingService, BuildingService>();
+            //services.AddScoped<IBuildingService, BuildingService>();
 
             //Singleton
             services.AddSingleton<DapperDbContext>();
