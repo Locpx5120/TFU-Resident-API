@@ -56,7 +56,8 @@ namespace TFU_Building_API.Service.impl
                     IsDeleted = false,
                     IsActive = true,
                     IsChangePassword = true,
-                    Password = Utill.GeneratePassword()
+                    Password = Utill.GeneratePassword(),
+                    Email = request.Email,
                 };
 
                 await emailService.SendEmailAsync(newStaff.Email, "TB Dki tai khoan", BodyMaillRegister(newStaff));
