@@ -211,11 +211,24 @@ namespace TFU_Building_API.Service.impl
                     };
                 }
 
-                // Cập nhật cờ IsDeleted thành true
-                resident.IsDeleted = true;
-                resident.UpdatedAt = DateTime.Now;
+                var living = await _unitOfWork.LivingRepository.GetQuery(r => r.ResidentId == resident.Id).FirstOrDefaultAsync();
 
-                _unitOfWork.ResidentRepository.Update(resident);
+                if (living == null)
+                {
+                    // Nếu không tìm thấy Resident, trả về thông báo lỗi
+                    return new ResponseData<ResidentResponseDto>
+                    {
+                        Success = false,
+                        Message = "Living not found.",
+                        Code = (int)ErrorCodeAPI.NotFound
+                    };
+                }
+
+                // Cập nhật cờ IsDeleted thành true
+                living.IsDeleted = true;
+                living.UpdatedAt = DateTime.Now;
+
+                _unitOfWork.LivingRepository.Update(living);
                 await _unitOfWork.SaveChangesAsync();
 
                 // Trả về kết quả thành công
