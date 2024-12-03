@@ -80,6 +80,8 @@ namespace TFU_Building_API.Dto
         public string QuantityOrArea { get; set; }  // Số lượng hoặc diện tích
         public decimal UnitPrice { get; set; }      // Giá tiền
         public decimal TotalPrice { get; set; }     // Tổng tiền
+        public string PaymentStatus { get; set; }
+        public DateTime? PaymentDate { get; set; }
     }
 
     public class UnpaidServiceDetailResponseDto

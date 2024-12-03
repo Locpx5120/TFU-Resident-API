@@ -51,6 +51,8 @@ namespace TFU_Building_API.Core.AppStart
             services.AddScoped<IApartmentType, ApartmentTypeService>();
 
             services.AddScoped<IThirdPartyService, ThirdPartyService>();
+            services.AddScoped<INotifyService, NotifyService>();
+            services.AddScoped<INotifyCategoryService, NotifyCategoryService>();
 
 
             //Singleton

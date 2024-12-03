@@ -151,6 +151,17 @@ namespace TFU_Building_API.Core.Infrastructure
         }
         #endregion
 
+        private IMasterDataRepository<Notify> _notifyRepository;
+        public IMasterDataRepository<Notify> NotifyRepository
+        {
+            get { return _notifyRepository ??= new MasterDataRepository<Notify>(_context, _currentUser); }
+        } 
+        private IMasterDataRepository<NotifyCategory> _notifyCategoryRepository;
+        public IMasterDataRepository<NotifyCategory> NotifyCategoryRepository
+        {
+            get { return _notifyCategoryRepository ??= new MasterDataRepository<NotifyCategory>(_context, _currentUser); }
+        }
+
 
         public async Task<int> SaveChangesAsync()
         {

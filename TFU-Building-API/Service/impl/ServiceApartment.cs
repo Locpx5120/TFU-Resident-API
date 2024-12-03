@@ -644,6 +644,90 @@ namespace TFU_Building_API.Service.impl
 
 
 
+        //public async Task<ResponseData<UnpaidServiceDetailResponseDto>> GetUnpaidServiceDetailsByApartmentId(UnpaidServiceDetailRequestDto request)
+        //{
+        //    try
+        //    {
+        //        var currentMonth = request.Month;
+        //        var currentYear = request.Year;
+
+        //        //var query = from inv in _unitOfWork.InvoiceRepository.GetQuery(x => x.PaidStatus == false && (x.IsDeleted == false))   
+        //        var query = from inv in _unitOfWork.InvoiceRepository.GetQuery(x => (x.IsDeleted == false))
+        //                    join sc in _unitOfWork.ServiceContractRepository.GetQuery(x => x.IsActive && (x.IsDeleted == false) && x.ApartmentId == request.ApartmentId)
+        //                        on inv.ServiceContractId equals sc.Id
+        //                    join s in _unitOfWork.ServiceRepository.GetQuery(x => (x.IsDeleted == false))
+        //                        on sc.ServiceId equals s.Id
+        //                    join a in _unitOfWork.ApartmentRepository.GetQuery(x => (x.IsDeleted == false))
+        //                        on sc.ApartmentId equals a.Id
+        //                    join at in _unitOfWork.ApartmentTypeRepository.GetQuery(x => x.IsActive && (x.IsDeleted == false))
+        //                        on a.ApartmentTypeId equals at.Id
+        //                    join ps in _unitOfWork.PackageServiceRepository.GetQuery(x => x.IsActive && (x.IsDeleted == false))
+        //                        on sc.PackageServiceId equals ps.Id into psJoin
+        //                    from ps in psJoin.DefaultIfEmpty()
+        //                    where inv.IssueDate.HasValue && inv.IssueDate.Value.Month == currentMonth && inv.IssueDate.Value.Year == currentYear
+        //                    select new
+        //                    {
+        //                        InvoiceId = inv.Id,
+        //                        ServiceName = s.ServiceName,
+        //                        Description = s.Description,
+        //                        QuantityOrArea = s.Unit == "m2" ? $"{at.LandArea} m2" : $"x{sc.Quantity}",
+        //                        UnitPrice = s.UnitPrice,
+        //                        Discount = ps.Discount ?? 0,
+        //                        Unit = s.Unit,
+        //                        LandArea = at.LandArea,
+        //                        Quantity = sc.Quantity,
+        //                        StartDate = sc.StartDate ?? DateTime.Now,
+        //                        EndDate = sc.EndDate ?? DateTime.Now
+        //                    };
+
+        //        // Áp dụng bộ lọc theo loại dịch vụ nếu có
+        //        if (!string.IsNullOrEmpty(request.ServiceType))
+        //        {
+        //            query = query.Where(x => x.ServiceName.Contains(request.ServiceType));
+        //        }
+
+        //        var result = await query.ToListAsync();
+
+        //        // Tính toán TotalPrice sau khi dữ liệu được tải
+        //        var services = result.Select(item => new UnpaidServiceDetailDto
+        //        {
+        //            InvoiceId = item.InvoiceId,
+        //            ServiceName = item.ServiceName,
+        //            Description = item.Description,
+        //            QuantityOrArea = item.QuantityOrArea,
+        //            UnitPrice = item.UnitPrice,
+        //            TotalPrice = CalculateTotalPrice(item.UnitPrice, item.StartDate, item.EndDate, item.Discount, item.Unit, item.LandArea, item.Quantity)
+        //        }).ToList();
+
+        //        // Tính tổng giá của tất cả dịch vụ
+        //        var totalAmount = services.Sum(x => x.TotalPrice);
+
+        //        // Đóng gói kết quả vào UnpaidServiceDetailResponseDto
+        //        var response = new UnpaidServiceDetailResponseDto
+        //        {
+        //            Services = services,
+        //            TotalAmount = totalAmount
+        //        };
+
+        //        return new ResponseData<UnpaidServiceDetailResponseDto>
+        //        {
+        //            Success = true,
+        //            Message = "Successfully retrieved unpaid service details.",
+        //            Data = response,
+        //            Code = (int)ErrorCodeAPI.OK
+        //        };
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return new ResponseData<UnpaidServiceDetailResponseDto>
+        //        {
+        //            Success = false,
+        //            Message = ex.Message,
+        //            Code = (int)ErrorCodeAPI.SystemIsError
+        //        };
+        //    }
+        //}
+
         public async Task<ResponseData<UnpaidServiceDetailResponseDto>> GetUnpaidServiceDetailsByApartmentId(UnpaidServiceDetailRequestDto request)
         {
             try
@@ -651,7 +735,6 @@ namespace TFU_Building_API.Service.impl
                 var currentMonth = request.Month;
                 var currentYear = request.Year;
 
-                //var query = from inv in _unitOfWork.InvoiceRepository.GetQuery(x => x.PaidStatus == false && (x.IsDeleted == false))   
                 var query = from inv in _unitOfWork.InvoiceRepository.GetQuery(x => (x.IsDeleted == false))
                             join sc in _unitOfWork.ServiceContractRepository.GetQuery(x => x.IsActive && (x.IsDeleted == false) && x.ApartmentId == request.ApartmentId)
                                 on inv.ServiceContractId equals sc.Id
@@ -677,7 +760,9 @@ namespace TFU_Building_API.Service.impl
                                 LandArea = at.LandArea,
                                 Quantity = sc.Quantity,
                                 StartDate = sc.StartDate ?? DateTime.Now,
-                                EndDate = sc.EndDate ?? DateTime.Now
+                                EndDate = sc.EndDate ?? DateTime.Now,
+                                PaidStatus = inv.PaidStatus,
+                                PaymentDate = inv.UpdatedAt
                             };
 
                 // Áp dụng bộ lọc theo loại dịch vụ nếu có
@@ -696,8 +781,16 @@ namespace TFU_Building_API.Service.impl
                     Description = item.Description,
                     QuantityOrArea = item.QuantityOrArea,
                     UnitPrice = item.UnitPrice,
-                    TotalPrice = CalculateTotalPrice(item.UnitPrice, item.StartDate, item.EndDate, item.Discount, item.Unit, item.LandArea, item.Quantity)
+                    TotalPrice = CalculateTotalPrice(item.UnitPrice, item.StartDate, item.EndDate, item.Discount, item.Unit, item.LandArea, item.Quantity),
+                    PaymentStatus = item.PaidStatus ? "Đã thanh toán" : "Chưa thanh toán",
+                    PaymentDate = item.PaidStatus ? item.PaymentDate : null // Lấy PaymentDate nếu đã thanh toán
                 }).ToList();
+
+                // Sắp xếp để dịch vụ mặc định ("Dịch vụ phòng") lên đầu
+                services = services
+                    .OrderByDescending(s => s.ServiceName == "Dịch vụ phòng") // Đưa "Dịch vụ phòng" lên đầu
+                    .ThenBy(s => s.ServiceName) // Sắp xếp các dịch vụ còn lại theo tên (tùy chọn)
+                    .ToList();
 
                 // Tính tổng giá của tất cả dịch vụ
                 var totalAmount = services.Sum(x => x.TotalPrice);
@@ -712,7 +805,7 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<UnpaidServiceDetailResponseDto>
                 {
                     Success = true,
-                    Message = "Successfully retrieved unpaid service details.",
+                    Message = "Successfully retrieved service details.",
                     Data = response,
                     Code = (int)ErrorCodeAPI.OK
                 };
@@ -727,5 +820,7 @@ namespace TFU_Building_API.Service.impl
                 };
             }
         }
+
+
     }
 }

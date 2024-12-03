@@ -485,6 +485,7 @@ namespace TFU_Building_API.Service.impl
                 serviceContract.Status = request.Status;
                 serviceContract.Note = request.Note;
                 serviceContract.UpdatedAt = DateTime.Now;
+                serviceContract.StartDate = DateTime.Now;
 
                 // If Status = 1, determine which field to update
                 if (request.Status == ServiceContractStatus.Approved)
