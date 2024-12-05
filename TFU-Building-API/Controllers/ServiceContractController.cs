@@ -74,7 +74,44 @@ namespace TFU_Building_API.Controllers
             return Ok(result);
         }
 
+
+        [HttpPost("add-repair-report")]
+        /// <summary>
+        /// Thêm đơn báo cáo sửa chữa
+        /// </summary>
+        /// <param name="request">Yêu cầu thêm dịch vụ.</param>
+        /// <returns>Kết quả thêm dịch vụ.</returns>
+        public async Task<IActionResult> AddRepairReport([FromBody] AddRepairReportServiceRequestDto request)
+        {
+            var result = await _serviceContractService.AddRepairReportServiceAsync(request);
+            if (!result.Success)
+                return BadRequest(result);
+
+            return Ok(result);
+        }
+
+        [HttpPost("update-repair-report")]
+        /// <summary>
+        /// Cập nhật đơn báo cáo sửa chữa
+        /// </summary>
+        /// <param name="request">Yêu cầu thêm dịch vụ.</param>
+        /// <returns>Kết quả thêm dịch vụ.</returns>
+        public async Task<IActionResult> UpdateRepairReport([FromBody] UpdateRepairReportServiceRequestDto request)
+        {
+            var result = await _serviceContractService.UpdateRepairReportServiceRequestAsync(request);
+            if (!result.Success)
+                return BadRequest(result);
+
+            return Ok(result);
+        }
+
+
         [HttpGet("vehicle-service-details/{serviceContractId}")]
+        /// <summary>
+        /// Chi tiết dịch vụ xe
+        /// </summary>
+        /// <param name="serviceContractId"></param>
+        /// <returns></returns>
         public async Task<IActionResult> GetVehicleServiceDetails(Guid serviceContractId)
         {
             var result = await _serviceContractService.GetVehicleServiceDetailAsync(serviceContractId);

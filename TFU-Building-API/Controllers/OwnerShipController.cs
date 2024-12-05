@@ -2,7 +2,6 @@
 using TFU_Building_API.Configure;
 using TFU_Building_API.Dto;
 using TFU_Building_API.Service;
-using TFU_Building_API.Service.impl;
 
 namespace TFU_Building_API.Controllers
 {
@@ -61,10 +60,7 @@ namespace TFU_Building_API.Controllers
         [HttpPost("getOwnerShips")]
         public async Task<IActionResult> GetOwnerShips(OwnerShipSearchRequestDto request)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+
 
             var response = await _ownerShipService.GetOwnerShips(request);
             if (!response.Success)

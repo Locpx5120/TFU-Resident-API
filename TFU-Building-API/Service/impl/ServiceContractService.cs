@@ -1,13 +1,11 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using BuildingModels;
+using Core.Enums;
+using Core.Model;
+using Microsoft.EntityFrameworkCore;
+using TFU_Building_API.Core.Handler;
+using TFU_Building_API.Core.Helper;
 using TFU_Building_API.Core.Infrastructure;
 using TFU_Building_API.Dto;
-using Core.Model;
-using BuildingModels;
-using Core.Enums;
-using Microsoft.EntityFrameworkCore;
-using TFU_Building_API.Core.Helper;
-using TFU_Building_API.Core.Handler;
 
 namespace TFU_Building_API.Service.impl
 {
@@ -18,6 +16,70 @@ namespace TFU_Building_API.Service.impl
         public ServiceContractService(IUnitOfWork UnitOfWork, IHttpContextAccessor HttpContextAccessor) : base(UnitOfWork, HttpContextAccessor)
         {
             _unitOfWork = UnitOfWork;
+        }
+
+        public async Task<ResponseData<List<AddRepairReportServiceResponseDto>>> AddRepairReportServiceAsync(AddRepairReportServiceRequestDto request)
+        {
+
+            try
+            {
+                var responseList = new List<AddRepairReportServiceResponseDto>();
+
+                foreach (var serviceRequest in request.Services)
+                {
+
+                    // Step 1: Add Service Contract to ServiceContracts table
+                    var serviceContract = new ServiceContract
+                    {
+                        Id = Guid.NewGuid(),
+                        StartDate = DateTime.Now,
+                        Status = ServiceContractStatus.Pending, // Assuming 1 means "Active"
+                        Quantity = 1, // Assuming 1 for one vehicle service
+                        Note = serviceRequest.Note,
+                        ApartmentId = serviceRequest.ApartmentId,
+                        ServiceId = serviceRequest.ServiceId,
+                        IsDeleted = false,
+                        IsActive = true
+                    };
+
+                    _unitOfWork.ServiceContractRepository.Add(serviceContract);
+
+                    // Add success response for each added service
+                    responseList.Add(new AddRepairReportServiceResponseDto
+                    {
+                        Success = true,
+                        Message = $"Service added successfully for license plate "
+                    });
+                }
+
+                // Save all changes at once
+                await _unitOfWork.SaveChangesAsync();
+
+                return new ResponseData<List<AddRepairReportServiceResponseDto>>
+                {
+                    Success = true,
+                    Message = "RepairReport services added successfully.",
+                    Data = responseList,
+                    Code = (int)ErrorCodeAPI.OK
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResponseData<List<AddRepairReportServiceResponseDto>>
+                {
+                    Success = false,
+                    Message = ex.Message,
+                    Data = new List<AddRepairReportServiceResponseDto>
+            {
+                new AddRepairReportServiceResponseDto
+                {
+                    Success = false,
+                    Message = ex.Message
+                }
+            },
+                    Code = (int)ErrorCodeAPI.SystemIsError
+                };
+            }
         }
 
         public async Task<ResponseData<string>> AddServiceContract(CreateServiceContractRequestDto request)
@@ -424,8 +486,8 @@ namespace TFU_Building_API.Service.impl
                                                Package = $"{ps.DurationInMonth} tháng",
                                                VehicleType = v.VehicleType,
                                                LicensePlate = v.LicensePlate,
-                                               StartDate = sc.StartDate??DateTime.Now,
-                                               EndDate = sc.EndDate??DateTime.Now,
+                                               StartDate = sc.StartDate ?? DateTime.Now,
+                                               EndDate = sc.EndDate ?? DateTime.Now,
                                                Note = sc.Note,
                                                Status = sc.Status
                                            }).FirstOrDefaultAsync();
@@ -459,7 +521,7 @@ namespace TFU_Building_API.Service.impl
             }
         }
 
-       
+
 
         public async Task<ResponseData<AddVehicleServiceResponseDto>> UpdateVehicleServiceRequestAsync(UpdateVehicleServiceRequestDto request)
         {
@@ -509,7 +571,7 @@ namespace TFU_Building_API.Service.impl
                         // Update the corresponding record in Livings
                         var living = await _unitOfWork.LivingRepository
                             .GetByIdAsync(serviceContract.LivingId ?? new Guid());
-                            
+
 
                         if (living != null)
                         {
@@ -582,7 +644,7 @@ namespace TFU_Building_API.Service.impl
                 }
 
                 // Step 3: Calculate StartDate and EndDate
-                var startDate = latestContract.EndDate??DateTime.Now;
+                var startDate = latestContract.EndDate ?? DateTime.Now;
                 var endDate = startDate.AddMonths(packageService.DurationInMonth);
 
                 // Step 4: Add new record in ServiceContracts
@@ -604,7 +666,7 @@ namespace TFU_Building_API.Service.impl
                     UpdatedAt = DateTime.Now
                 };
 
-                 _unitOfWork.ServiceContractRepository.Add(newServiceContract);
+                _unitOfWork.ServiceContractRepository.Add(newServiceContract);
                 await _unitOfWork.SaveChangesAsync();
 
                 return new ResponseData<string>
@@ -721,6 +783,9 @@ namespace TFU_Building_API.Service.impl
             }
         }
 
+        //public async Task<ResponseData<AddRepairReportServiceResponseDto>> UpdateRepairReportServiceRequestAsync(UpdateRepairReportServiceRequestDto request)
+        //{
 
+        //}
     }
 }
