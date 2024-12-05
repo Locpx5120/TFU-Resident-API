@@ -16,4 +16,6 @@ public partial class Assigment : MasterDataEntityBase
     public virtual Task? Task { get; set; }
     public Guid? StaffId { get; set; }
     public virtual Staff? Staff { get; set; }
+    public Guid? ServiceContractId { get; set; }
+    public virtual ServiceContract? ServiceContract { get; set; }
 }

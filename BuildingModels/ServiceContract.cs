@@ -25,4 +25,5 @@ public partial class ServiceContract : MasterDataEntityBase
     public virtual Apartment? Apartment { get; set; } = null!;
     public virtual Service? Service { get; set; } = null!;
     public virtual Vehicle? Vehicle { get; set; }
+    public virtual ICollection<Assigment> Assigments { get; set; } = new List<Assigment>();
 }

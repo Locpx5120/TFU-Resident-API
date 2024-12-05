@@ -61,6 +61,11 @@ namespace TFU_Building_API.Core.Infrastructure
         IMasterDataRepository<Vehicle> VehicleRepository { get; }
 
         #endregion
+
+        #region Assigment
+        IMasterDataRepository<Assigment> AssigmentRepository { get; }
+        #endregion
+
         #region ServiceCategory
         IMasterDataRepository<ServiceCategory> ServiceCategoryRepository { get; }
 
@@ -68,12 +73,12 @@ namespace TFU_Building_API.Core.Infrastructure
 
 
         #region ThirdParty
-        IMasterDataRepository<ThirdParty> ThirdPartyRepository { get; } 
+        IMasterDataRepository<ThirdParty> ThirdPartyRepository { get; }
         IMasterDataRepository<ThirdPartyContact> ThirdPartyContractRepository { get; }
 
         #endregion
 
-        IMasterDataRepository<Notify> NotifyRepository { get; } 
+        IMasterDataRepository<Notify> NotifyRepository { get; }
         IMasterDataRepository<NotifyCategory> NotifyCategoryRepository { get; }
         Task<int> SaveChangesAsync();
     }

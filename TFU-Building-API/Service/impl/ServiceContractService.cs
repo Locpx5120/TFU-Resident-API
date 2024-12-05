@@ -1,4 +1,5 @@
 ﻿using BuildingModels;
+using Constant;
 using Core.Enums;
 using Core.Model;
 using Microsoft.EntityFrameworkCore;
@@ -12,10 +13,14 @@ namespace TFU_Building_API.Service.impl
     public class ServiceContractService : BaseHandler, IServiceContractService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IUserIdentity _userIdentity;
 
-        public ServiceContractService(IUnitOfWork UnitOfWork, IHttpContextAccessor HttpContextAccessor) : base(UnitOfWork, HttpContextAccessor)
+        public ServiceContractService(IUnitOfWork UnitOfWork,
+            IUserIdentity userIdentity,
+            IHttpContextAccessor HttpContextAccessor) : base(UnitOfWork, HttpContextAccessor)
         {
             _unitOfWork = UnitOfWork;
+            _userIdentity = userIdentity;
         }
 
         public async Task<ResponseData<List<AddRepairReportServiceResponseDto>>> AddRepairReportServiceAsync(AddRepairReportServiceRequestDto request)
@@ -344,7 +349,6 @@ namespace TFU_Building_API.Service.impl
             }
         }
 
-
         private static string GetStatusDescription(int? status)
         {
             return status switch
@@ -520,8 +524,6 @@ namespace TFU_Building_API.Service.impl
                 };
             }
         }
-
-
 
         public async Task<ResponseData<AddVehicleServiceResponseDto>> UpdateVehicleServiceRequestAsync(UpdateVehicleServiceRequestDto request)
         {
@@ -783,9 +785,183 @@ namespace TFU_Building_API.Service.impl
             }
         }
 
-        //public async Task<ResponseData<AddRepairReportServiceResponseDto>> UpdateRepairReportServiceRequestAsync(UpdateRepairReportServiceRequestDto request)
-        //{
+        /// <summary>
+        /// Cập nhật đơn báo cáo sửa chữa
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public async Task<ResponseData<AddRepairReportServiceResponseDto>> UpdateRepairReportServiceRequestAsync(UpdateRepairReportServiceRequestDto request)
+        {
+            try
+            {
+                // Retrieve the service contract based on the provided ID
+                var serviceContract = await _unitOfWork.ServiceContractRepository
+                    .GetQuery(sc => sc.Id == request.ServiceContractId && sc.IsDeleted == false)
+                    .FirstOrDefaultAsync();
 
-        //}
+                if (serviceContract == null)
+                {
+                    return new ResponseData<AddRepairReportServiceResponseDto>
+                    {
+                        Success = false,
+                        Message = "Service contract not found.",
+                        Data = new AddRepairReportServiceResponseDto { Success = false, Message = "Service contract not found." },
+                        Code = (int)ErrorCodeAPI.NotFound
+                    };
+                }
+
+                // Update the service contract status and note
+
+                switch (request.Status)
+                {
+                    case ServiceContractStatus.Assigment:
+                        Assigment assigment = new Assigment();
+                        assigment.Id = Guid.NewGuid();
+                        assigment.StartTime = request.StartDate;
+                        assigment.ServicePrice = request.ServicePrice;
+                        assigment.ServiceContractId = request.ServiceContractId;
+                        assigment.StaffId = request.StaffId;
+                        serviceContract.NoteDetail = request.NoteDetail;
+                        _unitOfWork.AssigmentRepository.Add(assigment);
+                        break;
+                    case ServiceContractStatus.ApprovedAssigmentStaff:
+                        //Cư dân xác nhận thông tin ghi chú
+                        break;
+                    case ServiceContractStatus.RejectedAssigmentStaff:
+                        //Cư dân 0 xác nhận thông tin ghi chú
+                        serviceContract.Note = request.Note;
+                        break;
+                    case ServiceContractStatus.StaffPending:
+                        // Nhân viên xác nhân đang xử lý
+                        serviceContract.NoteKyThuat = request.NoteKyThuat;
+                        break;
+                    case ServiceContractStatus.StaffDone:
+                        // Nhân viên xác nhân đang xử lý
+                        if (serviceContract.Status != ServiceContractStatus.StaffDone)
+                        {
+                            Assigment assigment1 = await _unitOfWork.AssigmentRepository
+                                     .GetQuery(sc => sc.Id == serviceContract.ApartmentId && sc.IsDeleted == false).FirstOrDefaultAsync();
+
+                            if (assigment1 != null)
+                            {
+                                assigment1.EndTime = DateTime.Now;
+                                _unitOfWork.AssigmentRepository.Update(assigment1);
+                            }
+                        }
+                        serviceContract.NoteKyThuat = request.NoteKyThuat;
+                        break;
+                    case ServiceContractStatus.Approved:
+                        if (serviceContract.Status != ServiceContractStatus.Approved)
+                        {
+                            serviceContract.EndDate = DateTime.Now;
+                        }
+
+                        // Cán bộ/ Cư dân xác nhận đơn đã xong
+                        if (_userIdentity.RoleName.Equals(Constants.ROLE_HANH_CHINH))
+                        {
+                            serviceContract.NoteFeedbackHanhChinh = request.NoteFeedbackHanhChinh;
+                        }
+                        else
+                        {
+                            serviceContract.NoteFeedbackCuDan = request.NoteFeedbackCuDan;
+                        }
+                        break;
+                    default:
+                        return new ResponseData<AddRepairReportServiceResponseDto>
+                        {
+                            Success = false,
+                            Message = "Trạng thái chưa tồn tại",
+                            Data = new AddRepairReportServiceResponseDto { Success = false, Message = "Trạng thái chưa tồn tại" },
+                            Code = (int)ErrorCodeAPI.SystemIsError
+                        };
+                }
+                serviceContract.Status = request.Status;
+
+                // Save changes
+                _unitOfWork.ServiceContractRepository.Update(serviceContract);
+                await _unitOfWork.SaveChangesAsync();
+
+                return new ResponseData<AddRepairReportServiceResponseDto>
+                {
+                    Success = true,
+                    Message = "Vehicle service request updated successfully.",
+                    Data = new AddRepairReportServiceResponseDto { Success = true, Message = "Service request updated successfully." },
+                    Code = (int)ErrorCodeAPI.OK
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResponseData<AddRepairReportServiceResponseDto>
+                {
+                    Success = false,
+                    Message = ex.Message,
+                    Data = new AddRepairReportServiceResponseDto { Success = false, Message = ex.Message },
+                    Code = (int)ErrorCodeAPI.SystemIsError
+                };
+            }
+        }
+
+        /// <summary>
+        /// Chi tiết đơn
+        /// </summary>
+        /// <param name="serviceContractId"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<ResponseData<RepairReportServiceDetailDto>> GetRepairReportServiceDetailAsync(Guid serviceContractId)
+        {
+            try
+            {
+                var serviceDetail = await (from sc in _unitOfWork.ServiceContractRepository.GetQuery(sc => sc.Id == serviceContractId && sc.IsDeleted == false)
+                                           join a in _unitOfWork.ApartmentRepository.GetQuery(a => a.IsDeleted == false) on sc.ApartmentId equals a.Id
+                                           join b in _unitOfWork.BuildingRepository.GetQuery(b => b.IsDeleted == false) on a.BuildingId equals b.Id
+                                           join s in _unitOfWork.ServiceRepository.GetQuery(s => s.IsDeleted == false) on sc.ServiceId equals s.Id
+                                           join ass in _unitOfWork.AssigmentRepository.GetQuery(ass => ass.IsDeleted == false) on sc.Assigments.Select(x => x.Id).FirstOrDefault() equals ass.Id
+                                           //join v in _unitOfWork.VehicleRepository.GetQueryWithInactive(v => v.IsDeleted == false) on sc.VehicleId equals v.Id
+                                           select new RepairReportServiceDetailDto
+                                           {
+                                               ContractId = sc.Id,
+                                               BuildingName = b.Name,
+                                               ApartmentNumber = a.RoomNumber,
+                                               ServiceName = s.ServiceName,
+                                               StartTime = sc.StartDate ?? DateTime.Now,
+                                               EndDate = sc.EndDate ?? DateTime.Now,
+                                               StaffEndDate = ass.EndTime ?? DateTime.Now,
+                                               Note = sc.Note,
+                                               NoteDetail = sc.NoteDetail,
+                                               NoteFeedbackCuDan = sc.NoteFeedbackCuDan,
+                                               NoteKyThuat = sc.NoteKyThuat,
+                                               NoteFeedbackHanhChinh = sc.NoteFeedbackHanhChinh,
+                                               ServicePrice = ass.ServicePrice,
+                                               Status = sc.Status,
+                                           }).FirstOrDefaultAsync();
+
+                if (serviceDetail == null)
+                {
+                    return new ResponseData<RepairReportServiceDetailDto>
+                    {
+                        Success = false,
+                        Message = "Service contract not found",
+                        Code = (int)ErrorCodeAPI.NotFound
+                    };
+                }
+
+                return new ResponseData<RepairReportServiceDetailDto>
+                {
+                    Success = true,
+                    Message = "RepairReport service details retrieved successfully",
+                    Data = serviceDetail,
+                    Code = (int)ErrorCodeAPI.OK
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResponseData<RepairReportServiceDetailDto>
+                {
+                    Success = false,
+                    Message = ex.Message,
+                    Code = (int)ErrorCodeAPI.SystemIsError
+                };
+            }
+        }
     }
 }

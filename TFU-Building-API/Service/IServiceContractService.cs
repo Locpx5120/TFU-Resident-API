@@ -13,6 +13,7 @@ namespace TFU_Building_API.Service
         Task<ResponseData<List<AddRepairReportServiceResponseDto>>> AddRepairReportServiceAsync(AddRepairReportServiceRequestDto request);
 
         Task<ResponseData<VehicleServiceDetailDto>> GetVehicleServiceDetailAsync(Guid serviceContractId);
+        Task<ResponseData<RepairReportServiceDetailDto>> GetRepairReportServiceDetailAsync(Guid serviceContractId);
 
         Task<ResponseData<AddVehicleServiceResponseDto>> UpdateVehicleServiceRequestAsync(UpdateVehicleServiceRequestDto request);
         Task<ResponseData<AddRepairReportServiceResponseDto>> UpdateRepairReportServiceRequestAsync(UpdateRepairReportServiceRequestDto request);

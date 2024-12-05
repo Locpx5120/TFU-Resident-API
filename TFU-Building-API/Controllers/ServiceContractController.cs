@@ -105,6 +105,24 @@ namespace TFU_Building_API.Controllers
             return Ok(result);
         }
 
+        [HttpPost("deatil-repair-report/{serviceContractId}")]
+        /// <summary>
+        /// Cập nhật đơn báo cáo sửa chữa
+        /// </summary>
+        /// <param name="request">Yêu cầu thêm dịch vụ.</param>
+        /// <returns>Kết quả thêm dịch vụ.</returns>
+        public async Task<IActionResult> DetailRepairReport(Guid serviceContractId)
+        {
+            var result = await _serviceContractService.GetRepairReportServiceDetailAsync(serviceContractId);
+
+            if (!result.Success)
+            {
+                return StatusCode(result.Code, new { result.Success, result.Message });
+            }
+
+            return Ok(new { result.Success, result.Message, Data = result.Data });
+        }
+
 
         [HttpGet("vehicle-service-details/{serviceContractId}")]
         /// <summary>

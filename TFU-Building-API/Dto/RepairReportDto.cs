@@ -22,6 +22,32 @@
     {
         public Guid ServiceContractId { get; set; }
         public int Status { get; set; } // Use constants from ServiceContractStatus
+        public string? Note { get; set; } = string.Empty;
+        public string? NoteDetail { get; set; } = string.Empty;
+        public string? NoteFeedbackCuDan { get; set; } = string.Empty;
+        public string? NoteKyThuat { get; set; } = string.Empty;
+        public string? NoteFeedbackHanhChinh { get; set; } = string.Empty;
+        public DateTime? StartDate { get; set; } = DateTime.Now;
+        public double? ServicePrice { get; set; } = 0;
+        public Guid? StaffId { get; set; }
+    }
+
+    public class RepairReportServiceDetailDto
+    {
+        public Guid ContractId { get; set; }
+        public string BuildingName { get; set; }
+        public int ApartmentNumber { get; set; }
+        public string ServiceName { get; set; }
+        public string Package { get; set; }
+        public DateTime StartTime { get; set; }
+        public DateTime EndDate { get; set; }
+        public DateTime? StaffEndDate { get; set; }
         public string Note { get; set; }
+        public string? NoteDetail { get; set; } = string.Empty;
+        public string? NoteFeedbackCuDan { get; set; } = string.Empty;
+        public string? NoteKyThuat { get; set; } = string.Empty;
+        public string? NoteFeedbackHanhChinh { get; set; } = string.Empty;
+        public double? ServicePrice { get; set; } = 0;
+        public int? Status { get; set; }
     }
 }
