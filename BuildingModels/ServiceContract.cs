@@ -8,7 +8,11 @@ public partial class ServiceContract : MasterDataEntityBase
     public DateTime? EndDate { get; set; }
     public int? Status { get; set; }
     public int? Quantity { get; set; }
-    public string Note { get; set; }
+    public string? Note { get; set; } = string.Empty;
+    public string? NoteDetail { get; set; } = string.Empty;
+    public string? NoteFeedbackCuDan { get; set; } = string.Empty;
+    public string? NoteKyThuat { get; set; } = string.Empty;
+    public string? NoteFeedbackHanhChinh { get; set; } = string.Empty;
     public Guid? ApartmentId { get; set; }
     public Guid? ServiceId { get; set; }
     public Guid? VehicleId { get; set; }
