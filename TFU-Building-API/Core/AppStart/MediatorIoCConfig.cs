@@ -1,4 +1,6 @@
-﻿using TFU_Building_API.Core.Infrastructure;
+﻿using TFU_Building_API.Core.Dapper;
+using TFU_Building_API.Core.Dapper.ServiceContract;
+using TFU_Building_API.Core.Infrastructure;
 using TFU_Building_API.Core.Infrastructure.Dapper;
 using TFU_Building_API.Core.Mapper;
 using TFU_Building_API.Service;
@@ -55,9 +57,13 @@ namespace TFU_Building_API.Core.AppStart
             services.AddScoped<INotifyService, NotifyService>();
             services.AddScoped<INotifyCategoryService, NotifyCategoryService>();
 
+            //dapter
+            services.AddTransient<DapperCommon>();
+            services.AddSingleton<DapperDbContext>();
+            services.AddScoped<IServiceContractRepository, ServiceContractRepository>();
 
             //Singleton
-            services.AddSingleton<DapperDbContext>();
+            //services.AddScoped<IDapperDbContext, DapperDbContext>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
         }

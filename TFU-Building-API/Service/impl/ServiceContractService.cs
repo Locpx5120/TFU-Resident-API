@@ -3,6 +3,7 @@ using Constant;
 using Core.Enums;
 using Core.Model;
 using Microsoft.EntityFrameworkCore;
+using TFU_Building_API.Core.Dapper.ServiceContract;
 using TFU_Building_API.Core.Handler;
 using TFU_Building_API.Core.Helper;
 using TFU_Building_API.Core.Infrastructure;
@@ -14,13 +15,16 @@ namespace TFU_Building_API.Service.impl
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IUserIdentity _userIdentity;
+        private readonly IServiceContractRepository _serviceContractRepository;
 
         public ServiceContractService(IUnitOfWork UnitOfWork,
             IUserIdentity userIdentity,
+            IServiceContractRepository serviceContractRepository,
             IHttpContextAccessor HttpContextAccessor) : base(UnitOfWork, HttpContextAccessor)
         {
             _unitOfWork = UnitOfWork;
             _userIdentity = userIdentity;
+            _serviceContractRepository = serviceContractRepository;
         }
 
         public async Task<ResponseData<List<AddRepairReportServiceResponseDto>>> AddRepairReportServiceAsync(AddRepairReportServiceRequestDto request)
@@ -148,76 +152,79 @@ namespace TFU_Building_API.Service.impl
         {
             try
             {
-                // Lấy dữ liệu thô từ database
-                var query = from sc in _unitOfWork.ServiceContractRepository.GetQuery(x => x.ApartmentId == apartmentId && (x.IsDeleted == false))
-                            join s in _unitOfWork.ServiceRepository.GetQuery(x => (x.IsDeleted == false))
-                                on sc.ServiceId equals s.Id
-                            join ps in _unitOfWork.PackageServiceRepository.GetQuery(x => (x.IsDeleted == false))
-                                on sc.PackageServiceId equals ps.Id into psJoin
-                            from ps in psJoin.DefaultIfEmpty()
-                            select new
-                            {
-                                ServiceContractId = sc.Id,
-                                ServiceName = s.ServiceName,
-                                Purpose = s.Description,
-                                StartDate = sc.StartDate ?? DateTime.Now,
-                                QuantityOrArea = s.Unit == "m2" ? $"{sc.Apartment.ApartmentType.LandArea} m2" : $"x{sc.Quantity}",
-                                UnitPrice = s.UnitPrice,
-                                Status = sc.Status,
-                                Note = sc.Note,
-                                CreatedDate = sc.InsertedAt,
-                                ProcessedDate = sc.Status == ServiceContractStatus.Approved || sc.Status == ServiceContractStatus.Rejected
-                                    ? sc.UpdatedAt : (DateTime?)null,
-                                userCreateId = sc.InsertedById,
-                                Assigments = sc.Assigments.ToList(),
-                            };
+                ////// Lấy dữ liệu thô từ database
+                //var query = from sc in _unitOfWork.ServiceContractRepository.GetQuery(x => x.ApartmentId == apartmentId && (x.IsDeleted == false))
+                //            join s in _unitOfWork.ServiceRepository.GetQuery(x => (x.IsDeleted == false))
+                //                on sc.ServiceId equals s.Id
+                //            join ps in _unitOfWork.PackageServiceRepository.GetQuery(x => (x.IsDeleted == false))
+                //                on sc.PackageServiceId equals ps.Id into psJoin
+                //            from ps in psJoin.DefaultIfEmpty()
+                //            select new
+                //            {
+                //                ServiceContractId = sc.Id,
+                //                ServiceName = s.ServiceName,
+                //                Purpose = s.Description,
+                //                StartDate = sc.StartDate ?? DateTime.Now,
+                //                QuantityOrArea = s.Unit == "m2" ? $"{sc.Apartment.ApartmentType.LandArea} m2" : $"x{sc.Quantity}",
+                //                UnitPrice = s.UnitPrice,
+                //                Status = sc.Status,
+                //                Note = sc.Note,
+                //                CreatedDate = sc.InsertedAt,
+                //                ProcessedDate = sc.Status == ServiceContractStatus.Approved || sc.Status == ServiceContractStatus.Rejected
+                //                    ? sc.UpdatedAt : (DateTime?)null,
+                //                userCreateId = sc.InsertedById,
+                //                Assigments = sc.Assigments.ToList(),
+                //            };
 
-                if (_userIdentity.RoleName.Equals(Constants.ROLE_KI_THUAT))
-                {
-                    query = from item in query
-                            join ass in _unitOfWork.AssigmentRepository.GetQuery(ass => ass.IsDeleted == false) on item.Assigments.Select(x => x.Id).FirstOrDefault() equals ass.Id
-                            where ass.StaffId == _userIdentity.UserId
-                            select new
-                            {
-                                item.ServiceContractId,
-                                item.ServiceName,
-                                item.Purpose,
-                                item.StartDate,
-                                item.QuantityOrArea,
-                                item.UnitPrice,
-                                item.Status,
-                                item.Note,
-                                item.CreatedDate,
-                                item.ProcessedDate,
-                                item.userCreateId,
-                                item.Assigments
-                            };
+                ////if (_userIdentity.RoleName.Equals(Constants.ROLE_KI_THUAT))
+                ////{
+                ////    query = from item in query
+                ////            from ass in _unitOfWork.AssigmentRepository.GetQuery(ass => ass.IsDeleted == false)
+                ////            where ass.StaffId == _userIdentity.UserId
+                ////                  && item.Assigments != null
+                ////                  && item.Assigments.Any(a => a.Id == ass.Id) // Kiểm tra Assigments chứa ass.Id
+                ////            select new
+                ////            {
+                ////                item.ServiceContractId,
+                ////                item.ServiceName,
+                ////                item.Purpose,
+                ////                item.StartDate,
+                ////                item.QuantityOrArea,
+                ////                item.UnitPrice,
+                ////                item.Status,
+                ////                item.Note,
+                ////                item.CreatedDate,
+                ////                item.ProcessedDate,
+                ////                item.userCreateId,
+                ////                item.Assigments
+                ////            };
+                ////}
+                //var rawData = await query.ToListAsync();
+                //if (_userIdentity.RoleName.Equals(Constants.ROLE_Resident))
+                //{
+                //    rawData = rawData.Where(x => x.userCreateId == _userIdentity.UserId).ToList();
+                //}
+                //// Áp dụng xử lý Status bên ngoài truy vấn
+                //var result = rawData.Select(item => new ServiceContractDetailDto
+                //{
+                //    ServiceContractId = item.ServiceContractId,
+                //    ServiceName = item.ServiceName,
+                //    Purpose = item.Purpose,
+                //    CreatedDate = item.StartDate,
+                //    QuantityOrArea = item.QuantityOrArea,
+                //    UnitPrice = item.UnitPrice,
+                //    Status = GetStatusDescription(item.Status),
+                //    Note = item.Note,
+                //    ProcessedDate = item.ProcessedDate
+                //}).ToList();
 
-                }
-                var rawData = await query.OrderByDescending(x => x.CreatedDate).ToListAsync();
-                if (_userIdentity.RoleName.Equals(Constants.ROLE_Resident))
-                {
-                    rawData = rawData.Where(x => x.userCreateId == _userIdentity.UserId).ToList();
-                }
-                // Áp dụng xử lý Status bên ngoài truy vấn
-                var result = rawData.Select(item => new ServiceContractDetailDto
-                {
-                    ServiceContractId = item.ServiceContractId,
-                    ServiceName = item.ServiceName,
-                    Purpose = item.Purpose,
-                    CreatedDate = item.StartDate,
-                    QuantityOrArea = item.QuantityOrArea,
-                    UnitPrice = item.UnitPrice,
-                    Status = GetStatusDescription(item.Status),
-                    Note = item.Note,
-                    ProcessedDate = item.ProcessedDate
-                }).ToList();
+                var result1 = await _serviceContractRepository.GetServiceContractDetails(apartmentId);
 
                 return new ResponseData<List<ServiceContractDetailDto>>
                 {
                     Success = true,
                     Message = "Successfully retrieved service contract details.",
-                    Data = result,
+                    Data = result1.ToList(),
                     Code = (int)ErrorCodeAPI.OK
                 };
             }
@@ -939,30 +946,32 @@ namespace TFU_Building_API.Service.impl
         {
             try
             {
-                var serviceDetail = await (from sc in _unitOfWork.ServiceContractRepository.GetQuery(sc => sc.Id == serviceContractId && sc.IsDeleted == false)
-                                           join a in _unitOfWork.ApartmentRepository.GetQuery(a => a.IsDeleted == false) on sc.ApartmentId equals a.Id
-                                           join b in _unitOfWork.BuildingRepository.GetQuery(b => b.IsDeleted == false) on a.BuildingId equals b.Id
-                                           join s in _unitOfWork.ServiceRepository.GetQuery(s => s.IsDeleted == false) on sc.ServiceId equals s.Id
-                                           join ass in _unitOfWork.AssigmentRepository.GetQuery(ass => ass.IsDeleted == false) on sc.Assigments.Select(x => x.Id).FirstOrDefault() equals ass.Id
-                                           //join v in _unitOfWork.VehicleRepository.GetQueryWithInactive(v => v.IsDeleted == false) on sc.VehicleId equals v.Id
-                                           select new RepairReportServiceDetailDto
-                                           {
-                                               ContractId = sc.Id,
-                                               BuildingName = b.Name,
-                                               ApartmentNumber = a.RoomNumber,
-                                               ServiceName = s.ServiceName,
-                                               StartTime = sc.StartDate ?? DateTime.Now,
-                                               EndDate = sc.EndDate ?? DateTime.Now,
-                                               StaffEndDate = ass.EndTime ?? DateTime.Now,
-                                               Note = sc.Note,
-                                               NoteDetail = sc.NoteDetail,
-                                               NoteFeedbackCuDan = sc.NoteFeedbackCuDan,
-                                               NoteKyThuat = sc.NoteKyThuat,
-                                               NoteFeedbackHanhChinh = sc.NoteFeedbackHanhChinh,
-                                               ServicePrice = ass.ServicePrice,
-                                               Status = sc.Status,
-                                           }).FirstOrDefaultAsync();
+                //var serviceDetail = await (from sc in _unitOfWork.ServiceContractRepository.GetQuery(sc => sc.Id == serviceContractId && sc.IsDeleted == false)
+                //                           join a in _unitOfWork.ApartmentRepository.GetQuery(a => a.IsDeleted == false) on sc.ApartmentId equals a.Id
+                //                           join b in _unitOfWork.BuildingRepository.GetQuery(b => b.IsDeleted == false) on a.BuildingId equals b.Id
+                //                           join s in _unitOfWork.ServiceRepository.GetQuery(s => s.IsDeleted == false) on sc.ServiceId equals s.Id
+                //                           // LEFT JOIN Assigments để đảm bảo lấy được ServiceContract có Assigment = null
+                //                           from ass in _unitOfWork.AssigmentRepository.GetQuery(ass => ass.IsDeleted == false).Where(ass => ass.ServiceContractId == sc.Id).DefaultIfEmpty()
+                //                           select new RepairReportServiceDetailDto
+                //                           {
+                //                               ContractId = sc.Id,
+                //                               BuildingName = b.Name,
+                //                               ApartmentNumber = a.RoomNumber,
+                //                               ServiceName = s.ServiceName,
+                //                               StartTime = sc.StartDate ?? DateTime.Now,
+                //                               EndDate = sc.EndDate ?? DateTime.Now,
+                //                               // Kiểm tra nếu ass là null thì trả về giá trị mặc định
+                //                               StaffEndDate = ass.EndTime ?? DateTime.Now,
+                //                               Note = sc.Note,
+                //                               NoteDetail = sc.NoteDetail,
+                //                               NoteFeedbackCuDan = sc.NoteFeedbackCuDan,
+                //                               NoteKyThuat = sc.NoteKyThuat,
+                //                               NoteFeedbackHanhChinh = sc.NoteFeedbackHanhChinh,
+                //                               ServicePrice = ass.ServicePrice ?? 0,  // Nếu ass là null, trả về giá trị mặc định là 0
+                //                               Status = sc.Status,
+                //                           }).FirstOrDefaultAsync();
 
+                var serviceDetail = await _serviceContractRepository.GetRepairReportDetails(serviceContractId);
                 if (serviceDetail == null)
                 {
                     return new ResponseData<RepairReportServiceDetailDto>
@@ -977,7 +986,7 @@ namespace TFU_Building_API.Service.impl
                 {
                     Success = true,
                     Message = "RepairReport service details retrieved successfully",
-                    Data = serviceDetail,
+                    Data = serviceDetail.First(),
                     Code = (int)ErrorCodeAPI.OK
                 };
             }
