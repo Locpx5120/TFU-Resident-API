@@ -160,24 +160,52 @@ namespace TFU_Building_API.Service.impl
                                 ServiceContractId = sc.Id,
                                 ServiceName = s.ServiceName,
                                 Purpose = s.Description,
-                                CreatedDate = sc.StartDate ?? DateTime.Now,
+                                StartDate = sc.StartDate ?? DateTime.Now,
                                 QuantityOrArea = s.Unit == "m2" ? $"{sc.Apartment.ApartmentType.LandArea} m2" : $"x{sc.Quantity}",
                                 UnitPrice = s.UnitPrice,
                                 Status = sc.Status,
                                 Note = sc.Note,
+                                CreatedDate = sc.InsertedAt,
                                 ProcessedDate = sc.Status == ServiceContractStatus.Approved || sc.Status == ServiceContractStatus.Rejected
-                                    ? sc.UpdatedAt : (DateTime?)null
+                                    ? sc.UpdatedAt : (DateTime?)null,
+                                userCreateId = sc.InsertedById,
+                                Assigments = sc.Assigments.ToList(),
                             };
 
-                var rawData = await query.ToListAsync();
+                if (_userIdentity.RoleName.Equals(Constants.ROLE_KI_THUAT))
+                {
+                    query = from item in query
+                            join ass in _unitOfWork.AssigmentRepository.GetQuery(ass => ass.IsDeleted == false) on item.Assigments.Select(x => x.Id).FirstOrDefault() equals ass.Id
+                            where ass.StaffId == _userIdentity.UserId
+                            select new
+                            {
+                                item.ServiceContractId,
+                                item.ServiceName,
+                                item.Purpose,
+                                item.StartDate,
+                                item.QuantityOrArea,
+                                item.UnitPrice,
+                                item.Status,
+                                item.Note,
+                                item.CreatedDate,
+                                item.ProcessedDate,
+                                item.userCreateId,
+                                item.Assigments
+                            };
 
+                }
+                var rawData = await query.OrderByDescending(x => x.CreatedDate).ToListAsync();
+                if (_userIdentity.RoleName.Equals(Constants.ROLE_Resident))
+                {
+                    rawData = rawData.Where(x => x.userCreateId == _userIdentity.UserId).ToList();
+                }
                 // Áp dụng xử lý Status bên ngoài truy vấn
                 var result = rawData.Select(item => new ServiceContractDetailDto
                 {
                     ServiceContractId = item.ServiceContractId,
                     ServiceName = item.ServiceName,
                     Purpose = item.Purpose,
-                    CreatedDate = item.CreatedDate,
+                    CreatedDate = item.StartDate,
                     QuantityOrArea = item.QuantityOrArea,
                     UnitPrice = item.UnitPrice,
                     Status = GetStatusDescription(item.Status),

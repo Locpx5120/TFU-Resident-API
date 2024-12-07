@@ -20,5 +20,6 @@
         public const string ROLE_LE_TAN = "LeTan";
         public const string ROLE_BAN_QUAN_LY = "BanQuanLy";
         public const string ROLE_BEN_THU_BA = "BenThuBa";
+        public const string ROLE_Resident = "BenThuBa";
     }
 }
