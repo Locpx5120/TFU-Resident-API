@@ -45,6 +45,7 @@ namespace TFU_Building_API.Core.AppStart
             services.AddScoped<IResidentPayment, ResidentPaymentService>();
 
             services.AddScoped<IApartmentService, ApartmentService>();
+            services.AddScoped<IPaymentHistoryService, PaymentHistoryService>();
 
             services.AddScoped<IServiceCategoryService, ServiceCategoryService>();
             services.AddScoped<IServiceRequestService, ServiceRequestService>();
