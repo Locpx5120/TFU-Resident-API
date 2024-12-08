@@ -1,4 +1,5 @@
 ﻿using TFU_Building_API.Core.Dapper;
+using TFU_Building_API.Core.Dapper.Noti;
 using TFU_Building_API.Core.Dapper.ServiceContract;
 using TFU_Building_API.Core.Dapper.User;
 using TFU_Building_API.Core.Infrastructure;
@@ -56,12 +57,13 @@ namespace TFU_Building_API.Core.AppStart
 
             services.AddScoped<IThirdPartyService, ThirdPartyService>();
             services.AddScoped<INotifyService, NotifyService>();
-            services.AddScoped<INotifyCategoryService, NotifyCategoryService>();
+            //services.AddScoped<INotifyCategoryService, NotifyCategoryService>();
 
             //dapter
             services.AddTransient<DapperCommon>();
             services.AddSingleton<DapperDbContext>();
             services.AddScoped<IServiceContractRepository, ServiceContractRepository>();
+            services.AddScoped<INotifyRepository, NotifyRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
 
             //Singleton

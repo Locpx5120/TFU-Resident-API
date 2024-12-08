@@ -5,39 +5,39 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace BuildingModels.Migrations
 {
-    public partial class updateDB7 : Migration
+    public partial class updateDB4 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(
-                name: "FK_ThirdPartyContacts_Apartments_ApartmentId",
-                table: "ThirdPartyContacts");
+                name: "FK_Notifies_ImgBases_ImgBaseId",
+                table: "Notifies");
 
             migrationBuilder.AlterColumn<Guid>(
-                name: "ApartmentId",
-                table: "ThirdPartyContacts",
+                name: "ImgBaseId",
+                table: "Notifies",
                 type: "uniqueidentifier",
                 nullable: true,
                 oldClrType: typeof(Guid),
                 oldType: "uniqueidentifier");
 
             migrationBuilder.AddForeignKey(
-                name: "FK_ThirdPartyContacts_Apartments_ApartmentId",
-                table: "ThirdPartyContacts",
-                column: "ApartmentId",
-                principalTable: "Apartments",
+                name: "FK_Notifies_ImgBases_ImgBaseId",
+                table: "Notifies",
+                column: "ImgBaseId",
+                principalTable: "ImgBases",
                 principalColumn: "Id");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(
-                name: "FK_ThirdPartyContacts_Apartments_ApartmentId",
-                table: "ThirdPartyContacts");
+                name: "FK_Notifies_ImgBases_ImgBaseId",
+                table: "Notifies");
 
             migrationBuilder.AlterColumn<Guid>(
-                name: "ApartmentId",
-                table: "ThirdPartyContacts",
+                name: "ImgBaseId",
+                table: "Notifies",
                 type: "uniqueidentifier",
                 nullable: false,
                 defaultValue: new Guid("00000000-0000-0000-0000-000000000000"),
@@ -46,10 +46,10 @@ namespace BuildingModels.Migrations
                 oldNullable: true);
 
             migrationBuilder.AddForeignKey(
-                name: "FK_ThirdPartyContacts_Apartments_ApartmentId",
-                table: "ThirdPartyContacts",
-                column: "ApartmentId",
-                principalTable: "Apartments",
+                name: "FK_Notifies_ImgBases_ImgBaseId",
+                table: "Notifies",
+                column: "ImgBaseId",
+                principalTable: "ImgBases",
                 principalColumn: "Id",
                 onDelete: ReferentialAction.Cascade);
         }

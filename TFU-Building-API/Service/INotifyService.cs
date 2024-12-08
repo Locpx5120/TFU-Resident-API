@@ -8,6 +8,7 @@ namespace TFU_Building_API.Service
         Task<ResponseData<CreateNotifyResponseDto>> CreateNotifyAsync(CreateNotifyRequestDto request);
 
         Task<ResponseData<PaginatedResponseDto<NotifyResponseDto>>> GetNotifiesAsync(NotifyFilterRequestDto request);
+        Task<ResponseData<NotifyDetailResponseDto>> GetNotifiesDetailAsync(Guid notifyId);
     }
 
 }

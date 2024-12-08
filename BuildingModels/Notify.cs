@@ -1,20 +1,24 @@
 ﻿using Core.Entity;
+using System.ComponentModel.DataAnnotations;
 
 namespace BuildingModels;
 
 public partial class Notify : MasterDataEntityBase
 {
-    public DateTime? Date { get; set; }
-    public TimeSpan? Time { get; set; }
-
-    public Guid NotifyCategoryId { get; set; }
-    public virtual NotifyCategory NotifyCategory { get; set; } = null!;
-    public Guid RoleId { get; set; }
-    public Guid BuildingId { get; set; }
-    public string Title { get; set; }
+    public string Title { get; set; }  //Tiêu đề
+    public DateTime? ApplyDate { get; set; }  //Ngày áp dụng
+    public string NotificationType { get; set; } //Loại thông báo
+    [MaxLength(int.MaxValue)]
     public string ShortContent { get; set; }
+    [MaxLength(int.MaxValue)]
     public string LongContent { get; set; }
-    public string UrlImg { get; set; }
-    public int Status { get; set; }
+    public string Status { get; set; } //Trạng thái
 
+    public Guid BuildingId { get; set; }
+    public virtual Building Building { get; set; }
+    public Guid RoleId { get; set; }
+    public virtual Role Role { get; set; }
+    public Guid? ImgBaseId { get; set; } // link ảnh
+    public virtual ImgBase? ImgBase { get; set; }
+    public Guid? UserAccpectId { get; set; } = Guid.Empty;
 }

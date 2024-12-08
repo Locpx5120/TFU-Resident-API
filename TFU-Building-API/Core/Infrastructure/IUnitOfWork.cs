@@ -79,7 +79,7 @@ namespace TFU_Building_API.Core.Infrastructure
         #endregion
 
         IMasterDataRepository<Notify> NotifyRepository { get; }
-        IMasterDataRepository<NotifyCategory> NotifyCategoryRepository { get; }
+        IMasterDataRepository<ImgBase> ImgBaseRepository { get; }
         Task<int> SaveChangesAsync();
     }
 }

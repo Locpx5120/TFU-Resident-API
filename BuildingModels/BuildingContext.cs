@@ -19,12 +19,12 @@ public partial class BuildingContext : DbContext
         Database.SetConnectionString(connectionString);
     }
 
-    //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    //{
-    //    optionsBuilder.UseSqlServer("Data Source= 202.92.7.204,1437;Initial Catalog=QLToaNhaDb2_1;Persist Security Info=True;User ID=QLToaNhaDb2_1;Password=qe853B5f%;TrustServerCertificate=True");
-    //}
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        optionsBuilder.UseSqlServer("Data Source= 202.92.7.204,1437;Initial Catalog=QLToaNhaDb2_1;Persist Security Info=True;User ID=QLToaNhaDb2_1;Password=qe853B5f%;TrustServerCertificate=True");
+    }
 
-    // add-migration updateDB8 -Context BuildingContext
+    // add-migration updateDB15 -Context BuildingContext
     // update-database -Context BuildingContext
 
     public virtual DbSet<Apartment> Apartments { get; set; }
@@ -47,7 +47,7 @@ public partial class BuildingContext : DbContext
 
     public virtual DbSet<Notify> Notifies { get; set; }
 
-    public virtual DbSet<NotifyCategory> NotifyCategories { get; set; }
+    public virtual DbSet<ImgBase> ImgBases { get; set; }
 
     public virtual DbSet<OwnerShip> OwnerShips { get; set; }
 

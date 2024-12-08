@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BuildingModels.Migrations
 {
     [DbContext(typeof(BuildingContext))]
-    [Migration("20241103090532_DB1")]
-    partial class DB1
+    [Migration("20241208094646_updateDB2")]
+    partial class updateDB2
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -129,6 +129,9 @@ namespace BuildingModels.Migrations
                     b.Property<bool?>("IsDeleted")
                         .HasColumnType("bit");
 
+                    b.Property<Guid?>("ServiceContractId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<double?>("ServiceFee")
                         .HasColumnType("float");
 
@@ -151,6 +154,8 @@ namespace BuildingModels.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ServiceContractId");
 
                     b.HasIndex("StaffId");
 
@@ -324,6 +329,58 @@ namespace BuildingModels.Migrations
                     b.ToTable("HandleRequests");
                 });
 
+            modelBuilder.Entity("BuildingModels.ImgBase", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Base64")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ContentDisposition")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ContentType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("InsertedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("InsertedById")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<long>("Length")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("UpdatedById")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ImgBases");
+                });
+
             modelBuilder.Entity("BuildingModels.Invoice", b =>
                 {
                     b.Property<Guid>("Id")
@@ -429,11 +486,14 @@ namespace BuildingModels.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("AssigmentId")
+                    b.Property<DateTime?>("ApplyDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("BuildingId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime?>("EndTime")
-                        .HasColumnType("datetime2");
+                    b.Property<Guid>("ImgBaseId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("InsertedAt")
                         .HasColumnType("datetime2");
@@ -447,11 +507,30 @@ namespace BuildingModels.Migrations
                     b.Property<bool?>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<Guid>("NotifyCategoryId")
+                    b.Property<string>("LongContent")
+                        .IsRequired()
+                        .HasMaxLength(2147483647)
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NotificationType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("RoleId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime?>("StartTime")
-                        .HasColumnType("datetime2");
+                    b.Property<string>("ShortContent")
+                        .IsRequired()
+                        .HasMaxLength(2147483647)
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -459,48 +538,18 @@ namespace BuildingModels.Migrations
                     b.Property<Guid?>("UpdatedById")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("UserAccpectId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("AssigmentId");
+                    b.HasIndex("BuildingId");
 
-                    b.HasIndex("NotifyCategoryId");
+                    b.HasIndex("ImgBaseId");
+
+                    b.HasIndex("RoleId");
 
                     b.ToTable("Notifies");
-                });
-
-            modelBuilder.Entity("BuildingModels.NotifyCategory", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("InsertedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("InsertedById")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("UpdatedById")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("NotifyCategories");
                 });
 
             modelBuilder.Entity("BuildingModels.OwnerShip", b =>
@@ -553,9 +602,6 @@ namespace BuildingModels.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("AutoRenew")
-                        .HasColumnType("bit");
 
                     b.Property<decimal?>("Discount")
                         .HasColumnType("decimal(18,2)");
@@ -711,6 +757,9 @@ namespace BuildingModels.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Name_En")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
@@ -784,6 +833,9 @@ namespace BuildingModels.Migrations
                     b.Property<bool>("IsPackageAllowed")
                         .HasColumnType("bit");
 
+                    b.Property<Guid>("ServiceCategoryID")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("ServiceName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -803,7 +855,46 @@ namespace BuildingModels.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ServiceCategoryID");
+
                     b.ToTable("Services");
+                });
+
+            modelBuilder.Entity("BuildingModels.ServiceCategory", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("InsertedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("InsertedById")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("UpdatedById")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ServiceCategories");
                 });
 
             modelBuilder.Entity("BuildingModels.ServiceContract", b =>
@@ -814,9 +905,6 @@ namespace BuildingModels.Migrations
 
                     b.Property<Guid?>("ApartmentId")
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("Canceled")
-                        .HasColumnType("bit");
 
                     b.Property<DateTime?>("EndDate")
                         .HasColumnType("datetime2");
@@ -833,11 +921,22 @@ namespace BuildingModels.Migrations
                     b.Property<bool?>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<DateTime?>("LastRenewalDate")
-                        .HasColumnType("datetime2");
+                    b.Property<Guid?>("LivingId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Note")
-                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NoteDetail")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NoteFeedbackCuDan")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NoteFeedbackHanhChinh")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NoteKyThuat")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid?>("PackageServiceId")
@@ -845,9 +944,6 @@ namespace BuildingModels.Migrations
 
                     b.Property<int?>("Quantity")
                         .HasColumnType("int");
-
-                    b.Property<bool>("RenewStatus")
-                        .HasColumnType("bit");
 
                     b.Property<Guid?>("ServiceId")
                         .HasColumnType("uniqueidentifier");
@@ -864,13 +960,20 @@ namespace BuildingModels.Migrations
                     b.Property<Guid?>("UpdatedById")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("VehicleId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ApartmentId");
 
+                    b.HasIndex("LivingId");
+
                     b.HasIndex("PackageServiceId");
 
                     b.HasIndex("ServiceId");
+
+                    b.HasIndex("VehicleId");
 
                     b.ToTable("ServiceContracts");
                 });
@@ -1009,9 +1112,6 @@ namespace BuildingModels.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("ApartmentId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -1035,7 +1135,7 @@ namespace BuildingModels.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("StaffId")
+                    b.Property<Guid?>("StaffId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("Status")
@@ -1047,12 +1147,7 @@ namespace BuildingModels.Migrations
                     b.Property<Guid?>("UpdatedById")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("ApartmentId");
 
                     b.HasIndex("StaffId");
 
@@ -1063,6 +1158,9 @@ namespace BuildingModels.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("ApartmentId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("EndDate")
@@ -1101,9 +1199,53 @@ namespace BuildingModels.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ApartmentId");
+
                     b.HasIndex("ThirdPartyId");
 
                     b.ToTable("ThirdPartyContacts");
+                });
+
+            modelBuilder.Entity("BuildingModels.Vehicle", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("InsertedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("InsertedById")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("LicensePlate")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("ResidentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("UpdatedById")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("VehicleType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ResidentId");
+
+                    b.ToTable("Vehicles");
                 });
 
             modelBuilder.Entity("BuildingModels.Apartment", b =>
@@ -1127,6 +1269,10 @@ namespace BuildingModels.Migrations
 
             modelBuilder.Entity("BuildingModels.Assigment", b =>
                 {
+                    b.HasOne("BuildingModels.ServiceContract", "ServiceContract")
+                        .WithMany("Assigments")
+                        .HasForeignKey("ServiceContractId");
+
                     b.HasOne("BuildingModels.Staff", "Staff")
                         .WithMany()
                         .HasForeignKey("StaffId");
@@ -1134,6 +1280,8 @@ namespace BuildingModels.Migrations
                     b.HasOne("BuildingModels.Task", "Task")
                         .WithMany("Assigments")
                         .HasForeignKey("TaskId");
+
+                    b.Navigation("ServiceContract");
 
                     b.Navigation("Staff");
 
@@ -1212,19 +1360,29 @@ namespace BuildingModels.Migrations
 
             modelBuilder.Entity("BuildingModels.Notify", b =>
                 {
-                    b.HasOne("BuildingModels.Assigment", "Assigment")
-                        .WithMany()
-                        .HasForeignKey("AssigmentId");
-
-                    b.HasOne("BuildingModels.NotifyCategory", "NotifyCategory")
-                        .WithMany()
-                        .HasForeignKey("NotifyCategoryId")
+                    b.HasOne("BuildingModels.Building", "Building")
+                        .WithMany("Notify")
+                        .HasForeignKey("BuildingId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Assigment");
+                    b.HasOne("BuildingModels.ImgBase", "ImgBase")
+                        .WithMany("Notify")
+                        .HasForeignKey("ImgBaseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Navigation("NotifyCategory");
+                    b.HasOne("BuildingModels.Role", "Role")
+                        .WithMany("Notify")
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Building");
+
+                    b.Navigation("ImgBase");
+
+                    b.Navigation("Role");
                 });
 
             modelBuilder.Entity("BuildingModels.OwnerShip", b =>
@@ -1260,11 +1418,26 @@ namespace BuildingModels.Migrations
                     b.Navigation("Role");
                 });
 
+            modelBuilder.Entity("BuildingModels.Service", b =>
+                {
+                    b.HasOne("BuildingModels.ServiceCategory", "ServiceCategory")
+                        .WithMany()
+                        .HasForeignKey("ServiceCategoryID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ServiceCategory");
+                });
+
             modelBuilder.Entity("BuildingModels.ServiceContract", b =>
                 {
                     b.HasOne("BuildingModels.Apartment", "Apartment")
                         .WithMany()
                         .HasForeignKey("ApartmentId");
+
+                    b.HasOne("BuildingModels.Living", "Living")
+                        .WithMany()
+                        .HasForeignKey("LivingId");
 
                     b.HasOne("BuildingModels.PackageService", "PackageService")
                         .WithMany()
@@ -1274,11 +1447,19 @@ namespace BuildingModels.Migrations
                         .WithMany()
                         .HasForeignKey("ServiceId");
 
+                    b.HasOne("BuildingModels.Vehicle", "Vehicle")
+                        .WithMany()
+                        .HasForeignKey("VehicleId");
+
                     b.Navigation("Apartment");
+
+                    b.Navigation("Living");
 
                     b.Navigation("PackageService");
 
                     b.Navigation("Service");
+
+                    b.Navigation("Vehicle");
                 });
 
             modelBuilder.Entity("BuildingModels.Staff", b =>
@@ -1294,30 +1475,35 @@ namespace BuildingModels.Migrations
 
             modelBuilder.Entity("BuildingModels.ThirdParty", b =>
                 {
-                    b.HasOne("BuildingModels.Apartment", "Apartment")
-                        .WithMany()
-                        .HasForeignKey("ApartmentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("BuildingModels.Staff", "Staff")
                         .WithMany()
-                        .HasForeignKey("StaffId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Apartment");
+                        .HasForeignKey("StaffId");
 
                     b.Navigation("Staff");
                 });
 
             modelBuilder.Entity("BuildingModels.ThirdPartyContact", b =>
                 {
+                    b.HasOne("BuildingModels.Apartment", "Apartment")
+                        .WithMany()
+                        .HasForeignKey("ApartmentId");
+
                     b.HasOne("BuildingModels.ThirdParty", "ThirdParty")
                         .WithMany()
                         .HasForeignKey("ThirdPartyId");
 
+                    b.Navigation("Apartment");
+
                     b.Navigation("ThirdParty");
+                });
+
+            modelBuilder.Entity("BuildingModels.Vehicle", b =>
+                {
+                    b.HasOne("BuildingModels.Resident", "Resident")
+                        .WithMany()
+                        .HasForeignKey("ResidentId");
+
+                    b.Navigation("Resident");
                 });
 
             modelBuilder.Entity("BuildingModels.Apartment", b =>
@@ -1325,6 +1511,16 @@ namespace BuildingModels.Migrations
                     b.Navigation("Livings");
 
                     b.Navigation("OwnerShips");
+                });
+
+            modelBuilder.Entity("BuildingModels.Building", b =>
+                {
+                    b.Navigation("Notify");
+                });
+
+            modelBuilder.Entity("BuildingModels.ImgBase", b =>
+                {
+                    b.Navigation("Notify");
                 });
 
             modelBuilder.Entity("BuildingModels.Resident", b =>
@@ -1336,7 +1532,14 @@ namespace BuildingModels.Migrations
 
             modelBuilder.Entity("BuildingModels.Role", b =>
                 {
+                    b.Navigation("Notify");
+
                     b.Navigation("Users");
+                });
+
+            modelBuilder.Entity("BuildingModels.ServiceContract", b =>
+                {
+                    b.Navigation("Assigments");
                 });
 
             modelBuilder.Entity("BuildingModels.Task", b =>

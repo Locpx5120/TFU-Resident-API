@@ -327,6 +327,58 @@ namespace BuildingModels.Migrations
                     b.ToTable("HandleRequests");
                 });
 
+            modelBuilder.Entity("BuildingModels.ImgBase", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Base64")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ContentDisposition")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ContentType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("InsertedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("InsertedById")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<long>("Length")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("UpdatedById")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ImgBases");
+                });
+
             modelBuilder.Entity("BuildingModels.Invoice", b =>
                 {
                     b.Property<Guid>("Id")
@@ -432,11 +484,14 @@ namespace BuildingModels.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<DateTime?>("ApplyDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<Guid>("BuildingId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime?>("Date")
-                        .HasColumnType("datetime2");
+                    b.Property<Guid?>("ImgBaseId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("InsertedAt")
                         .HasColumnType("datetime2");
@@ -452,23 +507,24 @@ namespace BuildingModels.Migrations
 
                     b.Property<string>("LongContent")
                         .IsRequired()
+                        .HasMaxLength(2147483647)
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("NotifyCategoryId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("NotificationType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("RoleId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("ShortContent")
                         .IsRequired()
+                        .HasMaxLength(2147483647)
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<TimeSpan?>("Time")
-                        .HasColumnType("time");
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -480,50 +536,18 @@ namespace BuildingModels.Migrations
                     b.Property<Guid?>("UpdatedById")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("UrlImg")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<Guid?>("UserAccpectId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("NotifyCategoryId");
+                    b.HasIndex("BuildingId");
+
+                    b.HasIndex("ImgBaseId");
+
+                    b.HasIndex("RoleId");
 
                     b.ToTable("Notifies");
-                });
-
-            modelBuilder.Entity("BuildingModels.NotifyCategory", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("InsertedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("InsertedById")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("UpdatedById")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("NotifyCategories");
                 });
 
             modelBuilder.Entity("BuildingModels.OwnerShip", b =>
@@ -1334,13 +1358,27 @@ namespace BuildingModels.Migrations
 
             modelBuilder.Entity("BuildingModels.Notify", b =>
                 {
-                    b.HasOne("BuildingModels.NotifyCategory", "NotifyCategory")
-                        .WithMany()
-                        .HasForeignKey("NotifyCategoryId")
+                    b.HasOne("BuildingModels.Building", "Building")
+                        .WithMany("Notify")
+                        .HasForeignKey("BuildingId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("NotifyCategory");
+                    b.HasOne("BuildingModels.ImgBase", "ImgBase")
+                        .WithMany("Notify")
+                        .HasForeignKey("ImgBaseId");
+
+                    b.HasOne("BuildingModels.Role", "Role")
+                        .WithMany("Notify")
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Building");
+
+                    b.Navigation("ImgBase");
+
+                    b.Navigation("Role");
                 });
 
             modelBuilder.Entity("BuildingModels.OwnerShip", b =>
@@ -1471,6 +1509,16 @@ namespace BuildingModels.Migrations
                     b.Navigation("OwnerShips");
                 });
 
+            modelBuilder.Entity("BuildingModels.Building", b =>
+                {
+                    b.Navigation("Notify");
+                });
+
+            modelBuilder.Entity("BuildingModels.ImgBase", b =>
+                {
+                    b.Navigation("Notify");
+                });
+
             modelBuilder.Entity("BuildingModels.Resident", b =>
                 {
                     b.Navigation("Livings");
@@ -1480,6 +1528,8 @@ namespace BuildingModels.Migrations
 
             modelBuilder.Entity("BuildingModels.Role", b =>
                 {
+                    b.Navigation("Notify");
+
                     b.Navigation("Users");
                 });
 

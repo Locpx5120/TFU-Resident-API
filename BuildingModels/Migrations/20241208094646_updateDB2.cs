@@ -1,25 +1,26 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace BuildingModels.Migrations
 {
-    public partial class updateDB10 : Migration
+    public partial class updateDB2 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<string>(
-                name: "UrlImg",
+            migrationBuilder.AddColumn<Guid>(
+                name: "UserAccpectId",
                 table: "Notifies",
-                type: "nvarchar(max)",
+                type: "uniqueidentifier",
                 nullable: false,
-                defaultValue: "");
+                defaultValue: new Guid("00000000-0000-0000-0000-000000000000"));
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "UrlImg",
+                name: "UserAccpectId",
                 table: "Notifies");
         }
     }

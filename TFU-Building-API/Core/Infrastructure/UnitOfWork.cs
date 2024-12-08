@@ -156,10 +156,10 @@ namespace TFU_Building_API.Core.Infrastructure
         {
             get { return _notifyRepository ??= new MasterDataRepository<Notify>(_context, _currentUser); }
         }
-        private IMasterDataRepository<NotifyCategory> _notifyCategoryRepository;
-        public IMasterDataRepository<NotifyCategory> NotifyCategoryRepository
+        private IMasterDataRepository<ImgBase> _imgBaseRepository;
+        public IMasterDataRepository<ImgBase> ImgBaseRepository
         {
-            get { return _notifyCategoryRepository ??= new MasterDataRepository<NotifyCategory>(_context, _currentUser); }
+            get { return _imgBaseRepository ??= new MasterDataRepository<ImgBase>(_context, _currentUser); }
         }
         private IMasterDataRepository<Assigment> _assigmentRepository;
         public IMasterDataRepository<Assigment> AssigmentRepository

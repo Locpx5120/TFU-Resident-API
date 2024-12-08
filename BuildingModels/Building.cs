@@ -9,4 +9,6 @@ public partial class Building : MasterDataEntityBase
     public int? NumberApartment { get; set; }
     public Guid? ProjectId { get; set; }
 
+    public virtual ICollection<Notify> Notify { get; set; } = new List<Notify>();
+
 }

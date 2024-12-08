@@ -1,8 +1,9 @@
 ﻿using BuildingModels;
 using Core.Enums;
 using Core.Model;
+using fake_tool.Helpers;
 using Microsoft.EntityFrameworkCore;
-using TFU_Building_API.Core.Helper;
+using TFU_Building_API.Core.Dapper.Noti;
 using TFU_Building_API.Core.Infrastructure;
 using TFU_Building_API.Dto;
 
@@ -12,11 +13,14 @@ namespace TFU_Building_API.Service.impl
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IWebHostEnvironment _env;
+        private readonly INotifyRepository _notifyRepository;
 
-        public NotifyService(IUnitOfWork unitOfWork, IWebHostEnvironment env)
+
+        public NotifyService(IUnitOfWork unitOfWork, IWebHostEnvironment env, INotifyRepository notifyRepository)
         {
             _unitOfWork = unitOfWork;
             _env = env;
+            _notifyRepository = notifyRepository;
         }
 
         public async Task<ResponseData<CreateNotifyResponseDto>> CreateNotifyAsync(CreateNotifyRequestDto request)
@@ -24,49 +28,60 @@ namespace TFU_Building_API.Service.impl
             try
             {
                 string imageUrl = null;
+                ImgBase imgBase = new ImgBase();
 
                 // Lưu ảnh vào thư mục nếu người dùng tải lên
                 if (request.Image != null)
                 {
-                    // Định nghĩa đường dẫn thư mục lưu trữ ảnh
-                    var uploadPath = Path.Combine(_env.ContentRootPath, "uploads", "images");
-                    if (!Directory.Exists(uploadPath))
-                    {
-                        Directory.CreateDirectory(uploadPath);
-                    }
+                    //// Định nghĩa đường dẫn thư mục lưu trữ ảnh
+                    //var uploadPath = Path.Combine(_env.ContentRootPath, "uploads", "images");
+                    //if (!Directory.Exists(uploadPath))
+                    //{
+                    //    Directory.CreateDirectory(uploadPath);
+                    //}
 
-                    // Tạo tên file duy nhất để tránh trùng lặp
-                    var fileName = $"{Guid.NewGuid()}{Path.GetExtension(request.Image.FileName)}";
-                    var filePath = Path.Combine(uploadPath, fileName);
+                    //// Tạo tên file duy nhất để tránh trùng lặp
+                    //var fileName = $"{Guid.NewGuid()}{Path.GetExtension(request.Image.FileName)}";
+                    //var filePath = Path.Combine(uploadPath, fileName);
 
-                    // Lưu file lên server
-                    using (var stream = new FileStream(filePath, FileMode.Create))
-                    {
-                        await request.Image.CopyToAsync(stream);
-                    }
+                    //// Lưu file lên server
+                    //using (var stream = new FileStream(filePath, FileMode.Create))
+                    //{
+                    //    await request.Image.CopyToAsync(stream);
+                    //}
 
-                    // Tạo URL để truy cập ảnh
-                    imageUrl = $"/uploads/images/{fileName}";
+                    //// Tạo URL để truy cập ảnh
+                    //imageUrl = $"/uploads/images/{fileName}";
+
+                    imgBase.Id = Guid.NewGuid();
+                    imgBase.Base64 = await Utill.ConvertImageToBase64(request.Image);
+                    imgBase.FileName = request.Image.FileName;
+                    imgBase.Name = request.Image.Name;
+                    imgBase.ContentType = request.Image.ContentType;
+                    imgBase.ContentDisposition = request.Image.ContentDisposition;
+                    imgBase.Length = request.Image.Length;
+
+                    _unitOfWork.ImgBaseRepository.Add(imgBase);
                 }
 
                 // Khởi tạo bản tin mới
                 var newNotify = new Notify
                 {
                     Id = Guid.NewGuid(),
-                    Date = request.ApplyDate,
-                    Time = request.ApplyTime,
-                    NotifyCategoryId = request.NotifyCategoryId,
+                    ApplyDate = request.ApplyDate,
+                    NotificationType = request.NotificationType,
                     BuildingId = request.BuildingId,
                     RoleId = request.RoleId,
                     Title = request.Title,
-                    ShortContent = request.Content,
-                    LongContent = request.DetailContent,
-                    UrlImg = imageUrl,
-                    IsDeleted = false,
-                    IsActive = true,
+                    ShortContent = request.ShortContent,
+                    LongContent = request.LongContent,
                     Status = request.Status
-
                 };
+
+                if (imgBase.Id != null && imgBase.Id != Guid.Empty)
+                {
+                    newNotify.ImgBaseId = imgBase.Id;
+                }
 
                 // Thêm vào cơ sở dữ liệu
                 _unitOfWork.NotifyRepository.Add(newNotify);
@@ -103,82 +118,20 @@ namespace TFU_Building_API.Service.impl
             try
             {
                 // Stage 1: Fetch data from the database
-                var query = from n in _unitOfWork.NotifyRepository.GetQuery(x => x.IsDeleted == false)
-                            join nc in _unitOfWork.NotifyCategoryRepository.GetQuery(x => x.IsDeleted == false)
-                                on n.NotifyCategoryId equals nc.Id
-                            join b in _unitOfWork.BuildingRepository.GetQuery(x => x.IsDeleted == false)
-                                on n.BuildingId equals b.Id into buildingJoin
-                            from bj in buildingJoin.DefaultIfEmpty()
-                            join r in _unitOfWork.RoleRepository.GetQuery(x => x.IsDeleted == false)
-                                on n.RoleId equals r.Id into roleJoin
-                            from rj in roleJoin.DefaultIfEmpty()
-                            select new
-                            {
-                                n.Id,
-                                n.Title,
-                                n.ShortContent,
-                                n.Date,
-                                n.Time,
-                                n.NotifyCategoryId,  // Include NotifyCategoryId here
-                                n.BuildingId,
-                                NotifyCategoryName = nc.Name,
-                                BuildingName = bj != null ? bj.Name : "Tất cả",
-                                RoleName = rj != null ? rj.Name : "Tất cả",
-                                n.Status,
-                                n.InsertedById,
-                                n.UpdatedById
-                            };
+                var query = await _notifyRepository.GetNotifies(request);
 
-                // Apply filters
-                if (!string.IsNullOrEmpty(request.Title))
-                {
-                    query = query.Where(x => x.Title.Contains(request.Title));
-                }
 
-                if (request.NotifyCategoryId.HasValue)
-                {
-                    query = query.Where(x => x.NotifyCategoryId == request.NotifyCategoryId.Value);
-                }
-
-                if (request.BuildingId.HasValue)
-                {
-                    query = query.Where(x => x.BuildingId == request.BuildingId.Value);
-                }
-
-                if (!string.IsNullOrEmpty(request.StatusText))
-                {
-                    var statusValue = request.StatusText switch
-                    {
-                        "Bản nháp" => NotifyStatus.Draft,
-                        "Chờ phê duyệt" => NotifyStatus.Pending,
-                        "Đã duyệt" => NotifyStatus.Approved,
-                        "Từ chối" => NotifyStatus.Rejected,
-                        _ => (int?)null
-                    };
-                    if (statusValue.HasValue)
-                    {
-                        query = query.Where(x => x.Status == statusValue.Value);
-                    }
-                }
-
-                if (request.ApplyDate.HasValue)
-                {
-                    query = query.Where(x => x.Date == request.ApplyDate.Value);
-                }
-
-                // Sort by date descending
-                query = query.OrderByDescending(x => x.Date);
 
                 // Calculate total records before pagination
-                var totalRecords = await query.CountAsync();
+                var totalRecords = query.ToList().Count();
 
                 // Apply pagination
-                var paginatedQuery = query
+                var paginatedQuery = query.ToList()
                     .Skip((request.PageNumber - 1) * request.PageSize)
                     .Take(request.PageSize);
 
                 // Stage 2: Fetch the data into memory
-                var dataList = await paginatedQuery.ToListAsync();
+                var dataList = paginatedQuery.ToList();
 
                 // Stage 3: In-memory transformations
                 var resultData = new List<NotifyResponseDto>();
@@ -190,13 +143,14 @@ namespace TFU_Building_API.Service.impl
                         Title = item.Title,
                         ShortContent = item.ShortContent,
                         Date = item.Date,
-                        Time = item.Time,
-                        NotifyCategory = item.NotifyCategoryName,
+                        NotificationType = item.NotificationType,
                         BuildingName = item.BuildingName,
                         RoleName = item.RoleName,
-                        Status = GetNotifyStatus(new Notify { Status = item.Status }),
-                        CreatedBy = item.InsertedById != null ? await GetUserNameById(item.InsertedById.Value) : "",
-                        ApprovedBy = item.UpdatedById != null ? await GetUserNameById(item.UpdatedById.Value) : "",
+                        Status = item.Status,
+                        CreatedBy = item.CreatedBy,
+                        ApprovedBy = item.ApprovedBy,
+                        BuildingId = item.BuildingId,
+                        ImgBaseId = item.ImgBaseId,
                     };
                     resultData.Add(notifyResponse);
                 }
@@ -227,6 +181,56 @@ namespace TFU_Building_API.Service.impl
             }
         }
 
+        public async Task<ResponseData<NotifyDetailResponseDto>> GetNotifiesDetailAsync(Guid notifyId)
+        {
+            try
+            {
+                // Stage 1: Fetch data from the database
+                var query = await _notifyRepository.GetNotifiesDetails(notifyId);
+
+
+                // Stage 3: In-memory transformations
+                var resultData = new List<NotifyDetailResponseDto>();
+                foreach (var item in query)
+                {
+                    var notifyResponse = new NotifyDetailResponseDto
+                    {
+                        Id = item.Id,
+                        Title = item.Title,
+                        ShortContent = item.ShortContent,
+                        Date = item.Date,
+                        NotificationType = item.NotificationType,
+                        BuildingName = item.BuildingName,
+                        RoleName = item.RoleName,
+                        Status = item.Status,
+                        CreatedBy = item.CreatedBy,
+                        ApprovedBy = item.ApprovedBy,
+                        BuildingId = item.BuildingId,
+                        ImgBaseId = item.ImgBaseId,
+                    };
+                    resultData.Add(notifyResponse);
+                }
+
+
+                return new ResponseData<NotifyDetailResponseDto>
+                {
+                    Success = true,
+                    Message = "Successfully retrieved notify list.",
+                    Data = resultData.First(),
+                    Code = (int)ErrorCodeAPI.OK
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResponseData<NotifyDetailResponseDto>
+                {
+                    Success = false,
+                    Message = ex.Message,
+                    Code = (int)ErrorCodeAPI.SystemIsError
+                };
+            }
+        }
+
 
         // Helper method to get the status of the notify
         private string GetNotifyStatus(Notify notify)
@@ -234,10 +238,10 @@ namespace TFU_Building_API.Service.impl
             // Logic to determine the status of the notify
             return notify.Status switch
             {
-                NotifyStatus.Draft => "Bản nháp",
-                NotifyStatus.Pending => "Chờ phê duyệt",
-                NotifyStatus.Approved => "Đã duyệt",
-                NotifyStatus.Rejected => "Từ chối",
+                //NotifyStatus.Draft => "Bản nháp",
+                //NotifyStatus.Pending => "Chờ phê duyệt",
+                //NotifyStatus.Approved => "Đã duyệt",
+                //NotifyStatus.Rejected => "Từ chối",
                 _ => "Khác"
             };
         }

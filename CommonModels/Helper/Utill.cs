@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using Microsoft.AspNetCore.Http;
+using System.Text;
 using System.Text.Json;
 
 namespace fake_tool.Helpers
@@ -126,6 +127,43 @@ namespace fake_tool.Helpers
             }
 
             return (true, "Mật khẩu hợp lệ.");
+        }
+
+        public static async Task<string> ConvertImageToBase64(IFormFile? image = null)
+        {
+            if (image == null || image.Length == 0)
+            {
+                throw new ArgumentException("No image file uploaded.");
+            }
+
+            #region Kiểm tra dung lượng file (max 10MB)
+            const int MaxFileSize = 10 * 1024 * 1024; // 10MB
+            if (image.Length > MaxFileSize)
+            {
+                throw new ArgumentException("File size exceeds the maximum limit of 10MB.");
+            }
+            #endregion
+
+            #region Kiểm tra phần mở rộng file
+            var allowedExtensions = new[] { ".jpg", ".jpeg", ".png" };
+
+            var extension = Path.GetExtension(image.FileName).ToLower();
+
+            if (!allowedExtensions.Contains(extension))
+            {
+                throw new ArgumentException("Invalid file type. Only .jpg, .jpeg, and .png files are allowed.");
+            }
+            #endregion
+
+            // Chuyển IFormFile thành byte[]
+            using (var memoryStream = new MemoryStream())
+            {
+                image.CopyTo(memoryStream);
+                byte[] imageBytes = memoryStream.ToArray();
+
+                // Chuyển byte[] thành chuỗi Base64
+                return Convert.ToBase64String(imageBytes);
+            }
         }
     }
 }
