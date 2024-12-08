@@ -57,6 +57,7 @@ namespace TFU_Building_API.Core.AppStart
 
             services.AddScoped<IThirdPartyService, ThirdPartyService>();
             services.AddScoped<INotifyService, NotifyService>();
+            services.AddScoped<IImageService, ImageService>();
             //services.AddScoped<INotifyCategoryService, NotifyCategoryService>();
 
             //dapter
