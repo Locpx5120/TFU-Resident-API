@@ -42,6 +42,13 @@ namespace TFU_Building_API.Controllers
             return StatusCode(result.Code, result);
         }
 
+        [HttpPost("get-notifies-by-user")]
+        public async Task<IActionResult> GetNotifiesByUser()
+        {
+            var result = await _notifyService.GetNotifiesByUserAsync();
+            return StatusCode(result.Code, result);
+        }
+
         [HttpPost("get-notify-detail")]
         public async Task<IActionResult> GetNotifyDetail(Guid notifyId)
         {

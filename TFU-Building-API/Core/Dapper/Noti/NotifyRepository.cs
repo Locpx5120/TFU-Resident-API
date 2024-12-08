@@ -31,7 +31,7 @@ namespace TFU_Building_API.Core.Dapper.Noti
                 $" b.Name as BuildingName," +
                 $" n.NotificationType," +
                 $" n.Title," +
-                $" r.Name as RoleName" +
+                $" COALESCE(r.Name, 'All')  as RoleName" +
                 $"\r\n\t\t, n.ApplyDate as Date" +
                 $"\r\n\t\t, ( COALESCE(re.Email, '') + '' + COALESCE(sa.Email, '') ) as CreatedBy" +
                 $"\r\n\t\t, ( COALESCE(reUpdate.Email, '') + '' + COALESCE(saUpdate.Email, '') ) as ApprovedBy" +
@@ -42,7 +42,7 @@ namespace TFU_Building_API.Core.Dapper.Noti
 
                 $"\r\n  FROM Notifies n " +
                 $"\r\n  join Buildings b on n.BuildingId = b.id " +
-                $"\r\n  join Roles r on r.Id = n.RoleId" +
+                $"\r\n  left join Roles r on r.Id = n.RoleId" +
                 $"\r\n  left join Residents re on re.Id = n.InsertedById  " +
                 $"\r\n  left join Staff sa on sa.Id = n.InsertedById" +
                 $"\r\n  left join Residents reUpdate on reUpdate .Id = n.UserAccpectId  " +
@@ -69,6 +69,43 @@ namespace TFU_Building_API.Core.Dapper.Noti
                 query += $"\r\n\tand n.Status = @status ";
                 param.Add("@status", "" + request.Status + "%");
             }
+            #endregion
+
+            #region Order by
+            query += $"\r\n\r\n  Order by n.InsertedAt desc ";
+
+            #endregion
+
+            return await _dapperCommon.QueryAsync<NotifyResponseDto>(query, param);
+        }
+
+        public async Task<IEnumerable<NotifyResponseDto>> GetNotifiesByUser()
+        {
+            DynamicParameters param = new DynamicParameters();
+            var query = $"SELECT  n.id," +
+                $" b.Name as BuildingName," +
+                $" n.NotificationType," +
+                $" n.Title," +
+                $" r.Name as RoleName" +
+                $"\r\n\t\t, n.ApplyDate as Date" +
+                $"\r\n\t\t, ( COALESCE(re.Email, '') + '' + COALESCE(sa.Email, '') ) as CreatedBy" +
+                $"\r\n\t\t, ( COALESCE(reUpdate.Email, '') + '' + COALESCE(saUpdate.Email, '') ) as ApprovedBy" +
+                $"\r\n\t\t, n.Status" +
+                $"\r\n\t\t, n.ImgBaseId " +
+                $"\r\n\t\t, n.BuildingId " +
+                $"\r\n\t\t, n.ShortContent as ShortContent " +
+
+                $"\r\n  FROM Notifies n " +
+                $"\r\n  join Buildings b on n.BuildingId = b.id " +
+                $"\r\n  join Roles r on r.Id = n.RoleId" +
+                $"\r\n  left join Residents re on re.Id = n.InsertedById  " +
+                $"\r\n  left join Staff sa on sa.Id = n.InsertedById" +
+                $"\r\n  left join Residents reUpdate on reUpdate .Id = n.UserAccpectId  " +
+                $"\r\n  left join Staff saUpdate on saUpdate.Id = n.UserAccpectId";
+
+            #region Where
+            query += $"\r\n\tWhere r.Name is null or r.Name_En = @name_En";
+            param.Add("@name_En", "" + _userIdentity.RoleName + "");
             #endregion
 
             #region Order by

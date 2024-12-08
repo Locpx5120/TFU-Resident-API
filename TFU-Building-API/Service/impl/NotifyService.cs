@@ -181,6 +181,56 @@ namespace TFU_Building_API.Service.impl
             }
         }
 
+        public async Task<ResponseData<List<NotifyResponseDto>>> GetNotifiesByUserAsync()
+        {
+            try
+            {
+                // Stage 1: Fetch data from the database
+                var query = await _notifyRepository.GetNotifiesByUser();
+
+
+                // Stage 3: In-memory transformations
+                var resultData = new List<NotifyResponseDto>();
+                foreach (var item in query.ToList())
+                {
+                    var notifyResponse = new NotifyResponseDto
+                    {
+                        Id = item.Id,
+                        Title = item.Title,
+                        ShortContent = item.ShortContent,
+                        Date = item.Date,
+                        NotificationType = item.NotificationType,
+                        BuildingName = item.BuildingName,
+                        RoleName = item.RoleName,
+                        Status = item.Status,
+                        CreatedBy = item.CreatedBy,
+                        ApprovedBy = item.ApprovedBy,
+                        BuildingId = item.BuildingId,
+                        ImgBaseId = item.ImgBaseId,
+                    };
+                    resultData.Add(notifyResponse);
+                }
+
+                return new ResponseData<List<NotifyResponseDto>>
+                {
+                    Success = true,
+                    Message = "Successfully retrieved notify list.",
+                    Data = resultData,
+                    Code = (int)ErrorCodeAPI.OK
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResponseData<List<NotifyResponseDto>>
+                {
+                    Success = false,
+                    Message = ex.Message,
+                    Code = (int)ErrorCodeAPI.SystemIsError
+                };
+            }
+        }
+
+
         public async Task<ResponseData<NotifyDetailResponseDto>> GetNotifiesDetailAsync(Guid notifyId)
         {
             try

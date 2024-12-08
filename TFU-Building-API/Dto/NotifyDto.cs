@@ -35,6 +35,8 @@
         public Guid? ImgBaseId { get; set; }
     }
 
+
+
     public class NotifyDetailResponseDto
     {
         public Guid Id { get; set; }
