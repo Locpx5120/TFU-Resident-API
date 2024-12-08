@@ -63,4 +63,16 @@
         public int PageNumber { get; set; } = 1;
         public int PageSize { get; set; } = 10;
     }
+
+    public class NotifyUpdateRequestDto
+    {
+        public Guid Id { get; set; }
+        public string? Title { get; set; }
+        public string NotificationType { get; set; }
+        public Guid? BuildingId { get; set; }
+        public string? Status { get; set; }
+        public DateTime? ApplyDate { get; set; }
+        public int PageNumber { get; set; } = 1;
+        public int PageSize { get; set; } = 10;
+    }
 }

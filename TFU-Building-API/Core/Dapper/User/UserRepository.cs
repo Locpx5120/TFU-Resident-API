@@ -36,8 +36,14 @@ namespace TFU_Building_API.Core.Dapper.User
                 $"from {DapperConstant.STAFF} s\r\n" +
                 $"where id in (\r\n\t\t\t" +
                 $"select distinct(s.id)\r\n\t\t\t" +
-                $"from {DapperConstant.STAFF} s left join {DapperConstant.ASSIGMENTS} ass on s.Id = ass.StaffId \r\n\t\t\t" +
-                $"where s.RoleId = '{DapperConstant.ID_ROLE_KY_THUAT}' and s.IsActive = 1 and ((ass.StartTime is null or ass.EndTime is not null) or (ass.StartTime is not null and ass.EndTime is not null) )\r\n\t\t" +
+                $"from {DapperConstant.STAFF} s" +
+                $" left join {DapperConstant.ASSIGMENTS} ass on s.Id = ass.StaffId \r\n\t\t\t" +
+                $" join {DapperConstant.SERVICE_CONTRACTS} se on se.id = ass.ServiceContractId " +
+                $"where s.RoleId = '{DapperConstant.ID_ROLE_KY_THUAT}' and s.IsActive = 1 " +
+                $"and (" +
+                $"  (ass.StartTime is null or ass.EndTime is not null) or (ass.StartTime is not null and ass.EndTime is not null)" +
+                $" or se.Status = 1 " +
+                $" )\r\n\t\t" +
                 $")\r\n\t" +
                 $"and s.Email like @keyword ";
 

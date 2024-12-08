@@ -40,6 +40,7 @@
         public string ServiceName { get; set; }
         public string Package { get; set; }
         public DateTime StartTime { get; set; }
+        public string? StartDate { get; set; } = string.Empty;
         public DateTime EndDate { get; set; }
         public DateTime? StaffEndDate { get; set; }
         public string Note { get; set; }
@@ -49,5 +50,9 @@
         public string? NoteFeedbackHanhChinh { get; set; } = string.Empty;
         public double? ServicePrice { get; set; } = 0;
         public int? Status { get; set; }
+        public string? StaffName { get; set; }
+        public string? StaffEmail { get; set; }
+        public Guid? StaffId { get; set; }
+
     }
 }

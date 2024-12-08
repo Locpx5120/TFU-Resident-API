@@ -281,6 +281,11 @@ namespace TFU_Building_API.Service.impl
             }
         }
 
+        public Task<ResponseData<NotifyDetailResponseDto>> UpdateNotifyAsync(Guid notifyId)
+        {
+            throw new NotImplementedException();
+        }
+
 
         // Helper method to get the status of the notify
         private string GetNotifyStatus(Notify notify)

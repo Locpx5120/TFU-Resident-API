@@ -97,6 +97,7 @@ namespace TFU_Building_API.Core.Dapper.ServiceContract
                 $"    a.RoomNumber AS ApartmentNumber,\r\n" +
                 $"    s.ServiceName,\r\n" +
                 $"    COALESCE(sc.StartDate, GETDATE()) AS StartTime,\r\n" +
+                $"    COALESCE(ass.StartTime, '') AS StartDate,\r\n" +
                 $"    COALESCE(sc.EndDate, GETDATE()) AS EndDate,\r\n" +
                 $"    ass.EndTime AS StaffEndDate,\r\n" +
                 $"    sc.Note,\r\n" +
@@ -105,6 +106,9 @@ namespace TFU_Building_API.Core.Dapper.ServiceContract
                 $"    sc.NoteKyThuat,\r\n" +
                 $"    sc.NoteFeedbackHanhChinh,\r\n" +
                 $"    COALESCE(ass.ServicePrice, 0) AS ServicePrice,\r\n" +
+                $"  COALESCE(sa.FullName, '') as StaffName,\r\n\t" +
+                $"COALESCE(sa.Email, '') as StaffEmail,\r\n\t" +
+                $" sa.Id as StaffId," +
                 $"    sc.Status";
 
             #region FROM
@@ -116,7 +120,10 @@ namespace TFU_Building_API.Core.Dapper.ServiceContract
                  $"\n LEFT JOIN " +
                 $"\n  {DapperConstant.ASSIGMENTS} ass ON ass.ServiceContractId = sc.Id " +
                 $"\nJOIN  " +
-                $"\n  {DapperConstant.BUILDINGS} b ON a.BuildingId = b.Id";
+                $"\n  {DapperConstant.BUILDINGS} b ON a.BuildingId = b.Id" +
+                $"\n LEFT JOIN \r\n\t" +
+                $"{DapperConstant.STAFF} sa ON ass.StaffId = sa.Id";
+
             #endregion
 
             #region where

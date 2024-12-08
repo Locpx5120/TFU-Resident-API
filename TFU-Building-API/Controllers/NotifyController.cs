@@ -23,7 +23,7 @@ namespace TFU_Building_API.Controllers
         /// <param name="request">Thông tin bản tin cần tạo.</param>
         /// <returns>Thông tin về bản tin vừa tạo.</returns>
         [HttpPost("create")]
-        public async Task<IActionResult> CreateNotify([FromBody] CreateNotifyRequestDto request)
+        public async Task<IActionResult> CreateNotify([FromForm] CreateNotifyRequestDto request)
         {
             var result = await _notifyService.CreateNotifyAsync(request);
 
@@ -53,6 +53,13 @@ namespace TFU_Building_API.Controllers
         public async Task<IActionResult> GetNotifyDetail(Guid notifyId)
         {
             var result = await _notifyService.GetNotifiesDetailAsync(notifyId);
+            return StatusCode(result.Code, result);
+        }
+
+        [HttpPost("update-notify")]
+        public async Task<IActionResult> UpdateNotify(Guid notifyId)
+        {
+            var result = await _notifyService.UpdateNotifyAsync(notifyId);
             return StatusCode(result.Code, result);
         }
     }

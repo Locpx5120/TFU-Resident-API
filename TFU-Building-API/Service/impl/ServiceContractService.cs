@@ -971,8 +971,8 @@ namespace TFU_Building_API.Service.impl
                 //                               Status = sc.Status,
                 //                           }).FirstOrDefaultAsync();
 
-                var serviceDetail = await _serviceContractRepository.GetRepairReportDetails(serviceContractId);
-                if (serviceDetail == null)
+                var serviceDetails = await _serviceContractRepository.GetRepairReportDetails(serviceContractId);
+                if (serviceDetails == null)
                 {
                     return new ResponseData<RepairReportServiceDetailDto>
                     {
@@ -981,12 +981,17 @@ namespace TFU_Building_API.Service.impl
                         Code = (int)ErrorCodeAPI.NotFound
                     };
                 }
+                var serviceDetail = serviceDetails.First();
+                if (serviceDetail.StartDate.Equals("01/01/1900 00:00:00"))
+                {
+                    serviceDetail.StartDate = string.Empty;
+                }
 
                 return new ResponseData<RepairReportServiceDetailDto>
                 {
                     Success = true,
                     Message = "RepairReport service details retrieved successfully",
-                    Data = serviceDetail.First(),
+                    Data = serviceDetail,
                     Code = (int)ErrorCodeAPI.OK
                 };
             }
