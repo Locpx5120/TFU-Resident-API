@@ -1,5 +1,6 @@
 ﻿using TFU_Building_API.Core.Dapper;
 using TFU_Building_API.Core.Dapper.ServiceContract;
+using TFU_Building_API.Core.Dapper.User;
 using TFU_Building_API.Core.Infrastructure;
 using TFU_Building_API.Core.Infrastructure.Dapper;
 using TFU_Building_API.Core.Mapper;
@@ -61,6 +62,7 @@ namespace TFU_Building_API.Core.AppStart
             services.AddTransient<DapperCommon>();
             services.AddSingleton<DapperDbContext>();
             services.AddScoped<IServiceContractRepository, ServiceContractRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
 
             //Singleton
             //services.AddScoped<IDapperDbContext, DapperDbContext>();

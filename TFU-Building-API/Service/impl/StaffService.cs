@@ -1,8 +1,8 @@
 ﻿using BuildingModels;
 using Core.Enums;
 using Core.Model;
-using fake_tool.Helpers;
 using Microsoft.EntityFrameworkCore;
+using TFU_Building_API.Core.Dapper.User;
 using TFU_Building_API.Core.Handler;
 using TFU_Building_API.Core.Helper;
 using TFU_Building_API.Core.Infrastructure;
@@ -14,10 +14,13 @@ namespace TFU_Building_API.Service.impl
     {
         private readonly IConfiguration _config;
         private readonly IUnitOfWork _unitOfWork;
-        public StaffService(IUnitOfWork UnitOfWork, IHttpContextAccessor HttpContextAccessor, IConfiguration config) : base(UnitOfWork, HttpContextAccessor)
+        private readonly IUserRepository _userRepository;
+        public StaffService(IUnitOfWork UnitOfWork, IHttpContextAccessor HttpContextAccessor, IConfiguration config,
+            IUserRepository userRepository) : base(UnitOfWork, HttpContextAccessor)
         {
             _unitOfWork = UnitOfWork;
             _config = config;
+            _userRepository = userRepository;
         }
 
         public async Task<ResponseData<StaffResponseDto>> AddStaff(StaffRequestDto request)
@@ -394,6 +397,33 @@ namespace TFU_Building_API.Service.impl
                 };
             }
         }
+
+        public async Task<ResponseData<List<GetStaffAssigmentResponseDto>>> GetStaffListAssigment(string searchName)
+        {
+            try
+            {
+                // Query để lấy danh sách Staff không bị xóa
+                var query = await _userRepository.GetStaffListAssigment(searchName);
+
+                return new ResponseData<List<GetStaffAssigmentResponseDto>>
+                {
+                    Success = true,
+                    Message = "Successfully retrieved staff.",
+                    Data = query.ToList(),
+                    Code = (int)ErrorCodeAPI.OK
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResponseData<List<GetStaffAssigmentResponseDto>>
+                {
+                    Success = false,
+                    Message = $"An error occurred: {ex.Message}",
+                    Code = (int)ErrorCodeAPI.SystemIsError
+                };
+            }
+        }
+
 
     }
 }

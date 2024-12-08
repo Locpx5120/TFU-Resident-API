@@ -12,5 +12,6 @@ namespace TFU_Building_API.Service
         //Task<ResponseData<StaffInfoResponseDto>> GetStaffById(Guid staffId);
 
         Task<ResponseData<List<GetStaffResponseDto>>> GetStaffListAsync(string searchName);
+        Task<ResponseData<List<GetStaffAssigmentResponseDto>>> GetStaffListAssigment(string searchName);
     }
 }
