@@ -67,7 +67,7 @@ namespace TFU_Building_API.Core.Dapper.Noti
             if (!String.IsNullOrEmpty(request.Status))
             {
                 query += $"\r\n\tand n.Status = @status ";
-                param.Add("@status", "" + request.Status + "%");
+                param.Add("@status", "" + request.Status + "");
             }
             #endregion
 
@@ -86,7 +86,7 @@ namespace TFU_Building_API.Core.Dapper.Noti
                 $" b.Name as BuildingName," +
                 $" n.NotificationType," +
                 $" n.Title," +
-                $" r.Name as RoleName" +
+                $" COALESCE(r.Name, 'All')  as RoleName" +
                 $"\r\n\t\t, n.ApplyDate as Date" +
                 $"\r\n\t\t, ( COALESCE(re.Email, '') + '' + COALESCE(sa.Email, '') ) as CreatedBy" +
                 $"\r\n\t\t, ( COALESCE(reUpdate.Email, '') + '' + COALESCE(saUpdate.Email, '') ) as ApprovedBy" +
@@ -97,7 +97,7 @@ namespace TFU_Building_API.Core.Dapper.Noti
 
                 $"\r\n  FROM Notifies n " +
                 $"\r\n  join Buildings b on n.BuildingId = b.id " +
-                $"\r\n  join Roles r on r.Id = n.RoleId" +
+                $"\r\n  left join Roles r on r.Id = n.RoleId" +
                 $"\r\n  left join Residents re on re.Id = n.InsertedById  " +
                 $"\r\n  left join Staff sa on sa.Id = n.InsertedById" +
                 $"\r\n  left join Residents reUpdate on reUpdate .Id = n.UserAccpectId  " +
@@ -124,7 +124,7 @@ namespace TFU_Building_API.Core.Dapper.Noti
                 $" b.Name as BuildingName," +
                 $" n.NotificationType," +
                 $" n.Title," +
-                $" r.Name as RoleName" +
+                $" COALESCE(r.Name, 'All')  as RoleName" +
                 $"\r\n\t\t, n.ApplyDate as Date" +
                 $"\r\n\t\t, ( COALESCE(re.Email, '') + '' + COALESCE(sa.Email, '') ) as CreatedBy" +
                 $"\r\n\t\t, ( COALESCE(reUpdate.Email, '') + '' + COALESCE(saUpdate.Email, '') ) as ApprovedBy" +
@@ -132,11 +132,12 @@ namespace TFU_Building_API.Core.Dapper.Noti
                 $"\r\n\t\t, n.ImgBaseId " +
                 $"\r\n\t\t, n.BuildingId " +
                 $"\r\n\t\t, r.id as RoleId " +
-                $"\r\n\t\t, n.ShortContent as ShortContent " +
+                $"\r\n\t\t, n.ShortContent  " +
+                $"\r\n\t\t, n.LongContent " +
 
                 $"\r\n  FROM Notifies n " +
                 $"\r\n  join Buildings b on n.BuildingId = b.id " +
-                $"\r\n  join Roles r on r.Id = n.RoleId" +
+                $"\r\n  left join Roles r on r.Id = n.RoleId" +
                 $"\r\n  left join Residents re on re.Id = n.InsertedById  " +
                 $"\r\n  left join Staff sa on sa.Id = n.InsertedById" +
                 $"\r\n  left join Residents reUpdate on reUpdate .Id = n.UserAccpectId  " +

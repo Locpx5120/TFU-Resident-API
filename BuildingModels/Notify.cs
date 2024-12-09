@@ -16,7 +16,7 @@ public partial class Notify : MasterDataEntityBase
 
     public Guid BuildingId { get; set; }
     public virtual Building Building { get; set; }
-    public Guid RoleId { get; set; }
+    public Guid? RoleId { get; set; }
     public virtual Role Role { get; set; }
     public Guid? ImgBaseId { get; set; } // link ảnh
     public virtual ImgBase? ImgBase { get; set; }

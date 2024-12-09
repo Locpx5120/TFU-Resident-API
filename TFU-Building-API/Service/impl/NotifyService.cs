@@ -243,34 +243,11 @@ namespace TFU_Building_API.Service.impl
                 var query = await _notifyRepository.GetNotifiesDetails(notifyId);
 
 
-                // Stage 3: In-memory transformations
-                var resultData = new List<NotifyDetailResponseDto>();
-                foreach (var item in query)
-                {
-                    var notifyResponse = new NotifyDetailResponseDto
-                    {
-                        Id = item.Id,
-                        Title = item.Title,
-                        ShortContent = item.ShortContent,
-                        Date = item.Date,
-                        NotificationType = item.NotificationType,
-                        BuildingName = item.BuildingName,
-                        RoleName = item.RoleName,
-                        Status = item.Status,
-                        CreatedBy = item.CreatedBy,
-                        ApprovedBy = item.ApprovedBy,
-                        BuildingId = item.BuildingId,
-                        ImgBaseId = item.ImgBaseId,
-                    };
-                    resultData.Add(notifyResponse);
-                }
-
-
                 return new ResponseData<NotifyDetailResponseDto>
                 {
                     Success = true,
                     Message = "Successfully retrieved notify list.",
-                    Data = resultData.First(),
+                    Data = query.First(),
                     Code = (int)ErrorCodeAPI.OK
                 };
             }
