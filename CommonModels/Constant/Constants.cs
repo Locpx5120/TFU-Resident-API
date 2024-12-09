@@ -21,5 +21,13 @@
         public const string ROLE_BAN_QUAN_LY = "BanQuanLy";
         public const string ROLE_BEN_THU_BA = "BenThuBa";
         public const string ROLE_Resident = "BenThuBa";
+
+        //trạng thái bản tin
+        public const string NOTY_PENDING_APPROVAL = "PENDING_APPROVAL";
+        public const string NOTY_APPLYING = "APPLYING";
+        public const string NOTY_PENDING_APPLY = "PENDING_APPLY";
+        public const string NOTY_REJECT = "REJECT";
+        public const string NOTY_DRAFT = "DRAFT";
+        public const string NOTY_EXPIRE = "EXPIRE";
     }
 }

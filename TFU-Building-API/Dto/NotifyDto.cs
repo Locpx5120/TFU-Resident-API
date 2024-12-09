@@ -51,6 +51,7 @@
         public string ApprovedBy { get; set; }
         public Guid? BuildingId { get; set; }
         public Guid? ImgBaseId { get; set; }
+        public Guid? RoleId { get; set; }
     }
 
     public class NotifyFilterRequestDto
@@ -67,12 +68,14 @@
     public class NotifyUpdateRequestDto
     {
         public Guid Id { get; set; }
-        public string? Title { get; set; }
+        public DateTime ApplyDate { get; set; }
         public string NotificationType { get; set; }
-        public Guid? BuildingId { get; set; }
+        public Guid BuildingId { get; set; }
+        public Guid RoleId { get; set; }
+        public string Title { get; set; }
+        public string ShortContent { get; set; }
+        public string LongContent { get; set; }
+        public IFormFile? Image { get; set; } = null; // Ảnh được tải lên
         public string? Status { get; set; }
-        public DateTime? ApplyDate { get; set; }
-        public int PageNumber { get; set; } = 1;
-        public int PageSize { get; set; } = 10;
     }
 }

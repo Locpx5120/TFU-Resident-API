@@ -57,9 +57,9 @@ namespace TFU_Building_API.Controllers
         }
 
         [HttpPost("update-notify")]
-        public async Task<IActionResult> UpdateNotify(Guid notifyId)
+        public async Task<IActionResult> UpdateNotify([FromForm] NotifyUpdateRequestDto requestDto)
         {
-            var result = await _notifyService.UpdateNotifyAsync(notifyId);
+            var result = await _notifyService.UpdateNotifyAsync(requestDto);
             return StatusCode(result.Code, result);
         }
     }

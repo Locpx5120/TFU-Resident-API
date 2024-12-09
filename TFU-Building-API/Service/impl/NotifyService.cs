@@ -1,4 +1,5 @@
 ﻿using BuildingModels;
+using Constant;
 using Core.Enums;
 using Core.Model;
 using fake_tool.Helpers;
@@ -14,13 +15,16 @@ namespace TFU_Building_API.Service.impl
         private readonly IUnitOfWork _unitOfWork;
         private readonly IWebHostEnvironment _env;
         private readonly INotifyRepository _notifyRepository;
+        private readonly IUserIdentity _userIdentity;
 
-
-        public NotifyService(IUnitOfWork unitOfWork, IWebHostEnvironment env, INotifyRepository notifyRepository)
+        public NotifyService(IUnitOfWork unitOfWork, IWebHostEnvironment env
+           , IUserIdentity userIdentity
+           , INotifyRepository notifyRepository)
         {
             _unitOfWork = unitOfWork;
             _env = env;
             _notifyRepository = notifyRepository;
+            _userIdentity = userIdentity;
         }
 
         public async Task<ResponseData<CreateNotifyResponseDto>> CreateNotifyAsync(CreateNotifyRequestDto request)
@@ -281,9 +285,107 @@ namespace TFU_Building_API.Service.impl
             }
         }
 
-        public Task<ResponseData<NotifyDetailResponseDto>> UpdateNotifyAsync(Guid notifyId)
+        public async Task<ResponseData<NotifyDetailResponseDto>> UpdateNotifyAsync(NotifyUpdateRequestDto requestDto)
         {
-            throw new NotImplementedException();
+
+
+            try
+            {
+                // Stage 1: Fetch data from the database
+                var data = _unitOfWork.NotifyRepository.GetById(requestDto.Id);
+                if (data == null)
+                {
+                    return new ResponseData<NotifyDetailResponseDto>
+                    {
+                        Success = false,
+                        Message = "Not found Noty.",
+                        Data = null,
+                        Code = (int)ErrorCodeAPI.OK
+                    };
+                }
+                if (requestDto.Status.Equals(Constants.NOTY_APPLYING))
+                {
+                    if (_userIdentity.RoleName.Equals(Constants.ROLE_BAN_QUAN_LY))
+                    {
+                        data.Status = requestDto.Status;
+                        _unitOfWork.NotifyRepository.Update(data);
+
+                        if (await _unitOfWork.SaveChangesAsync() > 0)
+                        {
+                            return new ResponseData<NotifyDetailResponseDto>
+                            {
+                                Success = true,
+                                Message = "Successfully update notify.",
+                                Data = null,
+                                Code = (int)ErrorCodeAPI.OK
+                            };
+                        };
+                    }
+                    else
+                    {
+                        return new ResponseData<NotifyDetailResponseDto>
+                        {
+                            Success = false,
+                            Message = $"Role {_userIdentity.RoleName} not APPLYING",
+                            Data = null,
+                            Code = (int)ErrorCodeAPI.OK
+                        };
+                    }
+                }
+
+                data.Status = requestDto.Status;
+                data.ApplyDate = requestDto.ApplyDate;
+                data.NotificationType = requestDto.NotificationType;
+                data.BuildingId = requestDto.BuildingId;
+                data.RoleId = requestDto.RoleId;
+                data.Title = requestDto.Title;
+                data.ShortContent = requestDto.ShortContent;
+                data.LongContent = requestDto.LongContent;
+
+                if (requestDto.Image != null)
+                {
+                    ImgBase imgBase = new ImgBase();
+                    imgBase.Id = Guid.NewGuid();
+                    imgBase.Base64 = await Utill.ConvertImageToBase64(requestDto.Image);
+                    imgBase.FileName = requestDto.Image.FileName;
+                    imgBase.Name = requestDto.Image.Name;
+                    imgBase.ContentType = requestDto.Image.ContentType;
+                    imgBase.ContentDisposition = requestDto.Image.ContentDisposition;
+                    imgBase.Length = requestDto.Image.Length;
+
+                    _unitOfWork.ImgBaseRepository.Add(imgBase);
+                    data.ImgBaseId = imgBase.Id;
+                }
+
+                _unitOfWork.NotifyRepository.Update(data);
+
+                if (await _unitOfWork.SaveChangesAsync() > 0)
+                {
+                    return new ResponseData<NotifyDetailResponseDto>
+                    {
+                        Success = true,
+                        Message = "Successfully update notify.",
+                        Data = null,
+                        Code = (int)ErrorCodeAPI.OK
+                    };
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResponseData<NotifyDetailResponseDto>
+                {
+                    Success = false,
+                    Message = ex.Message,
+                    Code = (int)ErrorCodeAPI.SystemIsError
+                };
+            }
+
+            return new ResponseData<NotifyDetailResponseDto>
+            {
+                Success = false,
+                Message = "Liên hệ admin check lại code #_#",
+                Code = (int)ErrorCodeAPI.SystemIsError
+            };
         }
 
 
