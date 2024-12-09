@@ -24,6 +24,7 @@
         public Guid Id { get; set; }
         public string Title { get; set; }
         public string ShortContent { get; set; }
+        public string LongContent { get; set; }
         public DateTime? Date { get; set; }
         public string NotificationType { get; set; }
         public string BuildingName { get; set; }
@@ -33,6 +34,7 @@
         public string ApprovedBy { get; set; }
         public Guid? BuildingId { get; set; }
         public Guid? ImgBaseId { get; set; }
+
     }
 
 
@@ -72,7 +74,7 @@
         public DateTime ApplyDate { get; set; }
         public string NotificationType { get; set; }
         public Guid BuildingId { get; set; }
-        public Guid RoleId { get; set; }
+        public Guid? RoleId { get; set; }
         public string Title { get; set; }
         public string ShortContent { get; set; }
         public string LongContent { get; set; }

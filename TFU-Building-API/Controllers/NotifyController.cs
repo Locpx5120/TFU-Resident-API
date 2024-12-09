@@ -62,6 +62,20 @@ namespace TFU_Building_API.Controllers
             var result = await _notifyService.UpdateNotifyAsync(requestDto);
             return StatusCode(result.Code, result);
         }
+
+        [HttpPost("applying-notify")]
+        public async Task<IActionResult> ApplyingNotify(Guid id)
+        {
+            var result = await _notifyService.ApplyingNotifyAsync(id);
+            return StatusCode(result.Code, result);
+        }
+
+        [HttpPost("reject-notify")]
+        public async Task<IActionResult> RejectNotify(Guid id)
+        {
+            var result = await _notifyService.RejectNotifyAsync(id);
+            return StatusCode(result.Code, result);
+        }
     }
 }
 

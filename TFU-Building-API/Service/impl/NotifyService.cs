@@ -211,6 +211,7 @@ namespace TFU_Building_API.Service.impl
                         ApprovedBy = item.ApprovedBy,
                         BuildingId = item.BuildingId,
                         ImgBaseId = item.ImgBaseId,
+                        LongContent = item.LongContent,
                     };
                     resultData.Add(notifyResponse);
                 }
@@ -261,6 +262,100 @@ namespace TFU_Building_API.Service.impl
                 };
             }
         }
+
+        public async Task<ResponseData<NotifyDetailResponseDto>> ApplyingNotifyAsync(Guid id)
+        {
+            try
+            {
+                // Stage 1: Fetch data from the database
+                var data = _unitOfWork.NotifyRepository.GetById(id);
+                if (data == null)
+                {
+                    return new ResponseData<NotifyDetailResponseDto>
+                    {
+                        Success = false,
+                        Message = "Not found Noty.",
+                        Data = null,
+                        Code = (int)ErrorCodeAPI.OK
+                    };
+                }
+                data.Status = Constants.NOTY_APPLYING;
+                data.UserAccpectId = _userIdentity.UserId;
+                if (await _unitOfWork.SaveChangesAsync() > 0)
+                {
+                    return new ResponseData<NotifyDetailResponseDto>
+                    {
+                        Success = true,
+                        Message = "Successfully update notify.",
+                        Data = null,
+                        Code = (int)ErrorCodeAPI.OK
+                    };
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResponseData<NotifyDetailResponseDto>
+                {
+                    Success = false,
+                    Message = ex.Message,
+                    Code = (int)ErrorCodeAPI.SystemIsError
+                };
+            }
+
+            return new ResponseData<NotifyDetailResponseDto>
+            {
+                Success = false,
+                Message = "Liên hệ admin check lại code #_#",
+                Code = (int)ErrorCodeAPI.SystemIsError
+            };
+        }
+
+        public async Task<ResponseData<NotifyDetailResponseDto>> RejectNotifyAsync(Guid id)
+        {
+            try
+            {
+                // Stage 1: Fetch data from the database
+                var data = _unitOfWork.NotifyRepository.GetById(id);
+                if (data == null)
+                {
+                    return new ResponseData<NotifyDetailResponseDto>
+                    {
+                        Success = false,
+                        Message = "Not found Noty.",
+                        Data = null,
+                        Code = (int)ErrorCodeAPI.OK
+                    };
+                }
+                data.Status = Constants.NOTY_REJECT;
+                if (await _unitOfWork.SaveChangesAsync() > 0)
+                {
+                    return new ResponseData<NotifyDetailResponseDto>
+                    {
+                        Success = true,
+                        Message = "Successfully update notify.",
+                        Data = null,
+                        Code = (int)ErrorCodeAPI.OK
+                    };
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResponseData<NotifyDetailResponseDto>
+                {
+                    Success = false,
+                    Message = ex.Message,
+                    Code = (int)ErrorCodeAPI.SystemIsError
+                };
+            }
+
+            return new ResponseData<NotifyDetailResponseDto>
+            {
+                Success = false,
+                Message = "Liên hệ admin check lại code #_#",
+                Code = (int)ErrorCodeAPI.SystemIsError
+            };
+        }
+
 
         public async Task<ResponseData<NotifyDetailResponseDto>> UpdateNotifyAsync(NotifyUpdateRequestDto requestDto)
         {
@@ -314,7 +409,10 @@ namespace TFU_Building_API.Service.impl
                 data.ApplyDate = requestDto.ApplyDate;
                 data.NotificationType = requestDto.NotificationType;
                 data.BuildingId = requestDto.BuildingId;
-                data.RoleId = requestDto.RoleId;
+                if(requestDto.RoleId != null || requestDto.RoleId != Guid.Empty)
+                {
+                    data.RoleId = null;
+                }
                 data.Title = requestDto.Title;
                 data.ShortContent = requestDto.ShortContent;
                 data.LongContent = requestDto.LongContent;
