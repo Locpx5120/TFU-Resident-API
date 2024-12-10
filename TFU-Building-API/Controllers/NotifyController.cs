@@ -71,9 +71,9 @@ namespace TFU_Building_API.Controllers
         }
 
         [HttpPost("reject-notify")]
-        public async Task<IActionResult> RejectNotify(Guid id)
+        public async Task<IActionResult> RejectNotify([FromBody] NotifyRejectRequestDto requestDto)
         {
-            var result = await _notifyService.RejectNotifyAsync(id);
+            var result = await _notifyService.RejectNotifyAsync(requestDto);
             return StatusCode(result.Code, result);
         }
     }

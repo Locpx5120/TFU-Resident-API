@@ -47,6 +47,7 @@ namespace TFU_Building_API.Core.Dapper.Noti
                 $"\r\n\t\t, n.ImgBaseId " +
                 $"\r\n\t\t, n.BuildingId " +
                 $"\r\n\t\t, n.ShortContent as ShortContent " +
+                $"\r\n\t\t, n.NoteReject " +
 
                 $"\r\n  FROM Notifies n " +
                 $"\r\n  join Buildings b on n.BuildingId = b.id " +
@@ -111,6 +112,7 @@ namespace TFU_Building_API.Core.Dapper.Noti
                 $"\r\n\t\t, n.BuildingId " +
                 $"\r\n\t\t, n.ShortContent as ShortContent " +
                 $"\r\n\t\t, n.LongContent  " +
+                $"\r\n\t\t, n.NoteReject  " +
 
                 $"\r\n  FROM Notifies n " +
                 $"\r\n  join Buildings b on n.BuildingId = b.id " +
@@ -151,6 +153,7 @@ namespace TFU_Building_API.Core.Dapper.Noti
                 $"\r\n\t\t, r.id as RoleId " +
                 $"\r\n\t\t, n.ShortContent  " +
                 $"\r\n\t\t, n.LongContent " +
+                $"\r\n\t\t, n.NoteReject " +
 
                 $"\r\n  FROM Notifies n " +
                 $"\r\n  join Buildings b on n.BuildingId = b.id " +

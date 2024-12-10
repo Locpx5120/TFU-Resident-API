@@ -155,6 +155,7 @@ namespace TFU_Building_API.Service.impl
                         ApprovedBy = item.ApprovedBy,
                         BuildingId = item.BuildingId,
                         ImgBaseId = item.ImgBaseId,
+                        NoteReject = item.NoteReject,
                     };
                     resultData.Add(notifyResponse);
                 }
@@ -212,6 +213,7 @@ namespace TFU_Building_API.Service.impl
                         BuildingId = item.BuildingId,
                         ImgBaseId = item.ImgBaseId,
                         LongContent = item.LongContent,
+                        NoteReject = item.NoteReject,
                     };
                     resultData.Add(notifyResponse);
                 }
@@ -279,7 +281,7 @@ namespace TFU_Building_API.Service.impl
                         Code = (int)ErrorCodeAPI.OK
                     };
                 }
-                data.Status = Constants.NOTY_APPLYING;
+                data.Status = Constants.NOTY_PENDING_APPLY;
                 data.UserAccpectId = _userIdentity.UserId;
                 if (await _unitOfWork.SaveChangesAsync() > 0)
                 {
@@ -310,12 +312,12 @@ namespace TFU_Building_API.Service.impl
             };
         }
 
-        public async Task<ResponseData<NotifyDetailResponseDto>> RejectNotifyAsync(Guid id)
+        public async Task<ResponseData<NotifyDetailResponseDto>> RejectNotifyAsync(NotifyRejectRequestDto rejectRequestDto)
         {
             try
             {
                 // Stage 1: Fetch data from the database
-                var data = _unitOfWork.NotifyRepository.GetById(id);
+                var data = _unitOfWork.NotifyRepository.GetById(rejectRequestDto.Id);
                 if (data == null)
                 {
                     return new ResponseData<NotifyDetailResponseDto>
@@ -327,6 +329,7 @@ namespace TFU_Building_API.Service.impl
                     };
                 }
                 data.Status = Constants.NOTY_REJECT;
+                data.NoteReject = rejectRequestDto.Note;
                 if (await _unitOfWork.SaveChangesAsync() > 0)
                 {
                     return new ResponseData<NotifyDetailResponseDto>

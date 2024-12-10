@@ -34,7 +34,7 @@
         public string ApprovedBy { get; set; }
         public Guid? BuildingId { get; set; }
         public Guid? ImgBaseId { get; set; }
-
+        public string? NoteReject { get; set; }
     }
 
 
@@ -47,6 +47,7 @@
         public string LongContent { get; set; }
         public DateTime? Date { get; set; }
         public string NotificationType { get; set; }
+        public string? NoteReject { get; set; }
         public string BuildingName { get; set; }
         public string RoleName { get; set; }
         public string Status { get; set; }
@@ -80,5 +81,11 @@
         public string LongContent { get; set; }
         public IFormFile? Image { get; set; } = null; // Ảnh được tải lên
         public string? Status { get; set; }
+    }
+
+    public class NotifyRejectRequestDto
+    {
+        public Guid Id { get; set; }
+        public string Note { get; set; }
     }
 }

@@ -13,6 +13,7 @@ public partial class Notify : MasterDataEntityBase
     [MaxLength(int.MaxValue)]
     public string LongContent { get; set; }
     public string Status { get; set; } //Trạng thái
+    public string? NoteReject { get; set; } = string.Empty; //Note từ chối
 
     public Guid BuildingId { get; set; }
     public virtual Building Building { get; set; }
