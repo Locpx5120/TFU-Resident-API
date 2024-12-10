@@ -27,7 +27,15 @@ namespace TFU_Building_API.Core.Dapper.Noti
         public async Task<IEnumerable<NotifyResponseDto>> GetNotifies(NotifyFilterRequestDto request)
         {
             DynamicParameters param = new DynamicParameters();
-            var query = $"SELECT  n.id," +
+            var query = $"" +
+                $"update Notifies \r\n" +
+                $"set Status = 'APPLYING'\r\n" +
+                $"where Status = 'PENDING_APPLY' and ApplyDate >= getdate() and GETDATE() < DATEADD(DAY, 10, ApplyDate);\r\n\r\n" +
+                $"update Notifies \r\n" +
+                $"set Status = 'EXPIRE'\r\n" +
+                $"where Status = 'APPLYING' AND GETDATE() >= DATEADD(DAY, 10, ApplyDate);" +
+                $"\r\n\t\t" +
+                $"SELECT  n.id," +
                 $" b.Name as BuildingName," +
                 $" n.NotificationType," +
                 $" n.Title," +
@@ -82,7 +90,15 @@ namespace TFU_Building_API.Core.Dapper.Noti
         public async Task<IEnumerable<NotifyResponseDto>> GetNotifiesByUser()
         {
             DynamicParameters param = new DynamicParameters();
-            var query = $"SELECT  n.id," +
+            var query = $"" +
+                $"update Notifies \r\n" +
+                $"set Status = 'APPLYING'\r\n" +
+                $"where Status = 'PENDING_APPLY' and ApplyDate >= getdate() and GETDATE() < DATEADD(DAY, 10, ApplyDate);\r\n\r\n" +
+                $"update Notifies \r\n" +
+                $"set Status = 'EXPIRE'\r\n" +
+                $"where Status = 'APPLYING' AND GETDATE() >= DATEADD(DAY, 10, ApplyDate);" +
+                $"" +
+                $"\r\n\t\tSELECT  n.id," +
                 $" b.Name as BuildingName," +
                 $" n.NotificationType," +
                 $" n.Title," +

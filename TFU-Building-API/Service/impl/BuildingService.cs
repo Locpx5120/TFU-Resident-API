@@ -133,7 +133,7 @@ namespace TFU_Building_API.Service.impl
                     {
                         Id = b.Id,
                         BuildingName = b.Name,
-                       
+
                     });
 
                 var buildings = await query.ToListAsync();
@@ -207,7 +207,5 @@ namespace TFU_Building_API.Service.impl
                 };
             }
         }
-
-
     }
 }

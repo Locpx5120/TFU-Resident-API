@@ -359,8 +359,6 @@ namespace TFU_Building_API.Service.impl
 
         public async Task<ResponseData<NotifyDetailResponseDto>> UpdateNotifyAsync(NotifyUpdateRequestDto requestDto)
         {
-
-
             try
             {
                 // Stage 1: Fetch data from the database
@@ -409,7 +407,7 @@ namespace TFU_Building_API.Service.impl
                 data.ApplyDate = requestDto.ApplyDate;
                 data.NotificationType = requestDto.NotificationType;
                 data.BuildingId = requestDto.BuildingId;
-                if(requestDto.RoleId != null || requestDto.RoleId != Guid.Empty)
+                if (requestDto.RoleId != null || requestDto.RoleId != Guid.Empty)
                 {
                     data.RoleId = null;
                 }
