@@ -29,5 +29,15 @@
         public const string NOTY_REJECT = "REJECT";
         public const string NOTY_DRAFT = "DRAFT";
         public const string NOTY_EXPIRE = "EXPIRE";
+
+        // thể loại tiền đầu vào
+        public const string TRANS_SERVICE_INVOICE_ALL = "TRSCINA"; // Thanh toán dịch vụ phòng theo căn hộ danh sách id voince
+
+
+
+        // trạng thái giao dịch
+        public const string TRANS_STATUS_LOG_INIT = "LOG_INIT";
+        public const string TRANS_STATUS_LOG_DONE = "LOG_DONE";
+        public const string TRANS_STATUS_LOG_REJECT = "LOG_REJECT";
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Newtonsoft.Json;
 using System.Text;
 using System.Text.Json;
 
@@ -48,7 +49,19 @@ namespace fake_tool.Helpers
                 IncludeFields = true, // Bao gồm các trường (fields) trong serialization
             };
 
-            return JsonSerializer.Serialize(obj, options);
+            return System.Text.Json.JsonSerializer.Serialize(obj, options);
+        }
+
+        // Chuyển đối tượng thành chuỗi JSON
+        public static string ConvertObjectToJson(object obj)
+        {
+            return JsonConvert.SerializeObject(obj);
+        }
+
+        // Chuyển chuỗi JSON thành đối tượng
+        public static T ConvertJsonToObject<T>(string jsonString)
+        {
+            return JsonConvert.DeserializeObject<T>(jsonString);
         }
 
         public static string GeneratePassword(int length = 12, bool useUppercase = true, bool useNumbers = true, bool useSpecialChars = true)

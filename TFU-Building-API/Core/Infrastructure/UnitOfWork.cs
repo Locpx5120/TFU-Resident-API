@@ -167,6 +167,9 @@ namespace TFU_Building_API.Core.Infrastructure
             get { return _assigmentRepository ??= new MasterDataRepository<Assigment>(_context, _currentUser); }
         }
 
+        private IMasterDataRepository<Transaction> _transactionRepository;
+        public IMasterDataRepository<Transaction> TransactionRepository => _transactionRepository ??= new MasterDataRepository<Transaction>(_context, _currentUser);
+
         public async Task<int> SaveChangesAsync()
         {
             if (_currentUser != null)

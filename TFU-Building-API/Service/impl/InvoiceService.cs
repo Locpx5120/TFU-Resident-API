@@ -3,13 +3,13 @@ using Core.Enums;
 using Core.Model;
 using Microsoft.EntityFrameworkCore;
 using QRCoder;
-using System.Linq;
 using TFU_Building_API.Core.Handler;
 using TFU_Building_API.Core.Helper;
 using TFU_Building_API.Core.Infrastructure;
 using TFU_Building_API.Dto;
+using TFU_Building_API.Service;
 
-namespace TFU_Building_API.Service.impl
+namespace TFU_Building_API.Services.impl
 {
     public class InvoiceService : BaseHandler, IInvoiceService
     {
@@ -204,7 +204,7 @@ namespace TFU_Building_API.Service.impl
                     decimal baseUnitPrice = serviceContract.Service.UnitPrice;
                     decimal discount = serviceContract.PackageService?.Discount ?? 0;
 
-                    decimal totalAmount;
+                    decimal totalAmount = 0;
 
                     if (serviceContract.Service.Unit == "m2" && serviceContract.Apartment != null && serviceContract.Apartment.ApartmentType != null)
                     {
@@ -214,13 +214,18 @@ namespace TFU_Building_API.Service.impl
                         // Tính giá dịch vụ phòng mặc định
                         totalAmount = baseUnitPrice * months;
                     }
-                    else
+                    else if (serviceContract.Service.Unit.Equals("VNĐ/day"))
                     {
                         int days = (serviceContract.EndDate.Value - serviceContract.StartDate.Value).Days;
 
                         // Tính giá cơ bản cho mỗi ngày và áp dụng chiết khấu
                         decimal amountPerDay = baseUnitPrice * (serviceContract.Quantity ?? 0) * (1 - discount / 100);
                         totalAmount = amountPerDay * days;
+                    }
+                    else
+                    {
+                        totalAmount = serviceContract.Service.UnitPrice;
+                        //Service
                     }
 
                     var invoice = new Invoice

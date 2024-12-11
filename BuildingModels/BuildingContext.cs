@@ -28,6 +28,7 @@ public partial class BuildingContext : DbContext
     // update-database -Context BuildingContext
 
     public virtual DbSet<Apartment> Apartments { get; set; }
+    public virtual DbSet<Transaction> Transactions { get; set; }
     public virtual DbSet<ApartmentType> ApartmentTypes { get; set; }
 
     public virtual DbSet<Assigment> Assigments { get; set; }

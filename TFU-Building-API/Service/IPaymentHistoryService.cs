@@ -5,6 +5,9 @@ namespace TFU_Building_API.Service
 {
     public interface IPaymentHistoryService
     {
-        public Task<ResponseData<PaymentHistoryResponseDto>> CheckPayment(string type, Guid id);
+        public Task<ResponseData<TransactionQRResponseDto>> GetQR(TransactionQRRequestDto transaction);
+        public Task<ResponseData<PaymentHistoryResponseDto>> CheckPayment(PaymentHistoryRequestDto paymentHistoryRequest);
+        public Task<ResponseData<TransactionResponseDto>> GetTransactions(TransactionRequestDto transaction);
+
     }
 }
