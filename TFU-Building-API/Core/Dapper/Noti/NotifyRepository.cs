@@ -123,9 +123,9 @@ namespace TFU_Building_API.Core.Dapper.Noti
                 $"\r\n  left join Staff saUpdate on saUpdate.Id = n.UserAccpectId";
 
             #region Where
-            query += $"\r\n\tWhere r.Name is null or r.Name_En = @name_En";
+            query += $"\r\n\tWhere n.Status = 'APPLYING' AND  r.Name is null or r.Name_En = @name_En";
             param.Add("@name_En", "" + _userIdentity.RoleName + "");
-            query += $"\r\n\t AND n.Status = 'APPLYING'";
+            query += $"\r\n\t  ";
             #endregion
 
             #region Order by
