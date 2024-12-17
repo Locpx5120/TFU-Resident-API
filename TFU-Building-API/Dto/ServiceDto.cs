@@ -104,6 +104,8 @@ namespace TFU_Building_API.Dto
     {
         public Guid Id { get; set; }
         public string ServiceName { get; set; }
+        public decimal UnitPrice { get; set; }
+        public string Unit { get; set; }
     }
 
     public class ServiceResponseDto

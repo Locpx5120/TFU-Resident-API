@@ -24,7 +24,10 @@ namespace TFU_Building_API.Service.impl
                     .Select(s => new ServiceDto
                     {
                         Id = s.Id,
-                        ServiceName = s.ServiceName
+                        ServiceName = s.ServiceName,
+                        UnitPrice = s.UnitPrice,
+                        Unit = s.Unit,
+
                     })
                     .ToListAsync();
 

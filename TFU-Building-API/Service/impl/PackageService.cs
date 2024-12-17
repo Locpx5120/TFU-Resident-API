@@ -24,7 +24,9 @@ namespace TFU_Building_API.Service.impl
                     .Select(ps => new PackageServiceBasicDto
                     {
                         Id = ps.Id,
-                        Name = ps.Name
+                        Name = ps.Name,
+                        Discount = ps.Discount,
+                        DurationInMonth = ps.DurationInMonth
                     })
                     .ToListAsync();
 

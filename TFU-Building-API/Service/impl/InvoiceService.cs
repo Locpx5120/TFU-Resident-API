@@ -222,11 +222,22 @@ namespace TFU_Building_API.Services.impl
                         decimal amountPerDay = baseUnitPrice * (serviceContract.Quantity ?? 0) * (1 - discount / 100);
                         totalAmount = amountPerDay * days;
                     }
-                    else
+                    else if (serviceContract.Service.Unit.Equals("VNĐ"))
                     {
-                        totalAmount = serviceContract.Service.UnitPrice;
-
                         //Service
+                        totalAmount = serviceContract.Service.UnitPrice;
+                        Assigment assigment = _unitOfWork.AssigmentRepository.GetById(serviceContract.Id);
+                        if (assigment != null)
+                        {
+                            try
+                            {
+                                totalAmount += decimal.Parse(assigment.ServicePrice.ToString());
+                            }
+                            catch (Exception)
+                            {
+
+                            }
+                        }
                     }
 
                     var invoice = new Invoice
