@@ -47,10 +47,20 @@
     public class TransactionResponseDto
     {
         public List<TransactionHistoryResponseDto>? TransactionHistories { get; set; } = new List<TransactionHistoryResponseDto>();
+        public List<TransactionTransferResponseDto>? TransactionTransferResponseDtos { get; set; } = new List<TransactionTransferResponseDto>();
         public decimal? Total { get; set; } = 0; // Tổng tiền
         public decimal? Pay { get; set; } = 0; // Thu
         public decimal? Transfer { get; set; } = 0; // Chi
     }
+
+    public class TransactionTransferResponseDto
+    {
+        public Guid Id { get; set; }
+        public string NameService { get; set; }
+        public string Type { get; set; } // Thể loại giao dịch
+        public decimal? Price { get; set; } // số tiền
+    }
+
     public class TransactionRequestDto
     {
         public DateTime? To { get; set; } = null;

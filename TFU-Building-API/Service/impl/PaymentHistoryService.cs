@@ -20,7 +20,7 @@ namespace TFU_Building_API.Service.impl
         private string NoiDung = "Thanh toan don han";
         private string AccountName = "Hoang Tuan Kiet";
         private string URL = "https://oauth.casso.vn/v2/transactions"; // Thay bằng URL thật
-        private string APIKEY = "AK_CS.f5b8bUewYuYzaA8TGwIyzNBVD1uZvrEz8PqdFas6hPzOC7rHERe7Pm7lygLJJckog0R4IWH"; // token
+        private string APIKEY = "AK_CS.d4dc5220bca111ef9cf3ed0b3d7702f1.nXNV5gMErrUT9p9fYcN4ird73TZBzOVpcZKVIs9bXaKhDgLwkKYMlefzsH8HIIl0TtNXtAC5"; // token
 
         private readonly IUnitOfWork _unitOfWork;
         private readonly IUserIdentity _userIdentity;
@@ -53,17 +53,17 @@ namespace TFU_Building_API.Service.impl
                             Code = (int)ErrorCodeAPI.InternalError
                         };
                     }
-                    //bool check = await CheckBank(content, (decimal)transaction.Price);
-                    //if (!check)
-                    //{
-                    //    return new ResponseData<PaymentHistoryResponseDto>
-                    //    {
-                    //        Success = false,
-                    //        Message = "Khong tim thay thanh toan nay",
-                    //        Data = new PaymentHistoryResponseDto { Result = false },
-                    //        Code = (int)ErrorCodeAPI.OK
-                    //    };
-                    //}
+                    bool check = await CheckBank(content, (decimal)transaction.Price);
+                    if (!check)
+                    {
+                        return new ResponseData<PaymentHistoryResponseDto>
+                        {
+                            Success = false,
+                            Message = "Khong tim thay thanh toan nay",
+                            Data = new PaymentHistoryResponseDto { Result = false },
+                            Code = (int)ErrorCodeAPI.OK
+                        };
+                    }
                     transaction.Status = Constants.TRANS_STATUS_LOG_DONE;
                     List<RequestBodyItem> items = Utill.ConvertJsonToObject<List<RequestBodyItem>>(transaction.RequestBody);
                     List<Guid> ids = items.Select(item => item.Id).ToList();
@@ -124,7 +124,7 @@ namespace TFU_Building_API.Service.impl
                         string description = recordJson.Value<string>("description");
 
                         // Kiểm tra mô tả và giá trị
-                        if (!string.IsNullOrEmpty(description) && noiDung.Length > 25)
+                        if (!string.IsNullOrEmpty(description) && noiDung.Length > 15)
                         {
                             if (description.ToLower().Contains(noiDung.ToLower()) && price == amount)
                             {
@@ -153,6 +153,7 @@ namespace TFU_Building_API.Service.impl
                 //&& !x.Status.Equals(Constants.TRANS_STATUS_LOG_INIT)
                 && x.Status.Equals(Constants.TRANS_STATUS_LOG_DONE)
                 ).ToListAsync();
+                List<Guid> thirdPartiesId = _unitOfWork.ThirdPartyRepository.GetQuery(x => x.IsDeleted == false && x.IsTenant == false).Select(x => x.Id).ToList();
 
                 if (transactionRequest.To != null)
                 {
@@ -160,9 +161,42 @@ namespace TFU_Building_API.Service.impl
                 }
                 if (transactionRequest.From != null)
                 {
-                    query = query.Where(x => x.InsertedAt >= transactionRequest.To).ToList();
+                    query = query.Where(x => x.InsertedAt >= transactionRequest.From).ToList();
                 }
 
+
+                if (thirdPartiesId != null && thirdPartiesId.Count > 0)
+                {
+                    List<ThirdPartyContact> thirdPartyContacts = _unitOfWork.ThirdPartyContractRepository
+                        .GetQuery(x => x.IsDeleted == false && x.ThirdPartyId != null && thirdPartiesId.Contains((Guid)x.ThirdPartyId)).ToList();
+
+                    if (transactionRequest.To != null)
+                    {
+                        thirdPartyContacts = thirdPartyContacts.Where(x => x.EndDate <= transactionRequest.To).ToList();
+                    }
+                    if (transactionRequest.From != null)
+                    {
+                        thirdPartyContacts = thirdPartyContacts.Where(x => x.StartDate >= transactionRequest.From).ToList();
+                    }
+
+                    if (thirdPartyContacts != null && thirdPartyContacts.Count > 0)
+                    {
+                        List<TransactionTransferResponseDto> transactionTransfers = new List<TransactionTransferResponseDto>();
+                        foreach (var item in thirdPartyContacts)
+                        {
+                            transactionResponseDto.Transfer += item.Price;
+                            var transactionTransfer = new TransactionTransferResponseDto
+                            {
+                                Id = item.Id,
+                                NameService = item.NameService,
+                                Price = item.Price,
+                                Type = "HopDong",
+                            };
+                            transactionTransfers.Add(transactionTransfer);
+                        }
+                        transactionResponseDto.TransactionTransferResponseDtos = transactionTransfers;
+                    }
+                }
                 // Stage 3: In-memory transformations
                 var resultData = new List<TransactionHistoryResponseDto>();
                 foreach (var item in query.ToList())
@@ -179,7 +213,6 @@ namespace TFU_Building_API.Service.impl
                     };
                     resultData.Add(transaction);
                     transactionResponseDto.Pay += transaction.Price;
-
                 }
                 transactionResponseDto.Total = transactionResponseDto.Pay + transactionResponseDto.Transfer;
                 transactionResponseDto.TransactionHistories = resultData;
