@@ -15,5 +15,6 @@ namespace BuildingModels
         [MaxLength(int.MaxValue)]
         public string RequestBody { get; set; } // nội dung json
         public string Status { get; set; }
+
     }
 }

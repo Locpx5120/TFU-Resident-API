@@ -178,5 +178,38 @@ namespace fake_tool.Helpers
                 return Convert.ToBase64String(imageBytes);
             }
         }
+
+        // Helper method to calculate TotalPrice
+        public static decimal CalculateTotalPrice(decimal unitPrice, DateTime startDate, DateTime endDate, decimal discount, string unit, decimal landArea, int? quantity)
+        {
+            if (unit == "m2")
+            {
+                // Tính số tháng giữa StartDate và EndDate
+                int months = ((endDate.Year - startDate.Year) * 12) + endDate.Month - startDate.Month + 1;
+
+                // Tính giá dựa trên số tháng và diện tích LandArea
+                //decimal baseAmount = unitPrice * landArea * months;
+
+                // Tính giá dựa trên số tháng
+                decimal baseAmount = unitPrice * months;
+
+
+
+                // Áp dụng chiết khấu cho từng đơn vị
+                //return baseAmount * (1 - discount / 100);
+                return baseAmount;
+            }
+            else
+            {
+                // Tính số ngày giữa StartDate và EndDate
+                int days = (endDate - startDate).Days;
+
+                // Tính giá cơ bản cho từng đơn vị dựa trên Quantity và số ngày
+                decimal baseAmount = unitPrice * (quantity ?? 0) * days;
+
+                // Áp dụng chiết khấu cho từng đơn vị
+                return baseAmount * (1 - discount / 100);
+            }
+        }
     }
 }

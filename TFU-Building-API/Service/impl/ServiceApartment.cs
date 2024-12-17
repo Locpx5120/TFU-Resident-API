@@ -1,5 +1,6 @@
 ﻿using Core.Enums;
 using Core.Model;
+using fake_tool.Helpers;
 using Microsoft.EntityFrameworkCore;
 using TFU_Building_API.Core.Helper;
 using TFU_Building_API.Core.Infrastructure;
@@ -324,7 +325,7 @@ namespace TFU_Building_API.Service.impl
                 var data = result
                     .Select(item =>
                     {
-                        var totalPrice = CalculateTotalPrice(item.UnitPrice, item.StartDate, item.EndDate, item.Discount, item.Unit, item.LandArea, item.Quantity);
+                        var totalPrice = Utill.CalculateTotalPrice(item.UnitPrice, item.StartDate, item.EndDate, item.Discount, item.Unit, item.LandArea, item.Quantity);
                         return new ServiceDetailDto
                         {
                             ServiceName = item.ServiceName,
@@ -360,38 +361,7 @@ namespace TFU_Building_API.Service.impl
 
 
 
-        // Helper method to calculate TotalPrice
-        private static decimal CalculateTotalPrice(decimal unitPrice, DateTime startDate, DateTime endDate, decimal discount, string unit, decimal landArea, int? quantity)
-        {
-            if (unit == "m2")
-            {
-                // Tính số tháng giữa StartDate và EndDate
-                int months = ((endDate.Year - startDate.Year) * 12) + endDate.Month - startDate.Month + 1;
 
-                // Tính giá dựa trên số tháng và diện tích LandArea
-                //decimal baseAmount = unitPrice * landArea * months;
-
-                // Tính giá dựa trên số tháng
-                decimal baseAmount = unitPrice * months;
-
-
-
-                // Áp dụng chiết khấu cho từng đơn vị
-                //return baseAmount * (1 - discount / 100);
-                return baseAmount;
-            }
-            else
-            {
-                // Tính số ngày giữa StartDate và EndDate
-                int days = (endDate - startDate).Days;
-
-                // Tính giá cơ bản cho từng đơn vị dựa trên Quantity và số ngày
-                decimal baseAmount = unitPrice * (quantity ?? 0) * days;
-
-                // Áp dụng chiết khấu cho từng đơn vị
-                return baseAmount * (1 - discount / 100);
-            }
-        }
 
 
 
@@ -781,7 +751,7 @@ namespace TFU_Building_API.Service.impl
                     Description = item.Description,
                     QuantityOrArea = item.QuantityOrArea,
                     UnitPrice = item.UnitPrice,
-                    TotalPrice = CalculateTotalPrice(item.UnitPrice, item.StartDate, item.EndDate, item.Discount, item.Unit, item.LandArea, item.Quantity),
+                    TotalPrice = Utill.CalculateTotalPrice(item.UnitPrice, item.StartDate, item.EndDate, item.Discount, item.Unit, item.LandArea, item.Quantity),
                     PaymentStatus = item.PaidStatus ? "Đã thanh toán" : "Chưa thanh toán",
                     PaymentDate = item.PaidStatus ? item.PaymentDate : null // Lấy PaymentDate nếu đã thanh toán
                 }).ToList();

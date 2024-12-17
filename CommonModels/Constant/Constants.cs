@@ -36,8 +36,8 @@
 
 
         // trạng thái giao dịch
-        public const string TRANS_STATUS_LOG_INIT = "LOG_INIT";
-        public const string TRANS_STATUS_LOG_DONE = "LOG_DONE";
-        public const string TRANS_STATUS_LOG_REJECT = "LOG_REJECT";
+        public const string TRANS_STATUS_LOG_INIT = "LOG_TRANS_INIT";
+        public const string TRANS_STATUS_LOG_DONE = "LOG_TRANS_DONE";
+        public const string TRANS_STATUS_LOG_REJECT = "LOG_TRANS_REJECT";
     }
 }

@@ -8,6 +8,7 @@ namespace TFU_Building_API.Service
         public Task<ResponseData<TransactionQRResponseDto>> GetQR(TransactionQRRequestDto transaction);
         public Task<ResponseData<PaymentHistoryResponseDto>> CheckPayment(PaymentHistoryRequestDto paymentHistoryRequest);
         public Task<ResponseData<TransactionResponseDto>> GetTransactions(TransactionRequestDto transaction);
+        public Task<ResponseData<UnpaidServiceDetailResponseDto>> GetTransactionsDetail(Guid id);
 
     }
 }

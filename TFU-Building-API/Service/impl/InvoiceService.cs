@@ -225,6 +225,7 @@ namespace TFU_Building_API.Services.impl
                     else
                     {
                         totalAmount = serviceContract.Service.UnitPrice;
+
                         //Service
                     }
 
