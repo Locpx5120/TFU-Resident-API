@@ -732,7 +732,9 @@ namespace TFU_Building_API.Service.impl
                                 StartDate = sc.StartDate ?? DateTime.Now,
                                 EndDate = sc.EndDate ?? DateTime.Now,
                                 PaidStatus = inv.PaidStatus,
-                                PaymentDate = inv.UpdatedAt
+                                PaymentDate = inv.UpdatedAt,
+                                TotalPrice = inv.TotalAmount,
+                                UpdateAt = inv.UpdatedAt,
                             };
 
                 // Áp dụng bộ lọc theo loại dịch vụ nếu có
@@ -751,15 +753,15 @@ namespace TFU_Building_API.Service.impl
                     Description = item.Description,
                     QuantityOrArea = item.QuantityOrArea,
                     UnitPrice = item.UnitPrice,
-                    TotalPrice = Utill.CalculateTotalPrice(item.UnitPrice, item.StartDate, item.EndDate, item.Discount, item.Unit, item.LandArea, item.Quantity),
+                    TotalPrice = item.TotalPrice,
                     PaymentStatus = item.PaidStatus ? "Đã thanh toán" : "Chưa thanh toán",
                     PaymentDate = item.PaidStatus ? item.PaymentDate : null // Lấy PaymentDate nếu đã thanh toán
+
                 }).ToList();
 
                 // Sắp xếp để dịch vụ mặc định ("Dịch vụ phòng") lên đầu
                 services = services
-                    .OrderByDescending(s => s.ServiceName == "Dịch vụ phòng") // Đưa "Dịch vụ phòng" lên đầu
-                    .ThenBy(s => s.ServiceName) // Sắp xếp các dịch vụ còn lại theo tên (tùy chọn)
+                    .OrderByDescending(s => s.UpdateAt) // Đưa "Dịch vụ phòng" lên đầu
                     .ToList();
 
                 // Tính tổng giá của tất cả dịch vụ

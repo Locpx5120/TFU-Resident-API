@@ -82,6 +82,7 @@ namespace TFU_Building_API.Dto
         public decimal TotalPrice { get; set; }     // Tổng tiền
         public string PaymentStatus { get; set; }
         public DateTime? PaymentDate { get; set; }
+        public DateTime? UpdateAt { get; set; }
     }
 
     public class UnpaidServiceDetailResponseDto
