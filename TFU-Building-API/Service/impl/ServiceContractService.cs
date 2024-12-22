@@ -402,7 +402,8 @@ namespace TFU_Building_API.Service.impl
                                                StartDate = sc.StartDate ?? DateTime.Now,
                                                EndDate = sc.EndDate ?? DateTime.Now,
                                                Note = sc.Note,
-                                               Status = sc.Status
+                                               Status = sc.Status,
+                                               ServicePrice = s.UnitPrice
                                            }).FirstOrDefaultAsync();
 
                 if (serviceDetail == null)
@@ -457,8 +458,8 @@ namespace TFU_Building_API.Service.impl
                 // Update the service contract status and note
                 serviceContract.Status = request.Status;
                 serviceContract.Note = request.Note;
-                serviceContract.UpdatedAt = DateTime.Now;
-                serviceContract.StartDate = DateTime.Now;
+                //serviceContract.UpdatedAt = DateTime.Now;
+                //serviceContract.StartDate = DateTime.Now;
 
                 // If Status = 1, determine which field to update
                 if (request.Status == ServiceContractStatus.Approved)

@@ -50,6 +50,7 @@
         public DateTime EndDate { get; set; }
         public string Note { get; set; }
         public int? Status { get; set; }
+        public decimal? ServicePrice { get; set; }
     }
 
     public class UpdateVehicleServiceRequestDto

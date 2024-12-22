@@ -36,10 +36,23 @@
 
     public class TransactionHistoryResponseDto
     {
-        public Guid Id { get; set; }
+        public string Service { get; set; } // dich vu
+        public string SentUser { get; set; } // nguoi gui
+        public string ReciveUser { get; set; } // nguoi nhan
+        public string Status { get; set; } // dich vu
+        public decimal Amount { get; set; } // dich vu
+        public DateTime CreateAt { get; set; } // 
+        public int ApartmentFloorNumber { get; set; } // phong
+        public int ApartmentRoomNumber { get; set; } // phong
+        public string BuildingName { get; set; } // toa nha
+        public Guid BuildingId { get; set; } // toa nha
+        public Guid ApartmentId { get; set; } // toa nha
+
+        public Guid ServiceId { get; set; }
+        //public Guid Id { get; set; }
         public string Type { get; set; } // Thể loại giao dịch
         public Guid? TransactionMapId { get; set; } // id của giao dịch 
-        public decimal? Price { get; set; } // số tiền
+        //public decimal? Price { get; set; } // số tiền
         public string Content { get; set; } // Nội dung giao dịch
         public string Bank { get; set; } // ngân hàng
         public string AccountNumber { get; set; } // tài khoản nhận tiền
@@ -59,12 +72,19 @@
         public string NameService { get; set; }
         public string Type { get; set; } // Thể loại giao dịch
         public decimal? Price { get; set; } // số tiền
+        public int ApartmentFloorNumber { get; set; } // phong
+        public int ApartmentRoomNumber { get; set; } // phong
+        public string BuildingName { get; set; } // toa nha
+        public Guid BuildingId { get; set; } // toa nha
+        public Guid ApartmentId { get; set; } // toa nha
     }
 
     public class TransactionRequestDto
     {
         public DateTime? To { get; set; } = null;
         public DateTime? From { get; set; } = null;
+        public Guid? BuildingId { get; set; } = null;// toa nha
+        public Guid? ApartmentId { get; set; } = null;// toa nha
     }
 
 }

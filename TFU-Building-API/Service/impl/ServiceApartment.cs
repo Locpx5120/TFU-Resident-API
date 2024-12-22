@@ -733,7 +733,7 @@ namespace TFU_Building_API.Service.impl
                                 EndDate = sc.EndDate ?? DateTime.Now,
                                 PaidStatus = inv.PaidStatus,
                                 PaymentDate = inv.UpdatedAt,
-                                TotalPrice = inv.TotalAmount,
+                                TotalPrice = inv.TotalAmount < s.UnitPrice ? s.UnitPrice : inv.TotalAmount,
                                 UpdateAt = inv.UpdatedAt,
                             };
 

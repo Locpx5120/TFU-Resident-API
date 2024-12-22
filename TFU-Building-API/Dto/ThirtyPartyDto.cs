@@ -143,6 +143,7 @@
         public DateTime StartDate { get; set; } // Start date of the contract
         public DateTime EndDate { get; set; } // End date of the contract
         public decimal Price { get; set; } // Price for the service
+        public Guid BuildId { get; set; } // Thong tin toa nha
     }
 
     public class AddThirdPartyContractHireResponseDto

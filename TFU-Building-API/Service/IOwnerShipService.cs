@@ -10,6 +10,7 @@ namespace TFU_Building_API.Service
         Task<ResponseData<OwnerShipResponseDto>> DeleteOwnerShip(Guid ownerShipId);
         Task<ResponseData<PaginatedResponseDto<OwnerShipListResponseDto>>> GetOwnerShips(OwnerShipSearchRequestDto request);
         Task<ResponseData<OwnershipInfoResponseDto>> GetOwnershipById(Guid ownershipId);
+        Task<ResponseData<List<ApartmentMemberDetailDto>>> GetUserByOwnerShipId(Guid ownershipId);
     }
 
 }

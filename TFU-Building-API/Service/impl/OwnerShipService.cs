@@ -1,11 +1,9 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using BuildingModels;
 using Core.Enums;
 using Core.Model;
 using Microsoft.EntityFrameworkCore;
-using TFU_Building_API.Dto;
 using TFU_Building_API.Core.Infrastructure;
-using BuildingModels;
+using TFU_Building_API.Dto;
 
 namespace TFU_Building_API.Service.impl
 {
@@ -221,6 +219,7 @@ namespace TFU_Building_API.Service.impl
             try
             {
                 // Lấy danh sách ownership kết hợp với bảng User và Apartment
+
                 var ownerShipQuery = from ownership in _unitOfWork.OwnerShipRepository.GetQuery(x => x.IsDeleted == false)
                                      join user in _unitOfWork.ResidentRepository.GetQuery(u => u.IsDeleted == false)
                                         on ownership.ResidentId equals user.Id
@@ -353,5 +352,96 @@ namespace TFU_Building_API.Service.impl
             }
         }
 
+        public async Task<ResponseData<List<ApartmentMemberDetailDto>>> GetUserByOwnerShipId(Guid ownershipId)
+        {
+            try
+            {
+                // Tìm Ownership dựa trên Id
+                var ownership = await _unitOfWork.OwnerShipRepository.GetQuery(x => x.Id == ownershipId && x.IsDeleted == false)
+                .FirstOrDefaultAsync();
+
+                if (ownership == null)
+                {
+                    // Nếu không tìm thấy Ownership, trả về thông báo lỗi
+                    return new ResponseData<List<ApartmentMemberDetailDto>>
+                    {
+                        Success = false,
+                        Message = "Ownership not found.",
+                        Code = (int)ErrorCodeAPI.NotFound
+                    };
+                }
+
+                // Lấy thông tin từ bảng User dựa trên UserId
+                var user = await _unitOfWork.ResidentRepository.GetQuery(u => u.Id == ownership.ResidentId && u.IsDeleted == false)
+                    .FirstOrDefaultAsync();
+
+                if (user == null)
+                {
+                    return new ResponseData<List<ApartmentMemberDetailDto>>
+                    {
+                        Success = false,
+                        Message = "User associated with ownership not found.",
+                        Code = (int)ErrorCodeAPI.UserNotFound
+                    };
+                }
+
+                // Lấy thông tin từ bảng Apartment dựa trên ApartmentId
+                var apartment = await _unitOfWork.ApartmentRepository.GetQuery(a => a.Id == ownership.ApartmentId && a.IsDeleted == false)
+                    .FirstOrDefaultAsync();
+
+                if (apartment == null)
+                {
+                    return new ResponseData<List<ApartmentMemberDetailDto>>
+                    {
+                        Success = false,
+                        Message = "Apartment associated with ownership not found.",
+                        Code = (int)ErrorCodeAPI.NotFound
+                    };
+                }
+
+                // Retrieve members from Livings table excluding the owner
+                var membersQuery = _unitOfWork.LivingRepository.GetQuery(l => l.ApartmentId == apartment.Id && l.IsDeleted == false && l.ResidentId != user.Id);
+
+                // Ensure compatibility for Include
+                var membersWithIncludes = membersQuery as IQueryable<BuildingModels.Living>;
+
+                // Add Include for Resident
+                membersWithIncludes = membersWithIncludes.Include(l => l.Resident);
+
+
+                var members = await membersWithIncludes.ToListAsync();
+
+                // Prepare the response
+                var response = new List<ApartmentMemberDetailDto>();
+
+
+                response.AddRange(members.Select((l, index) => new ApartmentMemberDetailDto
+                {
+                    Id = l.ResidentId,
+                    STT = index + 1,
+                    MemberName = l.Resident.Name,
+                    Role = "Thành viên",
+                    Email = l.Resident.Email,
+                    PhoneNumber = l.Resident.Phone
+                }));
+
+                return new ResponseData<List<ApartmentMemberDetailDto>>
+                {
+                    Success = true,
+                    Message = "Apartment member details retrieved successfully.",
+                    Data = response,
+                    Code = (int)ErrorCodeAPI.OK
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResponseData<List<ApartmentMemberDetailDto>>
+                {
+                    Success = false,
+                    Message = ex.Message,
+                    Code = (int)ErrorCodeAPI.SystemIsError
+                };
+            }
+        }
     }
 }

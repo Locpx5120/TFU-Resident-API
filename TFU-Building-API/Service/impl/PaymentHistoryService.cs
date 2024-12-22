@@ -21,7 +21,7 @@ namespace TFU_Building_API.Service.impl
         private string AccountName = "Hoang Tuan Kiet";
         private string URL = "https://oauth.casso.vn/v2/transactions"; // Thay bằng URL thật
         private string APIKEY = "AK_CS.d4dc5220bca111ef9cf3ed0b3d7702f1.nXNV5gMErrUT9p9fYcN4ird73TZBzOVpcZKVIs9bXaKhDgLwkKYMlefzsH8HIIl0TtNXtAC5"; // token
-
+        private BuildingModels.Service Service;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IUserIdentity _userIdentity;
 
@@ -148,6 +148,7 @@ namespace TFU_Building_API.Service.impl
             try
             {
                 TransactionResponseDto transactionResponseDto = new TransactionResponseDto();
+                var resultData = new List<TransactionHistoryResponseDto>();
                 // Stage 1: Fetch data from the database
                 var query = await _unitOfWork.TransactionRepository.GetQuery(x => x.IsDeleted == false
                 //&& !x.Status.Equals(Constants.TRANS_STATUS_LOG_INIT)
@@ -163,56 +164,168 @@ namespace TFU_Building_API.Service.impl
                 {
                     query = query.Where(x => x.InsertedAt >= transactionRequest.From).ToList();
                 }
-
-
-                if (thirdPartiesId != null && thirdPartiesId.Count > 0)
+                if (_userIdentity.RoleName.Equals(Constants.ROLE_BEN_THU_BA) || _userIdentity.RoleName.Equals(Constants.ROLE_KE_TOAN))
                 {
                     List<ThirdPartyContact> thirdPartyContacts = _unitOfWork.ThirdPartyContractRepository
-                        .GetQuery(x => x.IsDeleted == false && x.ThirdPartyId != null && thirdPartiesId.Contains((Guid)x.ThirdPartyId)).ToList();
+                        .GetQuery(x => x.IsDeleted == false && x.ThirdPartyId != null).ToList();
 
-                    if (transactionRequest.To != null)
+                    if (thirdPartiesId != null && thirdPartiesId.Count > 0)
                     {
-                        thirdPartyContacts = thirdPartyContacts.Where(x => x.EndDate <= transactionRequest.To).ToList();
-                    }
-                    if (transactionRequest.From != null)
-                    {
-                        thirdPartyContacts = thirdPartyContacts.Where(x => x.StartDate >= transactionRequest.From).ToList();
-                    }
-
-                    if (thirdPartyContacts != null && thirdPartyContacts.Count > 0)
-                    {
-                        List<TransactionTransferResponseDto> transactionTransfers = new List<TransactionTransferResponseDto>();
-                        foreach (var item in thirdPartyContacts)
+                        if (transactionRequest.To != null)
                         {
-                            transactionResponseDto.Transfer += item.Price;
-                            var transactionTransfer = new TransactionTransferResponseDto
-                            {
-                                Id = item.Id,
-                                NameService = item.NameService,
-                                Price = item.Price,
-                                Type = "HopDong",
-                            };
-                            transactionTransfers.Add(transactionTransfer);
+                            thirdPartyContacts = thirdPartyContacts.Where(x => x.EndDate <= transactionRequest.To).ToList();
                         }
-                        transactionResponseDto.TransactionTransferResponseDtos = transactionTransfers;
+                        if (transactionRequest.From != null)
+                        {
+                            thirdPartyContacts = thirdPartyContacts.Where(x => x.StartDate >= transactionRequest.From).ToList();
+                        }
+                        List<ThirdPartyContact> thirdPartyContactsIsTenantF = thirdPartyContacts.Where(x => thirdPartiesId.Contains((Guid)x.ThirdPartyId)).ToList();
+                        List<ThirdPartyContact> thirdPartyContactsIsTenantT = thirdPartyContacts.Where(x => !thirdPartiesId.Contains((Guid)x.ThirdPartyId)).ToList();
+
+                        if (thirdPartyContactsIsTenantF != null && thirdPartyContactsIsTenantF.Count > 0)
+                        {
+                            List<TransactionTransferResponseDto> transactionTransfers = new List<TransactionTransferResponseDto>();
+                            foreach (var item in thirdPartyContactsIsTenantF)
+                            {
+                                if (transactionRequest.ApartmentId != null && transactionRequest.ApartmentId != item.ApartmentId)
+                                {
+                                    continue;
+                                }
+
+                                Apartment apartment = _unitOfWork.ApartmentRepository.GetById((Guid)item.ApartmentId);
+                                if (transactionRequest.BuildingId != null && transactionRequest.BuildingId != apartment.BuildingId)
+                                {
+                                    continue;
+                                }
+
+                                BuildingModels.Building building = _unitOfWork.BuildingRepository.GetById((Guid)apartment.BuildingId);
+
+                                transactionResponseDto.Transfer += item.Price;
+                                var transactionTransfer = new TransactionTransferResponseDto
+                                {
+                                    Id = item.Id,
+                                    NameService = item.NameService,
+                                    Price = item.Price,
+                                    Type = "HopDong",
+                                    ApartmentFloorNumber = apartment != null ? apartment.FloorNumber : 0,
+                                    ApartmentRoomNumber = apartment != null ? apartment.RoomNumber : 0,
+                                    ApartmentId = apartment != null ? apartment.Id : Guid.Empty,
+                                    BuildingName = building != null ? building.Name : "",
+                                    BuildingId = building != null ? building.Id : Guid.Empty,
+                                };
+                                transactionTransfers.Add(transactionTransfer);
+                            }
+                            transactionResponseDto.TransactionTransferResponseDtos = transactionTransfers;
+                        }
+                        if (thirdPartyContactsIsTenantT != null && thirdPartyContactsIsTenantT.Count > 0)
+                        {
+                            foreach (var item in thirdPartyContactsIsTenantT)
+                            {
+                                if (transactionRequest.ApartmentId != null && transactionRequest.ApartmentId != item.ApartmentId)
+                                {
+                                    continue;
+                                }
+                                Apartment apartment = _unitOfWork.ApartmentRepository.GetById((Guid)item.ApartmentId);
+                                if (transactionRequest.BuildingId != null && transactionRequest.BuildingId != apartment.BuildingId)
+                                {
+                                    continue;
+                                }
+                                BuildingModels.Building building = _unitOfWork.BuildingRepository.GetById((Guid)apartment.BuildingId);
+                                ThirdParty thirdParty = _unitOfWork.ThirdPartyRepository.GetById((Guid)item.ThirdPartyId);
+                                transactionResponseDto.Transfer += item.Price;
+                                var transaction = new TransactionHistoryResponseDto
+                                {
+                                    //ServiceId = (Guid)serviceContract.ServiceId,
+                                    Service = "Hợp đồng cho thuê",
+                                    SentUser = thirdParty.NameCompany,
+                                    ReciveUser = AccountName,
+                                    Status = "Hoàn thành",
+                                    //Id = item.Id,
+                                    ApartmentFloorNumber = apartment.FloorNumber,
+                                    ApartmentRoomNumber = apartment.RoomNumber,
+                                    ApartmentId = apartment.Id,
+                                    BuildingName = building.Name,
+                                    BuildingId = building.Id,
+                                    Type = "HopDong",
+                                    CreateAt = (DateTime)item.UpdatedAt,
+                                    //TransactionMapId = item.TransactionMapId,
+                                    Amount = (decimal)item.Price,
+                                    Content = "Thanh toan hop dong",
+                                    Bank = BankId,
+                                    AccountNumber = SoTaiKhoan,
+                                };
+                                resultData.Add(transaction);
+                                transactionResponseDto.Pay += item.Price;
+
+                            }
+                        }
                     }
+
                 }
                 // Stage 3: In-memory transformations
-                var resultData = new List<TransactionHistoryResponseDto>();
+
                 foreach (var item in query.ToList())
                 {
-                    var transaction = new TransactionHistoryResponseDto
+                    List<RequestBodyItem> items = Utill.ConvertJsonToObject<List<RequestBodyItem>>(item.RequestBody);
+                    List<Guid> ids = items.Select(item => item.Id).ToList();
+                    List<Invoice> invoices = _unitOfWork.InvoiceRepository.GetQuery(x => ids.Contains(x.Id)).ToList();
+                    foreach (var itemInvoice in invoices)
                     {
-                        Id = item.Id,
-                        Type = item.Type,
-                        TransactionMapId = item.TransactionMapId,
-                        Price = item.Price,
-                        Content = item.Content,
-                        Bank = item.Bank,
-                        AccountNumber = item.AccountNumber,
-                    };
-                    resultData.Add(transaction);
-                    transactionResponseDto.Pay += transaction.Price;
+                        ServiceContract serviceContract = _unitOfWork.ServiceContractRepository.GetById(itemInvoice.ServiceContractId);
+                        if (transactionRequest.ApartmentId != null && transactionRequest.ApartmentId != serviceContract.ApartmentId)
+                        {
+                            continue;
+                        }
+                        Apartment apartment = _unitOfWork.ApartmentRepository.GetById((Guid)serviceContract.ApartmentId);
+                        if (transactionRequest.BuildingId != null && transactionRequest.BuildingId != apartment.BuildingId)
+                        {
+                            continue;
+                        }
+                        BuildingModels.Building building = _unitOfWork.BuildingRepository.GetById((Guid)apartment.BuildingId);
+
+                        Service = _unitOfWork.ServiceRepository.GetById((Guid)serviceContract.ServiceId);
+                        string user = "";
+                        if (item.InsertedById != null)
+                        {
+                            Staff staff = _unitOfWork.StaffRepository.GetById((Guid)item.InsertedById);
+                            if (staff != null)
+                            {
+                                user = staff.Email;
+                            }
+                            else
+                            {
+                                Resident resident = _unitOfWork.ResidentRepository.GetById((Guid)item.InsertedById);
+                                if (resident != null)
+                                {
+                                    user = resident.Email;
+                                }
+                            }
+                        }
+                        var transaction = new TransactionHistoryResponseDto
+                        {
+                            ServiceId = (Guid)serviceContract.ServiceId,
+                            Service = Service.ServiceName,
+                            SentUser = user,
+                            ReciveUser = AccountName,
+                            Status = "Hoàn thành",
+                            //Id = item.Id,
+                            ApartmentFloorNumber = apartment.FloorNumber,
+                            ApartmentRoomNumber = apartment.RoomNumber,
+                            ApartmentId = apartment.Id,
+                            BuildingName = building.Name,
+                            BuildingId = building.Id,
+                            Type = item.Type,
+                            CreateAt = (DateTime)item.UpdatedAt,
+                            TransactionMapId = item.TransactionMapId,
+                            Amount = (decimal)item.Price,
+                            Content = item.Content,
+                            Bank = item.Bank,
+                            AccountNumber = item.AccountNumber,
+                        };
+                        resultData.Add(transaction);
+                        transactionResponseDto.Pay += itemInvoice.TotalAmount;
+                    }
+
                 }
                 transactionResponseDto.Total = transactionResponseDto.Pay + transactionResponseDto.Transfer;
                 transactionResponseDto.TransactionHistories = resultData;

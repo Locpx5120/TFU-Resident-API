@@ -931,6 +931,8 @@ namespace TFU_Building_API.Service.impl
                     };
                 }
 
+                Apartment apartment = _unitOfWork.ApartmentRepository.GetQuery(x => x.IsDeleted == false && x.BuildingId == request.BuildId).First();
+
                 // Create a new ThirdPartyContact entity
                 var newContract = new ThirdPartyContact
                 {
@@ -943,6 +945,7 @@ namespace TFU_Building_API.Service.impl
                     IsDeleted = false,
                     InsertedById = Guid.NewGuid(), // Replace with the actual user ID if available
                     InsertedAt = DateTime.Now,
+                    ApartmentId = apartment.Id,
                     IsActive = true
                 };
 
