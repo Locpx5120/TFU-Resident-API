@@ -29,7 +29,7 @@ namespace TFU_Building_API.Controllers
             return BadRequest(response);
         }
 
-        [HttpPut("edit")]
+        [HttpPost("edit")]
         public async Task<IActionResult> UpdateBuilding([FromBody] BuildingUpdateRequestDto request)
         {
             var response = await _buildingService.UpdateBuilding(request);

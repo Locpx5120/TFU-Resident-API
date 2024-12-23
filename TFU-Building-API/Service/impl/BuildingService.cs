@@ -42,8 +42,8 @@ namespace TFU_Building_API.Service.impl
                     NumberApartment = request.NumberApartment,
                     IsDeleted = false,
                     IsActive = true,
-                    InsertedAt = DateTime.Now,
-                    UpdatedAt = DateTime.Now,
+                    Address = request.Address,
+                    CreateAt = request.CreateAt,
                 };
 
                 _unitOfWork.BuildingRepository.Add(newBuilding);  // Thêm vào cơ sở dữ liệu
@@ -97,7 +97,10 @@ namespace TFU_Building_API.Service.impl
                 existingBuilding.NumberFloor = request.NumberFloor;
                 existingBuilding.NumberApartment = request.NumberApartment;
                 existingBuilding.IsActive = request.IsActive;
-                existingBuilding.UpdatedAt = DateTime.Now;
+                existingBuilding.Address = request.Address;
+                existingBuilding.CreateAt = request.CreateAt;
+
+                _unitOfWork.BuildingRepository.Update(existingBuilding);
 
                 // Lưu thay đổi
                 await _unitOfWork.SaveChangesAsync();
@@ -133,7 +136,10 @@ namespace TFU_Building_API.Service.impl
                     {
                         Id = b.Id,
                         BuildingName = b.Name,
-
+                        CreateAt = b.CreateAt,
+                        NumberFloor = (int)b.NumberFloor,
+                        NumberApartment = (int)b.NumberApartment,
+                        Address = b.Address,
                     });
 
                 var buildings = await query.ToListAsync();
@@ -186,6 +192,10 @@ namespace TFU_Building_API.Service.impl
                     {
                         Id = b.Id,
                         BuildingName = b.Name,
+                        CreateAt = b.CreateAt,
+                        NumberFloor = (int)b.NumberFloor,
+                        NumberApartment = (int)b.NumberApartment,
+                        Address = b.Address,
                     })
                     .ToList();
 

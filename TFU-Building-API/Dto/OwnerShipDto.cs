@@ -54,10 +54,13 @@ namespace TFU_Building_API.Dto
         public string PhoneNumber { get; set; }
         public string Email { get; set; }
         public Guid Id { get; set; }
+        public Guid ApartmentId { get; set; }
+        public Guid BuildingId { get; set; }
     }
 
     public class OwnerShipSearchRequestDto
     {
+        public Guid? BuildingId { get; set; }
         public string? Name { get; set; }
         public int PageSize { get; set; } = 10;
         public int PageNumber { get; set; } = 1;

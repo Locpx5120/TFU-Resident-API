@@ -224,7 +224,7 @@ namespace TFU_Building_API.Service.impl
                                      join user in _unitOfWork.ResidentRepository.GetQuery(u => u.IsDeleted == false)
                                         on ownership.ResidentId equals user.Id
                                      join apartment in _unitOfWork.ApartmentRepository.GetQuery(a => a.IsDeleted == false)
-                                        on ownership.ApartmentId equals apartment.Id
+                                       on ownership.ApartmentId equals apartment.Id
                                      select new OwnerShipListResponseDto
                                      {
                                          FullName = user.Name,
@@ -232,23 +232,48 @@ namespace TFU_Building_API.Service.impl
                                          RoomNumber = apartment.RoomNumber,
                                          PhoneNumber = user.Phone,
                                          Email = user.Email,
-                                         Id = ownership.Id
+                                         Id = ownership.Id,
+                                         ApartmentId = (Guid)apartment.Id,
+                                         BuildingId = (Guid)apartment.BuildingId,
                                      };
+
+                var apartmentIds = ownerShipQuery.Select(x => x.ApartmentId).ToList();
+
+                var apartmentNotOwnerShip = _unitOfWork.ApartmentRepository.GetQuery(a => a.IsDeleted == false && !apartmentIds.Contains(a.Id));
+                List<OwnerShipListResponseDto> ownerShipListResponseDtos = new List<OwnerShipListResponseDto>();
+                ownerShipListResponseDtos.AddRange(ownerShipQuery);
+
+                foreach (var apartment in apartmentNotOwnerShip)
+                {
+                    ownerShipListResponseDtos.Add(
+                    new OwnerShipListResponseDto
+                    {
+                        FloorNumber = apartment.FloorNumber,
+                        RoomNumber = apartment.RoomNumber,
+                        ApartmentId = (Guid)apartment.Id,
+                        BuildingId = (Guid)apartment.BuildingId,
+                    });
+                }
 
                 // Nếu có tìm kiếm theo tên
                 if (!string.IsNullOrEmpty(request.Name))
                 {
-                    ownerShipQuery = ownerShipQuery.Where(x => x.FullName.Contains(request.Name));
+                    ownerShipListResponseDtos = ownerShipListResponseDtos.Where(x => x.FullName.Contains(request.Name)).ToList();
+                }
+
+                if (request.BuildingId != null && request.BuildingId != Guid.Empty)
+                {
+                    ownerShipListResponseDtos = ownerShipListResponseDtos.Where(x => x.BuildingId == request.BuildingId).ToList();
                 }
 
                 // Tính tổng số bản ghi trước khi phân trang
-                var totalRecords = await ownerShipQuery.CountAsync();
+                var totalRecords = ownerShipListResponseDtos.ToList().Count();
 
                 // Áp dụng phân trang
-                var ownerShipList = await ownerShipQuery
+                var ownerShipList = ownerShipListResponseDtos.ToList()
                     .Skip((request.PageNumber - 1) * request.PageSize)
                     .Take(request.PageSize)
-                    .ToListAsync();
+                    .ToList();
 
                 var response = new PaginatedResponseDto<OwnerShipListResponseDto>
                 {
