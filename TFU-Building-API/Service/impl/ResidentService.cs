@@ -371,7 +371,7 @@ namespace TFU_Building_API.Service.impl
                          x.ResidentId.Equals(resident.Id) &&
                          x.ApartmentId.Equals(request.ApartmentId)
                         && x.IsDeleted == false
-                        ).ToArray();
+                        ).FirstOrDefault();
                     if (checkLiving != null)
                     {
                         return new ResponseData<List<AddMemberResponseDto>>
