@@ -9,6 +9,7 @@ namespace TFU_Building_API.Service
         //Task<ResponseData<List<ApartmentMemberDetailDto>>> GetApartmentDetailsByApartmentIdAsync(Guid apartmentId);
         Task<ResponseData<List<ApartmentMemberDetailDto>>> GetApartmentDetailsByApartmentIdAsync(Guid apartmentId, string? memberName = null);
         Task<ResponseData<AddApartmentMemberResponseDto>> AddApartmentMemberAsync(AddApartmentMemberDto request);
+        Task<ResponseData<AddApartmentResDto>> AddApartmentAsync(AddApartmentReqDto request);
 
         Task<ResponseData<List<ApartmentDto>>> GetApartmentsByBuildingIdAsync(Guid buildingId);
 

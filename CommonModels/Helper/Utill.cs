@@ -7,6 +7,15 @@ namespace fake_tool.Helpers
 {
     public class Utill
     {
+        public static string GenerateRandomPassword()
+        {
+            // Bạn có thể tùy chỉnh độ dài và kiểu ký tự của mật khẩu tại đây
+            const string validChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*";
+            var random = new Random();
+            return new string(Enumerable.Repeat(validChars, 12)
+                .Select(s => s[random.Next(s.Length)]).ToArray());
+        }
+
         public static string GenerateRandomString(int length)
         {
             const string characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";

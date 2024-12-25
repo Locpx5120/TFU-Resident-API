@@ -12,6 +12,7 @@ namespace TFU_Building_API.Service
         Task<ResponseData<ResidentInfoResponseDto>> GetResidentById(Guid residentId);
         Task<ResponseData<List<AddMemberResponseDto>>> AddMembersAsync(AddMemberRequestDto request);
         Task<ResponseData<MemberServiceDetailDto>> GetMemberServiceDetailAsync(Guid serviceContractId);
+        Task<ResponseData<List<GetResidentResponseDto>>> GetResidentsAsync();
 
     }
 }

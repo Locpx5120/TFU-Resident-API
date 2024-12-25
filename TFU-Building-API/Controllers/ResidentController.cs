@@ -21,6 +21,18 @@ namespace TFU_Building_API.Controllers
             _residentPayment = residentPayment;
         }
 
+        [HttpPost("GetResidents")]
+        public async Task<IActionResult> GetResidents()
+        {
+            var response = await _residentService.GetResidentsAsync();
+            if (!response.Success)
+            {
+                return BadRequest(response);
+            }
+
+            return Ok(response);
+        }
+
         [HttpPost("addResident")]
         public async Task<IActionResult> AddResident(ResidentRequestDto request)
         {
@@ -116,7 +128,7 @@ namespace TFU_Building_API.Controllers
         public async Task<IActionResult> AddMembers([FromBody] AddMemberRequestDto request)
         {
             var result = await _residentService.AddMembersAsync(request);
-            return StatusCode(result.Code, result);
+            return Ok(result);
         }
 
         [HttpGet("member-service-details/{serviceContractId}")]

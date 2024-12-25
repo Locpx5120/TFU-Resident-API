@@ -56,6 +56,16 @@ public class ApartmentController : ControllerBase
         return BadRequest(result);
     }
 
+    [HttpPost("add-apartment")]
+    public async Task<IActionResult> AddApartment([FromBody] AddApartmentReqDto request)
+    {
+        var result = await _apartmentService.AddApartmentAsync(request);
+        //if (result.Success)
+        //    return Ok(result);
+        //return BadRequest(result);
+        return Ok(result);
+    }
+
     /// <summary>
     /// Lấy danh sách căn hộ theo tòa nhà
     /// </summary>

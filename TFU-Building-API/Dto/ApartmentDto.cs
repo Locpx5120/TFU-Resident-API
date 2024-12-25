@@ -32,6 +32,21 @@
         public Guid ApartmentId { get; set; }
     }
 
+    public class AddApartmentReqDto
+    {
+        public double Price { get; set; }
+
+        public int FloorNumber { get; set; }
+        public int RoomNumber { get; set; }
+        public Guid ApartmentTypeId { get; set; }
+        public Guid BuildingId { get; set; }
+    }
+
+    public class AddApartmentResDto
+    {
+        public Guid ApartmentId { get; set; }
+    }
+
     public class AddApartmentMemberResponseDto
     {
         public bool Success { get; set; }

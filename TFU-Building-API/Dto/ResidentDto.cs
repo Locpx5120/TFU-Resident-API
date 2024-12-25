@@ -14,9 +14,22 @@ namespace TFU_Building_API.Dto
         [Required]
         [RegularExpression(@"^\d{10}$", ErrorMessage = "Phone number must be 10 digits.")]
         public string Phone { get; set; }
+        public DateTime? Birthday { get; set; }
+        public DateTime? RegistratorDate { get; set; }
+        //[Required]
+        //public Guid OwnerShipId { get; set; }
+    }
 
-        [Required]
-        public Guid OwnerShipId { get; set; }
+    public class GetResidentResponseDto
+    {
+        public Guid Id { get; set; }
+        public DateTime? RegistratorDate { get; set; }
+
+        public string Name { get; set; }
+        public string? Email { get; set; }
+        public DateTime? Birthday { get; set; }
+        public string? Phone { get; set; }
+        public bool IsOwner { get; set; }
     }
 
     public class ResidentResponseDto

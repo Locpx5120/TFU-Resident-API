@@ -1,39 +1,45 @@
-﻿using System;
-using System.Threading.Tasks;
-using BuildingModels;
+﻿using BuildingModels;
 using Core.Enums;
 using Core.Model;
+using fake_tool.Helpers;
 using Microsoft.EntityFrameworkCore;
+using TFU_Building_API.Core.Dapper.User;
+using TFU_Building_API.Core.Handler;
 using TFU_Building_API.Core.Helper;
 using TFU_Building_API.Core.Infrastructure;
 using TFU_Building_API.Dto;
 
 namespace TFU_Building_API.Service.impl
 {
-    public class ResidentService : IResidentService
+    public class ResidentService : BaseHandler, IResidentService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IConfiguration _config;
+        private readonly IUserRepository _userRepository;
 
-        public ResidentService(IUnitOfWork unitOfWork)
+        public ResidentService(IUnitOfWork UnitOfWork, IHttpContextAccessor HttpContextAccessor, IConfiguration config,
+            IUserRepository userRepository) : base(UnitOfWork, HttpContextAccessor)
         {
-            _unitOfWork = unitOfWork;
+            _unitOfWork = UnitOfWork;
+            _config = config;
+            _userRepository = userRepository;
         }
+
 
         public async Task<ResponseData<ResidentResponseDto>> AddResident(ResidentRequestDto request)
         {
             try
             {
-                // Kiểm tra xem OwnershipId có tồn tại không
-                var ownership = await _unitOfWork.OwnerShipRepository.GetQuery(x => x.Id == request.OwnerShipId && x.IsDeleted == false).FirstOrDefaultAsync();
+                var resident = _unitOfWork.ResidentRepository.GetQuery(x => x.Email == request.Email).FirstOrDefault();
 
-                if (ownership == null)
+                if (resident != null)
                 {
-                    // Nếu không tìm thấy Ownership, trả về lỗi
                     return new ResponseData<ResidentResponseDto>
                     {
                         Success = false,
-                        Message = "Ownership not found.",
-                        Code = (int)ErrorCodeAPI.NotFound
+                        Message = "Member da co trong phong nay roi. ",
+                        Data = null,
+                        Code = (int)ErrorCodeAPI.DuplicateEntry
                     };
                 }
 
@@ -44,16 +50,30 @@ namespace TFU_Building_API.Service.impl
                     Name = request.Name,
                     Email = request.Email,
                     Phone = request.Phone,
-                    RegistratorDate = DateTime.Now,  // Ngày đăng ký hiện tại
+                    RegistratorDate = request.RegistratorDate ?? DateTime.Now,
+                    Birthday = request.Birthday ?? DateTime.Now,
+                    IsOwner = false,
                     IsDeleted = false,
                     IsActive = true,
-                    InsertedAt = DateTime.Now,
-                    UpdatedAt = DateTime.Now,
+                    Password = Utill.GenerateRandomPassword(),
                 };
 
-                // Thêm resident mới vào cơ sở dữ liệu
                 _unitOfWork.ResidentRepository.Add(newResident);
                 await _unitOfWork.SaveChangesAsync();
+
+                var emailService = new EmailService(_config);
+
+                string subject = "Your New Account Details";
+                string body = $@"
+            <p>Dear {newResident.Name},</p>
+            <p>Your new account has been created successfully. Below are your login details:</p>
+            <p><b>Email:</b> {newResident.Email}</p>
+            <p><b>Password:</b> {newResident.Password}</p>
+            <p>Please log in and change your password as soon as possible.</p>
+            <br/>
+            <p>Best Regards,<br/>TFU Building Management Team</p>";
+
+                await emailService.SendEmailAsync(newResident.Email, subject, body);
 
                 // Trả về kết quả thành công với thông tin ResidentResponseDto
                 var response = new ResidentResponseDto
@@ -211,7 +231,7 @@ namespace TFU_Building_API.Service.impl
                     };
                 }
 
-                var living = await _unitOfWork.LivingRepository.GetQuery(r => r.ResidentId == resident.Id  && r.IsDeleted == false).FirstOrDefaultAsync();
+                var living = await _unitOfWork.LivingRepository.GetQuery(r => r.ResidentId == resident.Id && r.IsDeleted == false).FirstOrDefaultAsync();
 
                 if (living == null)
                 {
@@ -306,23 +326,62 @@ namespace TFU_Building_API.Service.impl
             {
                 var responseList = new List<AddMemberResponseDto>();
 
+
+
                 foreach (var member in request.Members)
                 {
                     // Step 1: Insert into Residents table
-                    var resident = new Resident
+                    var resident = _unitOfWork.ResidentRepository.GetQuery(false).Where(x => x.Email == member.Email).FirstOrDefault();
+                    if (resident == null)
                     {
-                        Id = Guid.NewGuid(),
-                        Name = member.Name,
-                        Email = member.Email,
-                        Birthday = member.Birthday,
-                        Phone = member.Phone,
-                        IsOwner = false,
-                        IsDeleted = false,
-                        InsertedAt = DateTime.Now,
-                        UpdatedAt = DateTime.Now,
-                        IsActive = true
-                    };
-                    _unitOfWork.ResidentRepository.Add(resident);
+                        var residentNew = new Resident
+                        {
+                            Id = Guid.NewGuid(),
+                            Name = member.Name,
+                            Email = member.Email,
+                            Birthday = member.Birthday,
+                            Phone = member.Phone,
+                            IsOwner = false,
+                            IsDeleted = false,
+                            InsertedAt = DateTime.Now,
+                            UpdatedAt = DateTime.Now,
+                            IsActive = true,
+                            Password = Utill.GenerateRandomPassword(),
+                        };
+                        _unitOfWork.ResidentRepository.Add(residentNew);
+
+                        var emailService = new EmailService(_config);
+
+                        string subject = "Your New Account Details";
+                        string body = $@"
+            <p>Dear {residentNew.Name},</p>
+            <p>Your new account has been created successfully. Below are your login details:</p>
+            <p><b>Email:</b> {residentNew.Email}</p>
+            <p><b>Password:</b> {residentNew.Password}</p>
+            <p>Please log in and change your password as soon as possible.</p>
+            <br/>
+            <p>Best Regards,<br/>TFU Building Management Team</p>";
+
+                        await emailService.SendEmailAsync(residentNew.Email, subject, body);
+
+                        resident = residentNew;
+                    }
+                    var checkLiving = _unitOfWork.LivingRepository
+                        .GetQuery(false).Where(x =>
+                         x.ResidentId.Equals(resident.Id) &&
+                         x.ApartmentId.Equals(request.ApartmentId)
+                        && x.IsDeleted == false
+                        ).ToArray();
+                    if (checkLiving != null)
+                    {
+                        return new ResponseData<List<AddMemberResponseDto>>
+                        {
+                            Success = false,
+                            Message = "Member da co trong phong nay roi. ",
+                            Data = null,
+                            Code = (int)ErrorCodeAPI.DuplicateEntry
+                        };
+                    }
 
                     // Step 2: Insert into Livings table
                     var living = new Living
@@ -331,11 +390,10 @@ namespace TFU_Building_API.Service.impl
                         StartDate = DateTime.Now,
                         ResidentId = resident.Id,
                         ApartmentId = request.ApartmentId,
-                        IsDeleted = true,
-                        InsertedAt = DateTime.Now,
-                        UpdatedAt = DateTime.Now,
-                        IsActive = false
+                        IsDeleted = false,
+                        IsActive = false,
                     };
+
                     _unitOfWork.LivingRepository.Add(living);
 
                     // Step 3: Insert into ServiceContracts table
@@ -464,6 +522,50 @@ namespace TFU_Building_API.Service.impl
             }
         }
 
+        public async Task<ResponseData<List<GetResidentResponseDto>>> GetResidentsAsync()
+        {
+            try
+            {
+                List<GetResidentResponseDto> residentResponseDtos = new List<GetResidentResponseDto>();
+                var responseList = _unitOfWork.ResidentRepository.GetQuery(x => x.IsDeleted == false).ToList();
 
+                foreach (var item in responseList)
+                {
+                    // Step 1: Insert into Residents table
+                    var resident = new GetResidentResponseDto
+                    {
+                        Id = item.Id,
+                        RegistratorDate = item.RegistratorDate,
+                        Name = item.Name,
+                        Email = item.Email,
+                        Birthday = item.Birthday,
+                        Phone = item.Phone,
+                        IsOwner = item.IsOwner,
+                    };
+                    residentResponseDtos.Add(resident);
+                }
+
+                return new ResponseData<List<GetResidentResponseDto>>
+                {
+                    Success = true,
+                    Message = "All resident successfully.",
+                    Data = residentResponseDtos,
+                    Code = (int)ErrorCodeAPI.OK
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResponseData<List<GetResidentResponseDto>>
+                {
+                    Success = false,
+                    Message = ex.Message,
+                    Data = new List<GetResidentResponseDto>
+            {
+               null
+            },
+                    Code = (int)ErrorCodeAPI.SystemIsError
+                };
+            }
+        }
     }
 }

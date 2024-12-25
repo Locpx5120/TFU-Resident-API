@@ -283,8 +283,6 @@ namespace TFU_Building_API.Service.impl
             }
         }
 
-
-
         public async Task<ResponseData<AddApartmentMemberResponseDto>> AddApartmentMemberAsync(AddApartmentMemberDto request)
         {
             try
@@ -381,6 +379,59 @@ namespace TFU_Building_API.Service.impl
             }
         }
 
+        public async Task<ResponseData<AddApartmentResDto>> AddApartmentAsync(AddApartmentReqDto request)
+        {
+            try
+            {
+                var existing = await _unitOfWork.ApartmentRepository
+                    .GetQuery(r =>
+                    r.BuildingId == request.BuildingId
+                    && r.FloorNumber == request.FloorNumber
+                    && r.RoomNumber == request.RoomNumber)
+                    .FirstOrDefaultAsync();
 
+                if (existing != null)
+                {
+                    return new ResponseData<AddApartmentResDto>
+                    {
+                        Success = false,
+                        Message = "Room is exist",
+                        Data = null,
+                        Code = (int)ErrorCodeAPI.InternalError
+                    };
+                }
+
+                var apartment = new Apartment
+                {
+                    Id = Guid.NewGuid(),
+                    Price = request.Price,
+                    FloorNumber = request.FloorNumber,
+                    RoomNumber = request.RoomNumber,
+                    ApartmentTypeId = request.ApartmentTypeId,
+                    BuildingId = request.BuildingId,
+                };
+
+                _unitOfWork.ApartmentRepository.Add(apartment);
+                await _unitOfWork.SaveChangesAsync();
+
+                return new ResponseData<AddApartmentResDto>
+                {
+                    Success = true,
+                    Message = "Apartment member added successfully.",
+                    Data = new AddApartmentResDto { ApartmentId = apartment.Id },
+                    Code = (int)ErrorCodeAPI.OK
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResponseData<AddApartmentResDto>
+                {
+                    Success = false,
+                    Message = ex.Message,
+                    Data = null,
+                    Code = (int)ErrorCodeAPI.SystemIsError
+                };
+            }
+        }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using BuildingModels;
 using Core.Enums;
 using Core.Model;
+using fake_tool.Helpers;
 using Microsoft.EntityFrameworkCore;
 using TFU_Building_API.Core.Dapper.User;
 using TFU_Building_API.Core.Handler;
@@ -44,7 +45,7 @@ namespace TFU_Building_API.Service.impl
                 }
 
                 // Tạo mật khẩu ngẫu nhiên cho nhân viên mới
-                var generatedPassword = GenerateRandomPassword();
+                var generatedPassword = Utill.GenerateRandomPassword();
 
                 // Tạo mới staff và thêm thông tin tài khoản
                 Staff newStaff = new Staff

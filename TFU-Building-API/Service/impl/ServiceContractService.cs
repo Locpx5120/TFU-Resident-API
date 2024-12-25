@@ -274,20 +274,20 @@ namespace TFU_Building_API.Service.impl
             try
             {
                 var responseList = new List<AddVehicleServiceResponseDto>();
-                var minimumStartDate = DateTime.Now.AddDays(7); // Minimum allowed start date (one week from now)
+                //var minimumStartDate = DateTime.Now.AddDays(7); // Minimum allowed start date (one week from now)
 
                 foreach (var serviceRequest in request.Services)
                 {
-                    // Validate StartDate
-                    if (serviceRequest.StartDate < minimumStartDate)
-                    {
-                        responseList.Add(new AddVehicleServiceResponseDto
-                        {
-                            Success = false,
-                            Message = $"Start date for license plate {serviceRequest.LicensePlate} must be at least one week from today."
-                        });
-                        continue; // Skip to the next service request
-                    }
+                    //// Validate StartDate
+                    //if (serviceRequest.StartDate < minimumStartDate)
+                    //{
+                    //    responseList.Add(new AddVehicleServiceResponseDto
+                    //    {
+                    //        Success = false,
+                    //        Message = $"Start date for license plate {serviceRequest.LicensePlate} must be at least one week from today."
+                    //    });
+                    //    continue; // Skip to the next service request
+                    //}
 
                     // Step 1: Add Vehicle to Vehicles table
                     var vehicle = new Vehicle
@@ -489,7 +489,23 @@ namespace TFU_Building_API.Service.impl
                         {
                             living.IsActive = true;
                             living.IsDeleted = false;
-                            living.UpdatedAt = DateTime.Now;
+                            _unitOfWork.LivingRepository.Update(living);
+                        }
+                    }
+                }
+                else if (request.Status == ServiceContractStatus.Rejected)
+                {
+                    if (serviceContract.LivingId.HasValue)
+                    {
+                        // Update the corresponding record in Livings
+                        var living = await _unitOfWork.LivingRepository
+                            .GetByIdAsync(serviceContract.LivingId ?? new Guid());
+
+
+                        if (living != null)
+                        {
+                            living.IsActive = false;
+                            living.IsDeleted = true;
                             _unitOfWork.LivingRepository.Update(living);
                         }
                     }
