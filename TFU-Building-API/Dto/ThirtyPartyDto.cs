@@ -1,4 +1,6 @@
-﻿namespace TFU_Building_API.Dto
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace TFU_Building_API.Dto
 {
     public class AddThirdPartyRequestDto
     {
@@ -138,11 +140,17 @@
 
     public class AddThirdPartyContractHireRequestDto
     {
+        [Required]
         public Guid ThirdPartyId { get; set; } // ID of the third party
+        [Required]
         public string NameService { get; set; } // Name of the service being provided
+        [Required]
         public DateTime StartDate { get; set; } // Start date of the contract
+        [Required]
         public DateTime EndDate { get; set; } // End date of the contract
+        [Required]
         public decimal Price { get; set; } // Price for the service
+        [Required]
         public Guid BuildId { get; set; } // Thong tin toa nha
     }
 

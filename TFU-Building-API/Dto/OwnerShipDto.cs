@@ -13,7 +13,7 @@ namespace TFU_Building_API.Dto
 
         [Required]
         public int FloorNumber { get; set; }
-
+        [Required]
         public Guid BuildingId { get; set; }
     }
 

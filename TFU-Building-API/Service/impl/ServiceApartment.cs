@@ -1,4 +1,5 @@
-﻿using Core.Enums;
+﻿using Constant;
+using Core.Enums;
 using Core.Model;
 using fake_tool.Helpers;
 using Microsoft.EntityFrameworkCore;
@@ -11,10 +12,12 @@ namespace TFU_Building_API.Service.impl
     public class ServiceApartment : IServiceApartment
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IUserIdentity _userIdentity;
 
-        public ServiceApartment(IUnitOfWork unitOfWork)
+        public ServiceApartment(IUnitOfWork unitOfWork, IUserIdentity userIdentity)
         {
             _unitOfWork = unitOfWork;
+            _userIdentity = userIdentity;
         }
 
         //public async Task<ResponseData<PaginatedResponseDto<ApartmentServiceSummaryDto>>> GetApartmentServiceSummaryByUserId(Guid userId, int pageSize, int pageNumber)
@@ -359,13 +362,6 @@ namespace TFU_Building_API.Service.impl
             }
         }
 
-
-
-
-
-
-
-
         //public async Task<ResponseData<PaginatedResponseDto<UnpaidServiceSummaryDto>>> GetUnpaidServiceSummaryByUserId(Guid userId, int pageSize, int pageNumber)
         //{
         //    try
@@ -514,51 +510,106 @@ namespace TFU_Building_API.Service.impl
         {
             try
             {
-                var query = from inv in _unitOfWork.InvoiceRepository.GetQuery(x => x.IsDeleted == false)
-                            join sc in _unitOfWork.ServiceContractRepository.GetQuery(x => x.IsActive && x.IsDeleted == false)
-                                on inv.ServiceContractId equals sc.Id
-                            join o in _unitOfWork.OwnerShipRepository.GetQuery(x => x.ResidentId == userId && x.IsDeleted == false)
-                                on sc.ApartmentId equals o.ApartmentId
-                            join a in _unitOfWork.ApartmentRepository.GetQuery(x => x.IsDeleted == false)
-                                on sc.ApartmentId equals a.Id
-                            join b in _unitOfWork.BuildingRepository.GetQuery(x => x.IsDeleted == false)
-                                on a.BuildingId equals b.Id
-                            select new UnpaidServiceSummaryDto
-                            {
-                                ApartmentId = a.Id,
-                                RoomNumber = a.RoomNumber,
-                                BuildingId = b.Id,
-                                BuildingName = b.Name,
-                                TotalServices = sc.Quantity ?? 1,
-                                Month = inv.IssueDate.HasValue ? inv.IssueDate.Value.Month : 0,
-                                Year = inv.IssueDate.HasValue ? inv.IssueDate.Value.Year : 0,
-                                PaymentStatus = inv.PaidStatus ? "Đã thanh toán" : "Chưa thanh toán"
-                            };
+                List<UnpaidServiceSummaryDto> unpaidServiceSummaryDtos = new List<UnpaidServiceSummaryDto>();
+                if (_userIdentity.RoleName.Equals(Constants.ROLE_KE_TOAN))
+                {
+                    //if (request.BuildingIdFilter == null || request.BuildingIdFilter == Guid.Empty)
+                    //{
+                    //    return new ResponseData<PaginatedResponseDto<UnpaidServiceSummaryDto>>
+                    //    {
+                    //        Success = true,
+                    //        Message = "Thieu BuildingIdFilter",
+                    //        Data = null,
+                    //        Code = (int)ErrorCodeAPI.InternalError
+                    //    };
+                    //}
+
+                    //if (request.ApartmentIdFilter == null || request.ApartmentIdFilter == Guid.Empty)
+                    //{
+                    //    return new ResponseData<PaginatedResponseDto<UnpaidServiceSummaryDto>>
+                    //    {
+                    //        Success = true,
+                    //        Message = "Thieu ApartmentIdFilter",
+                    //        Data = null,
+                    //        Code = (int)ErrorCodeAPI.InternalError
+                    //    };
+                    //}
+
+                    var query = from inv in _unitOfWork.InvoiceRepository.GetQuery(x => x.IsDeleted == false)
+                                join sc in _unitOfWork.ServiceContractRepository.GetQuery(x => x.IsActive && x.IsDeleted == false)
+                                    on inv.ServiceContractId equals sc.Id
+                                join o in _unitOfWork.OwnerShipRepository.GetQuery(x => x.IsDeleted == false)
+                                    on sc.ApartmentId equals o.ApartmentId
+                                join a in _unitOfWork.ApartmentRepository.GetQuery(x => x.IsDeleted == false)
+                                    on sc.ApartmentId equals a.Id
+                                join b in _unitOfWork.BuildingRepository.GetQuery(x => x.IsDeleted == false)
+                                    on a.BuildingId equals b.Id
+                                select new UnpaidServiceSummaryDto
+                                {
+                                    ApartmentId = a.Id,
+                                    RoomNumber = a.RoomNumber,
+                                    BuildingId = b.Id,
+                                    BuildingName = b.Name,
+                                    TotalServices = sc.Quantity ?? 1,
+                                    Month = inv.IssueDate.HasValue ? inv.IssueDate.Value.Month : 0,
+                                    Year = inv.IssueDate.HasValue ? inv.IssueDate.Value.Year : 0,
+                                    PaymentStatus = inv.PaidStatus ? "Đã thanh toán" : "Chưa thanh toán"
+                                };
+
+                    unpaidServiceSummaryDtos = query.ToList();
+                }
+                else
+                {
+                    var query = from inv in _unitOfWork.InvoiceRepository.GetQuery(x => x.IsDeleted == false)
+                                join sc in _unitOfWork.ServiceContractRepository.GetQuery(x => x.IsActive && x.IsDeleted == false)
+                                    on inv.ServiceContractId equals sc.Id
+                                join o in _unitOfWork.OwnerShipRepository.GetQuery(x => x.ResidentId == userId && x.IsDeleted == false)
+                                    on sc.ApartmentId equals o.ApartmentId
+                                join a in _unitOfWork.ApartmentRepository.GetQuery(x => x.IsDeleted == false)
+                                    on sc.ApartmentId equals a.Id
+                                join b in _unitOfWork.BuildingRepository.GetQuery(x => x.IsDeleted == false)
+                                    on a.BuildingId equals b.Id
+                                select new UnpaidServiceSummaryDto
+                                {
+                                    ApartmentId = a.Id,
+                                    RoomNumber = a.RoomNumber,
+                                    BuildingId = b.Id,
+                                    BuildingName = b.Name,
+                                    TotalServices = sc.Quantity ?? 1,
+                                    Month = inv.IssueDate.HasValue ? inv.IssueDate.Value.Month : 0,
+                                    Year = inv.IssueDate.HasValue ? inv.IssueDate.Value.Year : 0,
+                                    PaymentStatus = inv.PaidStatus ? "Đã thanh toán" : "Chưa thanh toán"
+                                };
+
+                    unpaidServiceSummaryDtos = query.ToList();
+                }
+
+
 
                 // Apply filters from request
                 if (request.BuildingIdFilter.HasValue)
                 {
-                    query = query.Where(x => x.BuildingId == request.BuildingIdFilter.Value);
+                    unpaidServiceSummaryDtos = unpaidServiceSummaryDtos.Where(x => x.BuildingId == request.BuildingIdFilter.Value).ToList();
                 }
                 if (request.ApartmentIdFilter.HasValue)
                 {
-                    query = query.Where(x => x.ApartmentId == request.ApartmentIdFilter.Value);
+                    unpaidServiceSummaryDtos = unpaidServiceSummaryDtos.Where(x => x.ApartmentId == request.ApartmentIdFilter.Value).ToList();
                 }
                 if (!string.IsNullOrEmpty(request.PaymentStatusFilter))
                 {
-                    query = query.Where(x => x.PaymentStatus == request.PaymentStatusFilter);
+                    unpaidServiceSummaryDtos = unpaidServiceSummaryDtos.Where(x => x.PaymentStatus == request.PaymentStatusFilter).ToList();
                 }
                 if (request.MonthFilter.HasValue)
                 {
-                    query = query.Where(x => x.Month == request.MonthFilter.Value);
+                    unpaidServiceSummaryDtos = unpaidServiceSummaryDtos.Where(x => x.Month == request.MonthFilter.Value).ToList();
                 }
                 if (request.YearFilter.HasValue)
                 {
-                    query = query.Where(x => x.Year == request.YearFilter.Value);
+                    unpaidServiceSummaryDtos = unpaidServiceSummaryDtos.Where(x => x.Year == request.YearFilter.Value).ToList();
                 }
 
                 // Group by ApartmentId and Month, calculate sum of TotalServices
-                var groupedQuery = query
+                var groupedQuery = unpaidServiceSummaryDtos
                     .GroupBy(x => new { x.ApartmentId, x.Month, x.Year })
                     .Select(g => new UnpaidServiceSummaryDto
                     {
@@ -570,19 +621,18 @@ namespace TFU_Building_API.Service.impl
                         Month = g.Key.Month,
                         Year = g.Key.Year,
                         PaymentStatus = g.Any(x => x.PaymentStatus == "Chưa thanh toán") ? "Chưa thanh toán" : "Đã thanh toán"
-                    });
+                    }).ToList();
 
                 // Sort by month descending
-                groupedQuery = groupedQuery.OrderByDescending(x => x.Month);
+                groupedQuery = groupedQuery.OrderByDescending(x => x.Month).ToList();
 
                 // Calculate total records before pagination
-                var totalRecords = await groupedQuery.CountAsync();
+                var totalRecords = groupedQuery.Count();
 
                 // Apply pagination
-                var data = await groupedQuery
+                var data = groupedQuery
                     .Skip((request.PageNumber - 1) * request.PageSize)
-                    .Take(request.PageSize)
-                    .ToListAsync();
+                    .Take(request.PageSize).ToList();
 
                 // Wrap the result in PaginatedResponseDto
                 var response = new PaginatedResponseDto<UnpaidServiceSummaryDto>

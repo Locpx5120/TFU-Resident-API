@@ -21,7 +21,9 @@ namespace TFU_Building_API.Service.impl
             try
             {
                 // Tìm kiếm Apartment theo roomnumber và floor
-                var apartment = await _unitOfWork.ApartmentRepository.GetQuery(a => a.RoomNumber == request.RoomNumber && a.FloorNumber == request.FloorNumber && a.BuildingId == request.BuildingId && a.IsDeleted == false).FirstOrDefaultAsync();
+                var apartment = await _unitOfWork.ApartmentRepository.GetQuery(a => a.RoomNumber == request.RoomNumber
+                && a.FloorNumber == request.FloorNumber
+                && a.BuildingId == request.BuildingId && a.IsDeleted == false).FirstOrDefaultAsync();
                 if (apartment == null)
                 {
                     return new ResponseData<OwnerShipResponseDto>

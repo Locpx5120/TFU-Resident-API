@@ -15,7 +15,7 @@ namespace TFU_Building_API.Controllers
         private readonly IService _service;
 
         public ApartmentServiceController(
-            IServiceApartment apartmentService, 
+            IServiceApartment apartmentService,
             IService service)
         {
             _apartmentService = apartmentService;
@@ -112,10 +112,10 @@ namespace TFU_Building_API.Controllers
 
             var response = await _apartmentService.GetServiceSummaryByUserId(userGuid, request);
 
-            if (!response.Success)
-            {
-                return BadRequest(response.Message);
-            }
+            //if (!response.Success)
+            //{
+            //    return BadRequest(response.Message);
+            //}
 
             return Ok(response.Data);
         }

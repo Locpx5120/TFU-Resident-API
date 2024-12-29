@@ -908,6 +908,17 @@ namespace TFU_Building_API.Service.impl
         {
             try
             {
+                if (request.Price < 1000000)
+                {
+                    return new ResponseData<AddThirdPartyContractHireResponseDto>
+                    {
+                        Success = false,
+                        Message = "Third party minimum contract of 1 million or more",
+                        Code = (int)ErrorCodeAPI.NotFound
+                    };
+                }
+
+
                 // Validate the ThirdPartyId
                 var thirdParty = await _unitOfWork.ThirdPartyRepository.GetQuery(x => x.Id == request.ThirdPartyId && x.IsDeleted == false).FirstOrDefaultAsync();
                 if (thirdParty == null)

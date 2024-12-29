@@ -1,9 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace TFU_Building_API.Dto
+﻿namespace TFU_Building_API.Dto
 {
     public class ApartmentResponseTypeDto
     {
+        public Guid Id { get; set; }
         public string Name { get; set; }
         public decimal LandArea { get; set; }
     }
