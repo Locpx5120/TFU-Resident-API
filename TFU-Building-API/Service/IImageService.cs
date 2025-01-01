@@ -6,5 +6,6 @@ namespace TFU_Building_API.Service
     public interface IImageService
     {
         Task<ResponseData<ImageDto>> Get(Guid id);
+        Task<ResponseData<ImageDto>> Add(IFormFile file);
     }
 }
