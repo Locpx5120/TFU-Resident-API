@@ -116,7 +116,26 @@ namespace TFU_Building_API.Service.impl
             try
             {
                 Guid? apartmentId = null;
-
+                if (request.StartDate <= request.EndDate)
+                {
+                    return new ResponseData<AddThirdPartyContactResponseDto>
+                    {
+                        Success = false,
+                        Message = "Third-party contract added faill. StartDate > EndDate",
+                        Data = null,
+                        Code = (int)ErrorCodeAPI.SystemIsError
+                    };
+                }
+                if (request.Price < 1000000)
+                {
+                    return new ResponseData<AddThirdPartyContactResponseDto>
+                    {
+                        Success = false,
+                        Message = "Third-party contract added faill. Price > 1.000.000 vnd",
+                        Data = null,
+                        Code = (int)ErrorCodeAPI.SystemIsError
+                    };
+                }
                 // Kiểm tra nếu có thông tin `BuildingId`, `FloorNumber`, `RoomNumber` thì mới lấy `ApartmentId`
                 if (request.BuildingId.HasValue && request.FloorNumber.HasValue && request.RoomNumber.HasValue)
                 {

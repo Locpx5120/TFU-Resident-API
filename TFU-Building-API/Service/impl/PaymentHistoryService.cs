@@ -164,7 +164,7 @@ namespace TFU_Building_API.Service.impl
                 {
                     query = query.Where(x => x.InsertedAt >= transactionRequest.From).ToList();
                 }
-                if (_userIdentity.RoleName.Equals(Constants.ROLE_BEN_THU_BA) || _userIdentity.RoleName.Equals(Constants.ROLE_KE_TOAN))
+                if (_userIdentity.RoleName.Equals(Constants.ROLE_BEN_THU_BA) || _userIdentity.RoleName.Equals(Constants.ROLE_KE_TOAN) || _userIdentity.RoleName.Equals(Constants.ROLE_BAN_QUAN_LY))
                 {
                     List<ThirdPartyContact> thirdPartyContacts = _unitOfWork.ThirdPartyContractRepository
                         .GetQuery(x => x.IsDeleted == false && x.ThirdPartyId != null).ToList();

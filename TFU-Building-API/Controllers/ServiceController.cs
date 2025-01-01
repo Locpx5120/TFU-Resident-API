@@ -109,7 +109,6 @@ namespace TFU_Building_API.Controllers
                 return Unauthorized("User ID not found in token.");
             }
 
-
             var response = await _apartmentService.GetServiceSummaryByUserId(userGuid, request);
 
             //if (!response.Success)

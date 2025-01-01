@@ -19,13 +19,21 @@ namespace TFU_Building_API.Dto
 
     public class AddThirdPartyContactRequestDto
     {
+        [Required]
         public DateTime StartDate { get; set; }
+        [Required]
         public DateTime EndDate { get; set; }
+        [Required]
         public decimal Price { get; set; }
+        [Required]
         public string NameService { get; set; }
+        [Required]
         public Guid ThirdPartyId { get; set; }
+        [Required]
         public Guid? BuildingId { get; set; } // Cho phép null
+        [Required]
         public int? FloorNumber { get; set; } // Cho phép null
+        [Required]
         public int? RoomNumber { get; set; }  // Cho phép null
     }
 
