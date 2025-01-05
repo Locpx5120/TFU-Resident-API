@@ -29,6 +29,8 @@ namespace TFU_Building_API.Dto
     {
         public Guid StaffId { get; set; }
         public Guid RoleId { get; set; }
+        public string Name { get; set; }
+        public string PhoneNumber { get; set; }
     }
 
     public class StaffSearchRequestDto

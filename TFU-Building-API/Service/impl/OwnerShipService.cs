@@ -34,20 +34,7 @@ namespace TFU_Building_API.Service.impl
                     };
                 }
 
-                // Kiểm tra xem ApartmentId đã tồn tại trong OwnerShip chưa
-                var existingOwnerShip = await _unitOfWork.OwnerShipRepository.GetQuery(x => x.ApartmentId == apartment.Id && x.IsDeleted == false).FirstOrDefaultAsync();
-                if (existingOwnerShip != null)
-                {
-                    return new ResponseData<OwnerShipResponseDto>
-                    {
-                        Success = false,
-                        Message = "This apartment already has an ownership.",
-                        Code = (int)ErrorCodeAPI.DuplicateEntry
-                    };
-                }
-
-                // Tìm kiếm User theo email
-                var user = await _unitOfWork.ResidentRepository.GetQuery(u => u.Email == request.Email && u.IsDeleted == false).FirstOrDefaultAsync();
+                var user = await _unitOfWork.ResidentRepository.GetQuery(u => u.Id == request.Id && u.IsDeleted == false).FirstOrDefaultAsync();
                 if (user == null)
                 {
                     return new ResponseData<OwnerShipResponseDto>
@@ -58,20 +45,41 @@ namespace TFU_Building_API.Service.impl
                     };
                 }
 
-                // Tạo mới quyền sở hữu
+                // Kiểm tra xem ApartmentId đã tồn tại trong OwnerShip chưa
+                var existingOwnerShip = await _unitOfWork.OwnerShipRepository.GetQuery(x => x.ApartmentId == apartment.Id && x.IsDeleted == false).FirstOrDefaultAsync();
+                if (existingOwnerShip != null)
+                {
+                    //return new ResponseData<OwnerShipResponseDto>
+                    //{
+                    //    Success = false,
+                    //    Message = "This apartment already has an ownership.",
+                    //    Code = (int)ErrorCodeAPI.DuplicateEntry
+                    //};
+
+                    if (existingOwnerShip.ResidentId == request.Id)
+                    {
+                        return new ResponseData<OwnerShipResponseDto>
+                        {
+                            Success = false,
+                            Message = "User have Owner Ship",
+                            Code = (int)ErrorCodeAPI.UserNotFound
+                        };
+                    }
+
+                    existingOwnerShip.IsDeleted = true;
+                    existingOwnerShip.IsActive = false;
+                    _unitOfWork.OwnerShipRepository.Update(existingOwnerShip);
+                }
+
                 var newOwnerShip = new OwnerShip
                 {
                     ApartmentId = apartment.Id,
-                    ResidentId = user.Id,
+                    ResidentId = request.Id,
                     StartDate = DateTime.Now,
                     EndDate = DateTime.Now.AddYears(50),
-                    InsertedAt = DateTime.Now,
-                    UpdatedAt = DateTime.Now,
-                    IsDeleted = false,
-                    IsActive = true
                 };
-
                 _unitOfWork.OwnerShipRepository.Add(newOwnerShip);
+
                 await _unitOfWork.SaveChangesAsync();
 
                 return new ResponseData<OwnerShipResponseDto>
@@ -98,20 +106,38 @@ namespace TFU_Building_API.Service.impl
         {
             try
             {
-                // Tìm quyền sở hữu theo ID
-                var ownerShip = await _unitOfWork.OwnerShipRepository.GetQuery(x => x.Id == request.Id && x.IsDeleted == false).FirstOrDefaultAsync();
-                if (ownerShip == null)
+                Building building = await _unitOfWork.BuildingRepository.GetByIdAsync(request.BuildingId);
+                if (building == null)
                 {
                     return new ResponseData<OwnerShipResponseDto>
                     {
                         Success = false,
-                        Message = "Ownership not found.",
-                        Code = (int)ErrorCodeAPI.NotFound
+                        Message = "Building is not exist",
+                        Data = null,
+                        Code = (int)ErrorCodeAPI.InternalError
                     };
                 }
 
+                if (building.NumberFloor < request.FloorNumber)
+                {
+                    return new ResponseData<OwnerShipResponseDto>
+                    {
+                        Success = false,
+                        Message = "building is not Floor",
+                        Data = null,
+                        Code = (int)ErrorCodeAPI.InternalError
+                    };
+                }
+
+
+
                 // Tìm kiếm Apartment theo roomnumber và floor
-                var apartment = await _unitOfWork.ApartmentRepository.GetQuery(a => a.RoomNumber == request.RoomNumber && a.FloorNumber == request.FloorNumber && a.BuildingId == request.BuildingId && a.IsDeleted == false).FirstOrDefaultAsync();
+                var apartment = await _unitOfWork.ApartmentRepository.GetQuery(a =>
+                a.RoomNumber == request.RoomNumber
+                && a.FloorNumber == request.FloorNumber
+                && a.BuildingId == request.BuildingId
+                && a.IsDeleted == false)
+                    .FirstOrDefaultAsync();
                 if (apartment == null)
                 {
                     return new ResponseData<OwnerShipResponseDto>
@@ -122,35 +148,34 @@ namespace TFU_Building_API.Service.impl
                     };
                 }
 
-                // Kiểm tra xem ApartmentId đã tồn tại trong OwnerShip chưa (ngoại trừ OwnerShip hiện tại)
-                var existingOwnerShip = await _unitOfWork.OwnerShipRepository.GetQuery(x => x.ApartmentId == apartment.Id && x.Id != ownerShip.Id && x.IsDeleted == false).FirstOrDefaultAsync();
-                if (existingOwnerShip != null)
+                //// Tìm quyền sở hữu theo ID
+                var ownerShip = await _unitOfWork.OwnerShipRepository
+                    .GetQuery(x => x.ResidentId == request.Id && x.ApartmentId == apartment.Id
+                && x.IsDeleted == false).FirstOrDefaultAsync();
+                if (ownerShip == null)
                 {
-                    return new ResponseData<OwnerShipResponseDto>
+                    OwnerShip ownerShipOld = _unitOfWork.OwnerShipRepository.GetQuery(x => x.ApartmentId == apartment.Id).FirstOrDefault();
+                    if (ownerShipOld != null)
                     {
-                        Success = false,
-                        Message = "This apartment already has an ownership.",
-                        Code = (int)ErrorCodeAPI.DuplicateEntry
+                        ownerShipOld.IsDeleted = true;
+                        ownerShipOld.IsActive = false;
+                        _unitOfWork.OwnerShipRepository.Update(ownerShipOld);
+                    }
+
+                    var newOwnerShip = new OwnerShip
+                    {
+                        ApartmentId = apartment.Id,
+                        ResidentId = request.Id,
+                        StartDate = DateTime.Now,
+                        EndDate = DateTime.Now.AddYears(50),
                     };
+                    _unitOfWork.OwnerShipRepository.Add(newOwnerShip);
+                    ownerShip = newOwnerShip;
                 }
 
-                // Tìm kiếm User theo email
-                var user = await _unitOfWork.ResidentRepository.GetQuery(u => u.Email == request.Email && u.IsDeleted == false).FirstOrDefaultAsync();
-                if (user == null)
-                {
-                    return new ResponseData<OwnerShipResponseDto>
-                    {
-                        Success = false,
-                        Message = "User not found.",
-                        Code = (int)ErrorCodeAPI.UserNotFound
-                    };
-                }
+                apartment.ApartmentTypeId = request.ApartmentTypeId;
 
-                // Cập nhật các thông tin của OwnerShip
-                ownerShip.ApartmentId = apartment.Id;
-                ownerShip.ResidentId = user.Id;
-                ownerShip.UpdatedAt = DateTime.Now; // Cập nhật thời gian update
-                ownerShip.EndDate = DateTime.Now.AddYears(50); // Update EndDate thêm 50 năm
+                _unitOfWork.ApartmentRepository.Update(apartment);
 
                 // Lưu thay đổi
                 await _unitOfWork.SaveChangesAsync();
@@ -221,7 +246,6 @@ namespace TFU_Building_API.Service.impl
             try
             {
                 // Lấy danh sách ownership kết hợp với bảng User và Apartment
-
                 var ownerShipQuery = from ownership in _unitOfWork.OwnerShipRepository.GetQuery(x => x.IsDeleted == false)
                                      join user in _unitOfWork.ResidentRepository.GetQuery(u => u.IsDeleted == false)
                                         on ownership.ResidentId equals user.Id
@@ -234,9 +258,10 @@ namespace TFU_Building_API.Service.impl
                                          RoomNumber = apartment.RoomNumber,
                                          PhoneNumber = user.Phone,
                                          Email = user.Email,
-                                         Id = ownership.Id,
-                                         ApartmentId = (Guid)apartment.Id,
-                                         BuildingId = (Guid)apartment.BuildingId,
+                                         Id = ownership.ResidentId ?? Guid.Empty,
+                                         ApartmentId = apartment.Id,
+                                         BuildingId = apartment.BuildingId,
+                                         ApartmentTypeId = apartment.ApartmentTypeId,
                                      };
 
                 var apartmentIds = ownerShipQuery.Select(x => x.ApartmentId).ToList();
@@ -250,17 +275,19 @@ namespace TFU_Building_API.Service.impl
                     ownerShipListResponseDtos.Add(
                     new OwnerShipListResponseDto
                     {
+                        Id = Guid.Empty,
                         FloorNumber = apartment.FloorNumber,
                         RoomNumber = apartment.RoomNumber,
                         ApartmentId = (Guid)apartment.Id,
                         BuildingId = (Guid)apartment.BuildingId,
+                        ApartmentTypeId = apartment.ApartmentTypeId,
                     });
                 }
 
                 // Nếu có tìm kiếm theo tên
                 if (!string.IsNullOrEmpty(request.Name))
                 {
-                    ownerShipListResponseDtos = ownerShipListResponseDtos.Where(x => x.FullName.Contains(request.Name)).ToList();
+                    ownerShipListResponseDtos = ownerShipListResponseDtos.Where(x => x.FullName != null && x.FullName.Contains(request.Name)).ToList();
                 }
 
                 if (request.BuildingId != null && request.BuildingId != Guid.Empty)

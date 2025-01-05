@@ -383,12 +383,49 @@ namespace TFU_Building_API.Service.impl
         {
             try
             {
-                var existing = await _unitOfWork.ApartmentRepository
-                    .GetQuery(r =>
-                    r.BuildingId == request.BuildingId
-                    && r.FloorNumber == request.FloorNumber
-                    && r.RoomNumber == request.RoomNumber)
-                    .FirstOrDefaultAsync();
+                Building building = await _unitOfWork.BuildingRepository.GetByIdAsync(request.BuildingId);
+                if (building == null)
+                {
+                    return new ResponseData<AddApartmentResDto>
+                    {
+                        Success = false,
+                        Message = "Building is not exist",
+                        Data = null,
+                        Code = (int)ErrorCodeAPI.InternalError
+                    };
+                }
+
+                List<Apartment> apartments = await _unitOfWork.ApartmentRepository.GetQuery(r =>
+                   r.BuildingId == request.BuildingId
+                   && r.IsActive
+                   && r.IsDeleted == false)
+                    .ToListAsync();
+
+                if (building.NumberApartment >= apartments.Count)
+                {
+                    return new ResponseData<AddApartmentResDto>
+                    {
+                        Success = false,
+                        Message = "building is full",
+                        Data = null,
+                        Code = (int)ErrorCodeAPI.InternalError
+                    };
+                }
+
+                if (building.NumberFloor < request.FloorNumber)
+                {
+                    return new ResponseData<AddApartmentResDto>
+                    {
+                        Success = false,
+                        Message = "building is not Floor",
+                        Data = null,
+                        Code = (int)ErrorCodeAPI.InternalError
+                    };
+                }
+
+                var existing = apartments.Where(r =>
+                     r.FloorNumber == request.FloorNumber && r.RoomNumber == request.RoomNumber)
+                        .ToList().FirstOrDefault();
 
                 if (existing != null)
                 {
@@ -412,6 +449,20 @@ namespace TFU_Building_API.Service.impl
                 };
 
                 _unitOfWork.ApartmentRepository.Add(apartment);
+
+                if (request.Id != null || request.Id == Guid.Empty)
+                {
+                    var newOwnerShip = new OwnerShip
+                    {
+                        ApartmentId = apartment.Id,
+                        ResidentId = request.Id,
+                        StartDate = DateTime.Now,
+                        EndDate = DateTime.Now.AddYears(50),
+                    };
+                    _unitOfWork.OwnerShipRepository.Add(newOwnerShip);
+                }
+
+
                 await _unitOfWork.SaveChangesAsync();
 
                 return new ResponseData<AddApartmentResDto>

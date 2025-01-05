@@ -5,8 +5,7 @@ namespace TFU_Building_API.Dto
     public class OwnerShipRequestDto
     {
         [Required]
-        [EmailAddress]
-        public string Email { get; set; }
+        public Guid Id { get; set; }
 
         [Required]
         public int RoomNumber { get; set; }
@@ -28,16 +27,14 @@ namespace TFU_Building_API.Dto
         public Guid Id { get; set; }
 
         [Required]
-        [EmailAddress]
-        public string Email { get; set; }
-
-        [Required]
         public int RoomNumber { get; set; }
 
         [Required]
         public int FloorNumber { get; set; }
-
+        [Required]
         public Guid BuildingId { get; set; }
+        [Required]
+        public Guid ApartmentTypeId { get; set; }
     }
 
     public class OwnerShipDeleteRequestDto
@@ -56,6 +53,7 @@ namespace TFU_Building_API.Dto
         public Guid Id { get; set; }
         public Guid ApartmentId { get; set; }
         public Guid BuildingId { get; set; }
+        public Guid ApartmentTypeId { get; set; }
     }
 
     public class OwnerShipSearchRequestDto

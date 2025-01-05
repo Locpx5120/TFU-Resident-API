@@ -15,4 +15,5 @@ public partial class ThirdPartyContact : MasterDataEntityBase
 
     public Guid? ApartmentId { get; set; }
     public virtual Apartment Apartment { get; set; }
+    public Guid? FileId { get; set; } // File được tải lên
 }

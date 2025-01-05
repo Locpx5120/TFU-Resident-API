@@ -40,6 +40,7 @@
         public int RoomNumber { get; set; }
         public Guid ApartmentTypeId { get; set; }
         public Guid BuildingId { get; set; }
+        public Guid? Id { get; set; }
     }
 
     public class AddApartmentResDto

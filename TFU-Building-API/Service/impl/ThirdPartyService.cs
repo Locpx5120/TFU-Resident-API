@@ -116,12 +116,22 @@ namespace TFU_Building_API.Service.impl
             try
             {
                 Guid? apartmentId = null;
-                if (request.StartDate <= request.EndDate)
+                if (request.FileId == null || request.FileId == Guid.Empty)
                 {
                     return new ResponseData<AddThirdPartyContactResponseDto>
                     {
                         Success = false,
-                        Message = "Third-party contract added faill. StartDate > EndDate",
+                        Message = "Third-party contract added faill. File null",
+                        Data = null,
+                        Code = (int)ErrorCodeAPI.SystemIsError
+                    };
+                }
+                if (request.StartDate >= request.EndDate)
+                {
+                    return new ResponseData<AddThirdPartyContactResponseDto>
+                    {
+                        Success = false,
+                        Message = "Third-party contract added faill. StartDate < EndDate",
                         Data = null,
                         Code = (int)ErrorCodeAPI.SystemIsError
                     };
@@ -137,7 +147,9 @@ namespace TFU_Building_API.Service.impl
                     };
                 }
                 // Kiểm tra nếu có thông tin `BuildingId`, `FloorNumber`, `RoomNumber` thì mới lấy `ApartmentId`
-                if (request.BuildingId.HasValue && request.FloorNumber.HasValue && request.RoomNumber.HasValue)
+                if (request.BuildingId != Guid.Empty
+                    && request.FloorNumber != 0 && request.RoomNumber != 0
+                    )
                 {
                     var apartment = await _unitOfWork.ApartmentRepository
                         .GetQuery(a => a.BuildingId == request.BuildingId &&
@@ -180,9 +192,8 @@ namespace TFU_Building_API.Service.impl
                     ThirdPartyId = request.ThirdPartyId,
                     ApartmentId = apartmentId, // `ApartmentId` có thể là null
                     IsDeleted = false,
-                    InsertedAt = DateTime.Now,
-                    UpdatedAt = DateTime.Now,
-                    IsActive = true
+                    IsActive = true,
+                    FileId = request.FileId,
                 };
 
                 // Thêm hợp đồng vào cơ sở dữ liệu
@@ -485,6 +496,7 @@ namespace TFU_Building_API.Service.impl
                                 on tpc.ThirdPartyId equals tp.Id
                             select new ContractDetailResponseDto
                             {
+                                Id = tpc.Id,
                                 CompanyName = tp.NameCompany,
                                 Floor = aj == null ? 0 : aj.FloorNumber,
                                 Room = aj == null ? 0 : aj.RoomNumber, // Handle null apartment
@@ -494,7 +506,8 @@ namespace TFU_Building_API.Service.impl
                                 //EndDate = (tp.Status == false && tp.IsTenant == false) ? null : tpc.EndDate, // Null if Status is false and IsTenant is false
                                 StartDate = tpc.StartDate,
                                 EndDate = tpc.EndDate,
-                                ServicePrice = tpc.Price
+                                ServicePrice = tpc.Price,
+                                FileId = tpc.FileId ?? Guid.Empty
                             };
 
 
@@ -927,6 +940,15 @@ namespace TFU_Building_API.Service.impl
         {
             try
             {
+                if (request.FileId == null || request.FileId == Guid.Empty)
+                {
+                    return new ResponseData<AddThirdPartyContractHireResponseDto>
+                    {
+                        Success = false,
+                        Message = "Third party file not null",
+                        Code = (int)ErrorCodeAPI.NotFound
+                    };
+                }
                 if (request.Price < 1000000)
                 {
                     return new ResponseData<AddThirdPartyContractHireResponseDto>
@@ -976,7 +998,8 @@ namespace TFU_Building_API.Service.impl
                     InsertedById = Guid.NewGuid(), // Replace with the actual user ID if available
                     InsertedAt = DateTime.Now,
                     ApartmentId = apartment.Id,
-                    IsActive = true
+                    IsActive = true,
+                    FileId = request.FileId,
                 };
 
                 // Insert the new contract

@@ -188,7 +188,8 @@ namespace TFU_Building_API.Service.impl
                 // Cập nhật RoleId của nhân viên
                 staff.RoleId = request.RoleId;
                 staff.UpdatedAt = DateTime.Now;  // Cập nhật thời gian chỉnh sửa
-
+                staff.FullName = request.Name;
+                staff.PhoneNumber = request.PhoneNumber;
                 // Lưu thay đổi vào cơ sở dữ liệu
                 UnitOfWork.StaffRepository.Update(staff);
                 await UnitOfWork.SaveChangesAsync();

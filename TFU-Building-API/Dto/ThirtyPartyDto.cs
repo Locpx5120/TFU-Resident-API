@@ -30,11 +30,13 @@ namespace TFU_Building_API.Dto
         [Required]
         public Guid ThirdPartyId { get; set; }
         [Required]
-        public Guid? BuildingId { get; set; } // Cho phép null
+        public Guid BuildingId { get; set; } // Cho phép null
         [Required]
-        public int? FloorNumber { get; set; } // Cho phép null
+        public int FloorNumber { get; set; } // Cho phép null
         [Required]
-        public int? RoomNumber { get; set; }  // Cho phép null
+        public int RoomNumber { get; set; }  // Cho phép null
+        [Required]
+        public Guid FileId { get; set; } // File được tải lên
     }
 
 
@@ -136,6 +138,7 @@ namespace TFU_Building_API.Dto
 
     public class ContractDetailResponseDto
     {
+        public Guid Id { get; set; }
         public string CompanyName { get; set; } // Name of the third party
         public string NameService { get; set; }
         public int Floor { get; set; } // Floor number
@@ -144,6 +147,7 @@ namespace TFU_Building_API.Dto
         public DateTime? StartDate { get; set; } // Contract start date
         public DateTime? EndDate { get; set; } // Contract end date
         public decimal ServicePrice { get; set; } // Price of the service
+        public Guid FileId { get; set; }
     }
 
     public class AddThirdPartyContractHireRequestDto
@@ -160,6 +164,8 @@ namespace TFU_Building_API.Dto
         public decimal Price { get; set; } // Price for the service
         [Required]
         public Guid BuildId { get; set; } // Thong tin toa nha
+        [Required]
+        public Guid FileId { get; set; }
     }
 
     public class AddThirdPartyContractHireResponseDto
