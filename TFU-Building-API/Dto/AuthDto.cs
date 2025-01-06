@@ -1,5 +1,4 @@
-﻿using Core.Entity;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
 
 namespace TFU_Building_API.Model
@@ -35,17 +34,26 @@ namespace TFU_Building_API.Model
 
     }
 
-    public class UserInfoResponse : MasterDataEntityBase
+    public class UserInfoResponse
     {
-        [JsonProperty("firstname")]
-        public string FirstName { get; set; }
-        [JsonProperty("lastname")]
-        public string LastName { get; set; }
-        public string Email { get; set; } = null!;
-        public string? Phone { get; set; }
-        public string? Address { get; set; }
-        public Guid? RoleId { get; set; }
-        public string? RoleName { get; set; }
+        public string FullName { get; set; }
+        public string Email { get; set; }
+        public string? PhoneNumber { get; set; }
+        public DateTime? Birthday { get; set; }
+    }
+
+    public class UserInfoRequestDto
+    {
+        public string FullName { get; set; }
+        public string PhoneNumber { get; set; }
+        public DateTime Birthday { get; set; }
+    }
+
+    public class UserChangePassRequestDto
+    {
+        public string OldPassword { get; set; }
+        public string NewPassword { get; set; }
+        public string ConfirmPassword { get; set; }
     }
 
     public class RegisterRequestDto

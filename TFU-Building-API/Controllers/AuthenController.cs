@@ -1,5 +1,4 @@
-﻿using BuildingModels;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TFU_Building_API.Configure;
 using TFU_Building_API.Core.Helper;
@@ -38,20 +37,50 @@ namespace Controllers
             }
         }
 
-        //[Authorize]
-        //[HttpGet("token")]
-        //public async Task<IActionResult> GetUserInfo()
-        //{
-        //    try
-        //    {
-        //        var response = await _authService.GetUserInfo();
-        //        return Ok(response);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return BadRequest(ex.Message);
-        //    }
-        //}
+        [Authorize]
+        [HttpGet("token")]
+        public async Task<IActionResult> GetUserInfo()
+        {
+            try
+            {
+                var response = await _authService.GetUserInfo();
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [Authorize]
+        [HttpPost("updateUserLogin")]
+        public async Task<IActionResult> UpdateUserLogin(UserInfoRequestDto userInfoRequestDto)
+        {
+            try
+            {
+                var response = await _authService.UpdateUserLogin(userInfoRequestDto);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [Authorize]
+        [HttpPost("updateUserPass")]
+        public async Task<IActionResult> UpdateUserPass(UserChangePassRequestDto requestDto)
+        {
+            try
+            {
+                var response = await _authService.UpdateUserPass(requestDto);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
 
         //[HttpPost("changePassword")]
         //[Authorize]

@@ -154,25 +154,127 @@ namespace TFU_Building_API.Service.Impl
         }
 
 
-        //public async Task<ResponseData<UserInfoResponse>> GetUserInfo()
-        //{
-        //    var user = await UnitOfWork.UserRepository.GetQuery(
-        //        f => f.Id == _userIdentity.UserId &&
-        //        f.IsDeleted == false).FirstOrDefaultAsync();
-        //    if (user == null) return new ResponseData<UserInfoResponse>(ErrorCodeAPI.BadRequest);
+        public async Task<ResponseData<UserInfoResponse>> GetUserInfo()
+        {
+            UserInfoResponse userInfoResponse = new UserInfoResponse();
+            Staff staff = UnitOfWork.StaffRepository.GetById((Guid)_userIdentity.UserId);
+            if (staff != null)
+            {
+                userInfoResponse.FullName = staff.FullName;
+                userInfoResponse.Email = staff.Email;
+                userInfoResponse.PhoneNumber = staff.PhoneNumber;
+                userInfoResponse.Birthday = staff.Birthday;
+            }
+            else
+            {
+                Resident resident = UnitOfWork.ResidentRepository.GetById((Guid)_userIdentity.UserId);
+                userInfoResponse.FullName = resident.Name;
+                userInfoResponse.Email = resident.Email;
+                userInfoResponse.PhoneNumber = resident.Phone;
+                userInfoResponse.Birthday = resident.Birthday;
+            }
 
-        //    var role = await UnitOfWork.RoleRepository.GetByIdAsync(user.RoleId);
-        //    var response = _mapper.Map<UserInfoResponse>(user);
-        //    response.RoleName = role?.Name;
+            return new ResponseData<UserInfoResponse>()
+            {
+                Success = true,
+                Message = MessConstant.Successfully,
+                Code = (int)ErrorCodeAPI.OK,
+                Data = userInfoResponse,
+            };
+        }
 
-        //    return new ResponseData<UserInfoResponse>()
-        //    {
-        //        Success = true,
-        //        Message = MessConstant.Successfully,
-        //        Code = (int)ErrorCodeAPI.OK,
-        //        Data = response,
-        //    };
-        //}
+        public async Task<ResponseData<UserInfoResponse>> UpdateUserLogin(UserInfoRequestDto userInfoRequestDto)
+        {
+            Staff staff = UnitOfWork.StaffRepository.GetById((Guid)_userIdentity.UserId);
+            if (staff != null)
+            {
+                staff.FullName = userInfoRequestDto.FullName;
+                staff.PhoneNumber = userInfoRequestDto.PhoneNumber;
+                staff.Birthday = userInfoRequestDto.Birthday.AddDays(1);
+                UnitOfWork.StaffRepository.Update(staff);
+                await UnitOfWork.SaveChangesAsync();
+            }
+            else
+            {
+                Resident resident = UnitOfWork.ResidentRepository.GetById((Guid)_userIdentity.UserId);
+                resident.Name = userInfoRequestDto.FullName;
+                resident.Phone = userInfoRequestDto.PhoneNumber;
+                resident.Birthday = userInfoRequestDto.Birthday.AddDays(1);
+                UnitOfWork.ResidentRepository.Update(resident);
+                await UnitOfWork.SaveChangesAsync();
+            }
+
+            return new ResponseData<UserInfoResponse>()
+            {
+                Success = true,
+                Message = MessConstant.Successfully,
+                Code = (int)ErrorCodeAPI.OK,
+                Data = null
+            };
+        }
+
+        public async Task<ResponseData<UserInfoResponse>> UpdateUserPass(UserChangePassRequestDto requestDto)
+        {
+            if (!requestDto.NewPassword.Equals(requestDto.ConfirmPassword))
+            {
+                return new ResponseData<UserInfoResponse>()
+                {
+                    Success = false,
+                    Message = MessConstant.Failed,
+                    Code = (int)ErrorCodeAPI.InternalError,
+                    Data = null
+                };
+            }
+
+            Staff staff = UnitOfWork.StaffRepository.GetById((Guid)_userIdentity.UserId);
+            if (staff != null)
+            {
+
+                if (!staff.Password.Equals(requestDto.OldPassword))
+                {
+                    return new ResponseData<UserInfoResponse>()
+                    {
+                        Success = false,
+                        Message = MessConstant.Failed,
+                        Code = (int)ErrorCodeAPI.InternalError,
+                        Data = null
+                    };
+                }
+
+                staff.Password = requestDto.NewPassword;
+
+                UnitOfWork.StaffRepository.Update(staff);
+                await UnitOfWork.SaveChangesAsync();
+            }
+            else
+            {
+                Resident resident = UnitOfWork.ResidentRepository.GetById((Guid)_userIdentity.UserId);
+
+                if (!resident.Password.Equals(requestDto.OldPassword))
+                {
+                    return new ResponseData<UserInfoResponse>()
+                    {
+                        Success = false,
+                        Message = MessConstant.Failed,
+                        Code = (int)ErrorCodeAPI.InternalError,
+                        Data = null
+                    };
+                }
+
+                resident.Password = requestDto.NewPassword;
+
+                UnitOfWork.ResidentRepository.Update(resident);
+                await UnitOfWork.SaveChangesAsync();
+            }
+
+            return new ResponseData<UserInfoResponse>()
+            {
+                Success = true,
+                Message = MessConstant.Successfully,
+                Code = (int)ErrorCodeAPI.OK,
+                Data = null
+            };
+        }
 
         //public async Task<ResponseData<RegisterResponseDto>> Register(RegisterRequestDto register)
         //{
