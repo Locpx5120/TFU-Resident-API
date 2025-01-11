@@ -374,7 +374,9 @@ namespace TFU_Building_API.Service.impl
                                 StartDate = tpc.StartDate,
                                 EndDate = tpc.EndDate,
                                 ServicePrice = tpc.Price,
-                                FileId = tpc.FileId ?? Guid.Empty
+                                FileId = tpc.FileId ?? Guid.Empty,
+                                BuildingName = bj == null ? "" : bj.Name,
+                                BuildingId = bj == null ? Guid.Empty : bj.Id,
                             };
 
 

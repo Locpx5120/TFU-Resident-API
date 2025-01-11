@@ -148,6 +148,8 @@ namespace TFU_Building_API.Dto
         public DateTime? EndDate { get; set; } // Contract end date
         public decimal ServicePrice { get; set; } // Price of the service
         public Guid FileId { get; set; }
+        public string BuildingName { get; set; }
+        public Guid BuildingId { get; set; }
     }
 
     public class AddThirdPartyContractHireRequestDto

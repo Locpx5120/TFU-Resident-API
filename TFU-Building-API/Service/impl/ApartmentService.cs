@@ -425,12 +425,24 @@ namespace TFU_Building_API.Service.impl
                     };
                 }
 
-                if (building.NumberFloor < request.FloorNumber)
+
+                if (building.NumberFloor < request.FloorNumber || request.FloorNumber < 0)
                 {
                     return new ResponseData<AddApartmentResDto>
                     {
                         Success = false,
                         Message = $"Vui lòng nhập lại vì trùng phòng\r\nSố tầng đã chọn không hợp lệ. Toà nhà có {building.NumberFloor} tầng.",
+                        Data = null,
+                        Code = (int)ErrorCodeAPI.InternalError
+                    };
+                }
+
+                if (request.RoomNumber < 0)
+                {
+                    return new ResponseData<AddApartmentResDto>
+                    {
+                        Success = false,
+                        Message = $"Vui lòng nhập lại\r\nSố phồng đã chọn không hợp lệ. Không có phòng {request.RoomNumber}",
                         Data = null,
                         Code = (int)ErrorCodeAPI.InternalError
                     };
