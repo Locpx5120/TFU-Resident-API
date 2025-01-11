@@ -48,7 +48,7 @@ namespace TFU_Building_API.Service.impl
                         return new ResponseData<PaymentHistoryResponseDto>
                         {
                             Success = false,
-                            Message = "Khong tim thay thanh toan nay",
+                            Message = MessConstant.PaymentFoundZero,
                             Data = new PaymentHistoryResponseDto { Result = false },
                             Code = (int)ErrorCodeAPI.InternalError
                         };
@@ -59,7 +59,7 @@ namespace TFU_Building_API.Service.impl
                         return new ResponseData<PaymentHistoryResponseDto>
                         {
                             Success = false,
-                            Message = "Khong tim thay thanh toan nay",
+                            Message = MessConstant.PaymentFoundZero,
                             Data = new PaymentHistoryResponseDto { Result = false },
                             Code = (int)ErrorCodeAPI.OK
                         };
@@ -79,7 +79,7 @@ namespace TFU_Building_API.Service.impl
                     return new ResponseData<PaymentHistoryResponseDto>
                     {
                         Success = true,
-                        Message = "payment successfully.",
+                        Message = MessConstant.PaymentSuccessfully,
                         Data = new PaymentHistoryResponseDto { Result = true },
                         Code = (int)ErrorCodeAPI.OK
                     };
@@ -88,7 +88,7 @@ namespace TFU_Building_API.Service.impl
             return new ResponseData<PaymentHistoryResponseDto>
             {
                 Success = true,
-                Message = "Khong tim thay thanh toan nay",
+                Message = MessConstant.PaymentFoundZero,
                 Data = new PaymentHistoryResponseDto { Result = false },
                 Code = (int)ErrorCodeAPI.InternalError
             };
@@ -206,7 +206,7 @@ namespace TFU_Building_API.Service.impl
                                     Id = item.Id,
                                     NameService = item.NameService,
                                     Price = item.Price,
-                                    Type = "HopDong",
+                                    Type = "Hợp Đồng Thuê",
                                     ApartmentFloorNumber = apartment != null ? apartment.FloorNumber : 0,
                                     ApartmentRoomNumber = apartment != null ? apartment.RoomNumber : 0,
                                     ApartmentId = apartment != null ? apartment.Id : Guid.Empty,
@@ -248,11 +248,11 @@ namespace TFU_Building_API.Service.impl
                                     ApartmentId = apartment.Id,
                                     BuildingName = building.Name,
                                     BuildingId = building.Id,
-                                    Type = "HopDong",
+                                    Type = "Hợp Đồng Cho Thuê",
                                     CreateAt = (DateTime)item.UpdatedAt,
                                     //TransactionMapId = item.TransactionMapId,
                                     Amount = (decimal)item.Price,
-                                    Content = "Thanh toan hop dong",
+                                    Content = "Thanh toán hợp đồng",
                                     Bank = BankId,
                                     AccountNumber = SoTaiKhoan,
                                 };
@@ -334,7 +334,7 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<TransactionResponseDto>
                 {
                     Success = true,
-                    Message = "Successfully Transaction list.",
+                    Message = MessConstant.FindSuccessfully,
                     Data = transactionResponseDto,
                     Code = (int)ErrorCodeAPI.OK
                 };
@@ -364,7 +364,7 @@ namespace TFU_Building_API.Service.impl
                     return new ResponseData<UnpaidServiceDetailResponseDto>
                     {
                         Success = false,
-                        Message = "Khong tim thay thanh toan nay",
+                        Message = MessConstant.PaymentFoundZero,
                         Code = (int)ErrorCodeAPI.InternalError
                     };
                 }
@@ -438,7 +438,7 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<UnpaidServiceDetailResponseDto>
                 {
                     Success = true,
-                    Message = "Successfully retrieved service details.",
+                    Message = MessConstant.FindSuccessfully,
                     Data = response,
                     Code = (int)ErrorCodeAPI.OK
                 };
@@ -472,13 +472,13 @@ namespace TFU_Building_API.Service.impl
                     case Constants.TRANS_SERVICE_INVOICE_ALL:
                         if (transactionQRRequest.InvoiceId == null || transactionQRRequest.InvoiceId.Count == 0)
                         {
-                            throw new Exception("Ko hop le");
+                            throw new Exception("Sai định dạng");
                         }
 
                         List<Invoice> invoices = await _unitOfWork.InvoiceRepository.GetQuery(x => x.PaidStatus == false && transactionQRRequest.InvoiceId.Contains(x.Id)).ToListAsync();
                         if (invoices == null || invoices.Count == 0)
                         {
-                            throw new Exception("Ko tim thay invoice hop le");
+                            throw new Exception("Không tìm thấy đơn thanh toán");
                         }
                         transaction.Status = Constants.TRANS_STATUS_LOG_INIT;
                         transaction.Price = 0;
@@ -507,7 +507,7 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<TransactionQRResponseDto>
                 {
                     Success = true,
-                    Message = "Successfully Transaction list.",
+                    Message = MessConstant.FindSuccessfully,
                     Data = transactionQR,
                     Code = (int)ErrorCodeAPI.OK
                 };

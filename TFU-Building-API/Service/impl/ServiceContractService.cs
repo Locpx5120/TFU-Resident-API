@@ -58,7 +58,7 @@ namespace TFU_Building_API.Service.impl
                     responseList.Add(new AddRepairReportServiceResponseDto
                     {
                         Success = true,
-                        Message = $"Service added successfully for license plate "
+                        Message = MessConstant.UpdateSuccessfully
                     });
                 }
 
@@ -68,7 +68,7 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<List<AddRepairReportServiceResponseDto>>
                 {
                     Success = true,
-                    Message = "RepairReport services added successfully.",
+                    Message = MessConstant.UpdateSuccessfully,
                     Data = responseList,
                     Code = (int)ErrorCodeAPI.OK
                 };
@@ -104,7 +104,7 @@ namespace TFU_Building_API.Service.impl
                     return new ResponseData<string>
                     {
                         Success = false,
-                        Message = "Package service not found.",
+                        Message = MessConstant.PackageServiceFoundZero,
                         Code = (int)ErrorCodeAPI.NotFound
                     };
                 }
@@ -134,7 +134,7 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<string>
                 {
                     Success = true,
-                    Message = "Service contract created successfully.",
+                    Message = MessConstant.UpdateSuccessfully,
                     Code = (int)ErrorCodeAPI.OK
                 };
             }
@@ -158,7 +158,7 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<List<ServiceContractDetailDto>>
                 {
                     Success = true,
-                    Message = "Successfully retrieved service contract details.",
+                    Message = MessConstant.FindSuccessfully,
                     Data = result1.ToList(),
                     Code = (int)ErrorCodeAPI.OK
                 };
@@ -242,7 +242,7 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<PaginatedResponseDto<ServiceContractDetailDto>>
                 {
                     Success = true,
-                    Message = "Successfully retrieved service contract details.",
+                    Message = MessConstant.FindSuccessfully,
                     Data = paginatedResponse,
                     Code = (int)ErrorCodeAPI.OK
                 };
@@ -313,7 +313,7 @@ namespace TFU_Building_API.Service.impl
                         responseList.Add(new AddVehicleServiceResponseDto
                         {
                             Success = false,
-                            Message = $"Invalid package service for license plate {serviceRequest.LicensePlate}."
+                            Message = $"Không tìm thấy gói dịch vụ cho {serviceRequest.LicensePlate}."
                         });
                         continue;
                     }
@@ -346,7 +346,7 @@ namespace TFU_Building_API.Service.impl
                     responseList.Add(new AddVehicleServiceResponseDto
                     {
                         Success = true,
-                        Message = $"Service added successfully for license plate {serviceRequest.LicensePlate}."
+                        Message = $"Thêm dịch vụ thành công  {serviceRequest.LicensePlate}."
                     });
                 }
 
@@ -356,7 +356,7 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<List<AddVehicleServiceResponseDto>>
                 {
                     Success = true,
-                    Message = "Vehicle services added successfully.",
+                    Message = MessConstant.UpdateSuccessfully,
                     Data = responseList,
                     Code = (int)ErrorCodeAPI.OK
                 };
@@ -411,7 +411,7 @@ namespace TFU_Building_API.Service.impl
                     return new ResponseData<VehicleServiceDetailDto>
                     {
                         Success = false,
-                        Message = "Service contract not found",
+                        Message = MessConstant.ServiceContractFoundZero,
                         Code = (int)ErrorCodeAPI.NotFound
                     };
                 }
@@ -419,7 +419,7 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<VehicleServiceDetailDto>
                 {
                     Success = true,
-                    Message = "Vehicle service details retrieved successfully",
+                    Message = MessConstant.FindSuccessfully,
                     Data = serviceDetail,
                     Code = (int)ErrorCodeAPI.OK
                 };
@@ -449,8 +449,8 @@ namespace TFU_Building_API.Service.impl
                     return new ResponseData<AddVehicleServiceResponseDto>
                     {
                         Success = false,
-                        Message = "Service contract not found.",
-                        Data = new AddVehicleServiceResponseDto { Success = false, Message = "Service contract not found." },
+                        Message = MessConstant.ServiceContractFoundZero,
+                        Data = new AddVehicleServiceResponseDto { Success = false, Message = MessConstant.ServiceContractFoundZero },
                         Code = (int)ErrorCodeAPI.NotFound
                     };
                 }
@@ -518,8 +518,8 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<AddVehicleServiceResponseDto>
                 {
                     Success = true,
-                    Message = "Vehicle service request updated successfully.",
-                    Data = new AddVehicleServiceResponseDto { Success = true, Message = "Service request updated successfully." },
+                    Message = MessConstant.UpdateSuccessfully,
+                    Data = new AddVehicleServiceResponseDto { Success = true, Message = MessConstant.UpdateSuccessfully },
                     Code = (int)ErrorCodeAPI.OK
                 };
             }
@@ -551,7 +551,7 @@ namespace TFU_Building_API.Service.impl
                     return new ResponseData<string>
                     {
                         Success = false,
-                        Message = "No existing contracts found for the apartment.",
+                        Message = MessConstant.ThirdPartyContractFoundZero,
                         Code = (int)ErrorCodeAPI.NotFound
                     };
                 }
@@ -566,7 +566,7 @@ namespace TFU_Building_API.Service.impl
                     return new ResponseData<string>
                     {
                         Success = false,
-                        Message = "Package service not found.",
+                        Message = MessConstant.PackageServiceFoundZero,
                         Code = (int)ErrorCodeAPI.NotFound
                     };
                 }
@@ -600,7 +600,7 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<string>
                 {
                     Success = true,
-                    Message = "Service contract added successfully.",
+                    Message = MessConstant.UpdateSuccessfully,
                     Data = $"Service contract for apartment {request.ApartmentId} added successfully.",
                     Code = (int)ErrorCodeAPI.OK
                 };
@@ -631,7 +631,7 @@ namespace TFU_Building_API.Service.impl
                     return new ResponseData<string>
                     {
                         Success = false,
-                        Message = "User does not own any apartments.",
+                        Message = MessConstant.OwnerShipFoundZero,
                         Code = (int)ErrorCodeAPI.NotFound
                     };
                 }
@@ -662,7 +662,7 @@ namespace TFU_Building_API.Service.impl
                     return new ResponseData<string>
                     {
                         Success = true,
-                        Message = "Service contracts already exist for all apartments.",
+                        Message = "Tất cả các căn hộ đều đã có hợp đồng dịch vụ.",
                         Code = (int)ErrorCodeAPI.OK
                     };
                 }
@@ -677,7 +677,7 @@ namespace TFU_Building_API.Service.impl
                         EndDate = new DateTime(currentYear, currentMonth, DateTime.DaysInMonth(currentYear, currentMonth)),
                         Status = ServiceContractStatus.Approved,
                         Quantity = 1,
-                        Note = "Monthly fixed room service",
+                        Note = "Dịch vụ phòng cố định hàng tháng",
                         ApartmentId = apartmentId,
                         ServiceId = Guid.Parse("f517bef7-d325-487b-9f76-eb4d20413634"),
                         PackageServiceId = Guid.Parse("520e4b8e-8592-4e2d-b2fd-f3a804dee6e9"),
@@ -696,7 +696,7 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<string>
                 {
                     Success = true,
-                    Message = "Service contracts successfully created for all applicable apartments.",
+                    Message = MessConstant.UpdateSuccessfully,
                     Code = (int)ErrorCodeAPI.OK
                 };
             }
@@ -705,7 +705,7 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<string>
                 {
                     Success = false,
-                    Message = $"An error occurred: {ex.Message}",
+                    Message = $"Lỗi: {ex.Message}",
                     Code = (int)ErrorCodeAPI.SystemIsError
                 };
             }
@@ -730,8 +730,8 @@ namespace TFU_Building_API.Service.impl
                     return new ResponseData<AddRepairReportServiceResponseDto>
                     {
                         Success = false,
-                        Message = "Service contract not found.",
-                        Data = new AddRepairReportServiceResponseDto { Success = false, Message = "Service contract not found." },
+                        Message = MessConstant.ServiceContractFoundZero,
+                        Data = new AddRepairReportServiceResponseDto { Success = false, Message = MessConstant.ServiceContractFoundZero },
                         Code = (int)ErrorCodeAPI.NotFound
                     };
                 }
@@ -810,8 +810,8 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<AddRepairReportServiceResponseDto>
                 {
                     Success = true,
-                    Message = "Vehicle service request updated successfully.",
-                    Data = new AddRepairReportServiceResponseDto { Success = true, Message = "Service request updated successfully." },
+                    Message = MessConstant.UpdateSuccessfully,
+                    Data = new AddRepairReportServiceResponseDto { Success = true, Message = MessConstant.UpdateSuccessfully },
                     Code = (int)ErrorCodeAPI.OK
                 };
             }
@@ -843,7 +843,7 @@ namespace TFU_Building_API.Service.impl
                     return new ResponseData<RepairReportServiceDetailDto>
                     {
                         Success = false,
-                        Message = "Service contract not found",
+                        Message = MessConstant.ServiceContractFoundZero,
                         Code = (int)ErrorCodeAPI.NotFound
                     };
                 }
@@ -856,7 +856,7 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<RepairReportServiceDetailDto>
                 {
                     Success = true,
-                    Message = "RepairReport service details retrieved successfully",
+                    Message = MessConstant.UpdateSuccessfully,
                     Data = serviceDetail,
                     Code = (int)ErrorCodeAPI.OK
                 };

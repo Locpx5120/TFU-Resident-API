@@ -127,7 +127,7 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<List<ApartmentResponseDto>>
                 {
                     Success = true,
-                    Message = "Apartment information retrieved successfully.",
+                    Message = "Tìm kiếm thông tin căn hộ thành công.",
                     Data = apartments,
                     Code = (int)ErrorCodeAPI.OK
                 };
@@ -226,7 +226,7 @@ namespace TFU_Building_API.Service.impl
                     return new ResponseData<List<ApartmentMemberDetailDto>>
                     {
                         Success = false,
-                        Message = "Apartment owner not found.",
+                        Message = "Không tìm thấy chủ căn hộ",
                         Code = (int)ErrorCodeAPI.NotFound
                     };
                 }
@@ -267,7 +267,7 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<List<ApartmentMemberDetailDto>>
                 {
                     Success = true,
-                    Message = "Apartment member details retrieved successfully.",
+                    Message = "Tìm kiếm thông tin căn hộ thành công.",
                     Data = response,
                     Code = (int)ErrorCodeAPI.OK
                 };
@@ -329,8 +329,8 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<AddApartmentMemberResponseDto>
                 {
                     Success = true,
-                    Message = "Apartment member added successfully.",
-                    Data = new AddApartmentMemberResponseDto { Success = true, Message = "Member added successfully" },
+                    Message = "Thêm cư dân thành công",
+                    Data = new AddApartmentMemberResponseDto { Success = true, Message = "Thêm cư dân thành công" },
                     Code = (int)ErrorCodeAPI.OK
                 };
             }
@@ -375,7 +375,7 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<List<ApartmentDto>>
                 {
                     Success = true,
-                    Message = "Apartments retrieved successfully.",
+                    Message = "Tìm kiếm thông tin thành công",
                     Data = apartments,
                     Code = (int)ErrorCodeAPI.OK
                 };

@@ -25,7 +25,7 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<ApartmentResponseTypeDto>
                 {
                     Success = true,
-                    Message = "ApartmentType already exists.",
+                    Message = "Thể loại phòng đã tồn tại",
                     Code = (int)ErrorCodeAPI.OK
                 };
             }
@@ -51,7 +51,7 @@ namespace TFU_Building_API.Service.impl
             return new ResponseData<ApartmentResponseTypeDto>
             {
                 Success = true,
-                Message = "Add ApartmentType successfully.",
+                Message = "Thêm thành công",
                 Data = response,
                 Code = (int)ErrorCodeAPI.OK,
             };
@@ -70,7 +70,7 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<List<ApartmentResponseTypeDto>>
                 {
                     Success = true,
-                    Message = "ApartmentTypes retrived successfully",
+                    Message = "Tìm kiếm thông tin thành công",
                     Data = apartmentTypes,
                     Code = (int)ErrorCodeAPI.OK
                 };

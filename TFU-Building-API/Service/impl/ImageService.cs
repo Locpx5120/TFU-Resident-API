@@ -1,4 +1,5 @@
 ﻿using BuildingModels;
+using Constant;
 using Core.Enums;
 using Core.Model;
 using fake_tool.Helpers;
@@ -52,7 +53,7 @@ namespace TFU_Building_API.Service.impl
             return new ResponseData<ImageDto>
             {
                 Success = true,
-                Message = "file đã được tạo thành công.",
+                Message = "Tệp đã được tạo thành công.",
                 Data = response,
                 Code = (int)ErrorCodeAPI.OK
             };
@@ -70,7 +71,7 @@ namespace TFU_Building_API.Service.impl
                     return new ResponseData<ImageDto>
                     {
                         Success = false,
-                        Message = "Image not found.",
+                        Message = "Không tìm thấy ảnh",
                         Code = (int)ErrorCodeAPI.NotFound
                     };
                 }
@@ -87,7 +88,7 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<ImageDto>
                 {
                     Success = true,
-                    Message = "imageDto information successfully.",
+                    Message = MessConstant.Successfully,
                     Data = imageDto,
                     Code = (int)ErrorCodeAPI.OK
                 };

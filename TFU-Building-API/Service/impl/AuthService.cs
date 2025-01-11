@@ -97,7 +97,7 @@ namespace TFU_Building_API.Service.Impl
             if (resident != null)
             {
                 user = resident;
-                userRole = "Resident"; // Thiết lập vai trò là Resident
+                userRole = Constants.ROLE_Resident; // Thiết lập vai trò là Resident
             }
             else
             {

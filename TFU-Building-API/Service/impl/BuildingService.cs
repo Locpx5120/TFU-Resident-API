@@ -1,4 +1,5 @@
 ﻿using BuildingModels;
+using Constant;
 using Core.Enums;
 using Core.Model;
 using Microsoft.EntityFrameworkCore;
@@ -28,7 +29,7 @@ namespace TFU_Building_API.Service.impl
                     return new ResponseData<BuildingResponseDto>
                     {
                         Success = false,
-                        Message = "Building already exists.",
+                        Message = MessConstant.BuildingHasExist,
                         Code = (int)ErrorCodeAPI.DuplicateEntry
                     };
                 }
@@ -58,7 +59,7 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<BuildingResponseDto>
                 {
                     Success = true,
-                    Message = "Building created successfully.",
+                    Message = MessConstant.BuildingUpdateSuccessfully,
                     Data = response,
                     Code = (int)ErrorCodeAPI.OK
                 };
@@ -87,7 +88,7 @@ namespace TFU_Building_API.Service.impl
                     return new ResponseData<BuildingUpdateResponseDto>
                     {
                         Success = false,
-                        Message = "Building not found.",
+                        Message = MessConstant.BuildingFoundZero,
                         Code = (int)ErrorCodeAPI.NotFound
                     };
                 }
@@ -109,7 +110,7 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<BuildingUpdateResponseDto>
                 {
                     Success = true,
-                    Message = "Building updated successfully.",
+                    Message = MessConstant.BuildingUpdateSuccessfully,
                     Data = new BuildingUpdateResponseDto { Id = existingBuilding.Id },
                     Code = (int)ErrorCodeAPI.OK
                 };
@@ -183,7 +184,7 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<List<BuildingResponseDto>>
                 {
                     Success = true,
-                    Message = "Lấy thông tin toà nhà thành công",
+                    Message = MessConstant.FindSuccessfully,
                     Data = buildings ?? new List<BuildingResponseDto>(),
                     Code = (int)ErrorCodeAPI.OK
                 };
@@ -193,7 +194,7 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<List<BuildingResponseDto>>
                 {
                     Success = false,
-                    Message = $"An error occurred: {ex.Message}",
+                    Message = $"Lỗi: {ex.Message}",
                     Code = (int)ErrorCodeAPI.SystemIsError
                 };
             }
@@ -215,7 +216,7 @@ namespace TFU_Building_API.Service.impl
                     return new ResponseData<List<BuildingResponseDto>>
                     {
                         Success = false,
-                        Message = "User does not own any apartments.",
+                        Message = MessConstant.UserNotApartment,
                         Code = (int)ErrorCodeAPI.NotFound
                     };
                 }
@@ -238,7 +239,7 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<List<BuildingResponseDto>>
                 {
                     Success = true,
-                    Message = "Successfully retrieved buildings.",
+                    Message = MessConstant.FindSuccessfully,
                     Data = buildings,
                     Code = (int)ErrorCodeAPI.OK
                 };
@@ -248,7 +249,7 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<List<BuildingResponseDto>>
                 {
                     Success = false,
-                    Message = $"An error occurred: {ex.Message}",
+                    Message = $"Lỗi: {ex.Message}",
                     Code = (int)ErrorCodeAPI.SystemIsError
                 };
             }

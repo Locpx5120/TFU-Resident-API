@@ -1,4 +1,5 @@
 ﻿using BuildingModels;
+using Constant;
 using Core.Enums;
 using Core.Model;
 using Microsoft.EntityFrameworkCore;
@@ -159,7 +160,7 @@ namespace TFU_Building_API.Services.impl
                     return new ResponseData<string>
                     {
                         Success = false,
-                        Message = "This user does not own any apartments.",
+                        Message = MessConstant.UserNotApartment,
                         Code = (int)ErrorCodeAPI.NotFound
                     };
                 }
@@ -265,8 +266,8 @@ namespace TFU_Building_API.Services.impl
                 {
                     Success = true,
                     Message = newServiceContracts.Any()
-                        ? "Invoices created successfully for new services of all apartments owned by this user."
-                        : "All services of this user already have invoices for the current month.",
+                        ? "Đã tạo thành công hóa đơn cho các dịch vụ mới của tất cả các căn hộ do người dùng này sở hữu."
+                        : "Tất cả các dịch vụ của người dùng này đều đã có hóa đơn cho tháng hiện tại.",
                     Code = (int)ErrorCodeAPI.OK
                 };
             }
@@ -295,7 +296,7 @@ namespace TFU_Building_API.Services.impl
                         return new ResponseData<InvoicePaymentResponseDto>
                         {
                             Success = false,
-                            Message = $"Invoice with ID {invoiceId} not found.",
+                            Message = $"Không tìm thấy hóa đơn với ID {invoiceId}",
                             Code = (int)ErrorCodeAPI.NotFound
                         };
                     }
@@ -318,12 +319,12 @@ namespace TFU_Building_API.Services.impl
                 return new ResponseData<InvoicePaymentResponseDto>
                 {
                     Success = true,
-                    Message = "All payments processed successfully.",
+                    Message = "Tất cả thanh toán đã được xử lý thành công.",
                     Data = new InvoicePaymentResponseDto
                     {
                         Success = true,
                         QRCodeUrl = qrCodeUrl,
-                        Message = "Please scan the QR code with your banking app to proceed with payment."
+                        Message = "Vui lòng quét mã QR bằng ứng dụng ngân hàng của bạn để tiến hành thanh toán."
                     },
                     Code = (int)ErrorCodeAPI.OK
                 };
@@ -407,7 +408,7 @@ namespace TFU_Building_API.Services.impl
                 return new ResponseData<List<ResidentPaymentInfoDto>>
                 {
                     Success = true,
-                    Message = "Payment information retrieved successfully.",
+                    Message = "Đã lấy thông tin thanh toán thành công.",
                     Data = result,
                     Code = (int)ErrorCodeAPI.OK
                 };

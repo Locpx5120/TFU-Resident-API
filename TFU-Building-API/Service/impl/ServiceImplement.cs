@@ -49,7 +49,7 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<List<ServiceDto>>
                 {
                     Success = true,
-                    Message = "Successfully retrieved services.",
+                    Message = MessConstant.UpdateSuccessfully,
                     Data = services,
                     Code = (int)ErrorCodeAPI.OK
                 };
@@ -85,7 +85,7 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<List<ServiceResponseDto>>
                 {
                     Success = true,
-                    Message = "Services retrieved successfully.",
+                    Message = MessConstant.UpdateSuccessfully,
                     Data = services,
                     Code = (int)ErrorCodeAPI.OK
                 };

@@ -57,7 +57,7 @@ namespace TFU_Building_API.Service.impl
         //        return new ResponseData<PaginatedResponseDto<ApartmentServiceSummaryDto>>
         //        {
         //            Success = true,
-        //            Message = "Successfully retrieved apartment service summary.",
+        //            Message = MessConstant.FindSuccessfully,
         //            Data = response,
         //            Code = (int)ErrorCodeAPI.OK
         //        };
@@ -114,7 +114,7 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<PaginatedResponseDto<ApartmentServiceSummaryDto>>
                 {
                     Success = true,
-                    Message = "Successfully retrieved apartment service summary.",
+                    Message = MessConstant.FindSuccessfully,
                     Data = response,
                     Code = (int)ErrorCodeAPI.OK
                 };
@@ -182,7 +182,7 @@ namespace TFU_Building_API.Service.impl
         //        return new ResponseData<List<ServiceDetailDto>>
         //        {
         //            Success = true,
-        //            Message = "Successfully retrieved service details.",
+        //            Message = MessConstant.FindSuccessfully,
         //            Data = data,
         //            Code = (int)ErrorCodeAPI.OK
         //        };
@@ -259,7 +259,7 @@ namespace TFU_Building_API.Service.impl
         //        return new ResponseData<List<ServiceDetailDto>>
         //        {
         //            Success = true,
-        //            Message = "Successfully retrieved service details.",
+        //            Message = MessConstant.FindSuccessfully,
         //            Data = data,
         //            Code = (int)ErrorCodeAPI.OK
         //        };
@@ -346,7 +346,7 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<List<ServiceDetailDto>>
                 {
                     Success = true,
-                    Message = "Successfully retrieved service details.",
+                    Message = MessConstant.FindSuccessfully,
                     Data = data,
                     Code = (int)ErrorCodeAPI.OK
                 };
@@ -489,7 +489,7 @@ namespace TFU_Building_API.Service.impl
         //          return new ResponseData<PaginatedResponseDto<UnpaidServiceSummaryDto>>
         //          {
         //              Success = true,
-        //              Message = "Successfully retrieved service summary.",
+        //              Message = MessConstant.FindSuccessfully,
         //              Data = response,
         //              Code = (int)ErrorCodeAPI.OK
         //          };
@@ -513,27 +513,6 @@ namespace TFU_Building_API.Service.impl
                 List<UnpaidServiceSummaryDto> unpaidServiceSummaryDtos = new List<UnpaidServiceSummaryDto>();
                 if (_userIdentity.RoleName.Equals(Constants.ROLE_KE_TOAN))
                 {
-                    //if (request.BuildingIdFilter == null || request.BuildingIdFilter == Guid.Empty)
-                    //{
-                    //    return new ResponseData<PaginatedResponseDto<UnpaidServiceSummaryDto>>
-                    //    {
-                    //        Success = true,
-                    //        Message = "Thieu BuildingIdFilter",
-                    //        Data = null,
-                    //        Code = (int)ErrorCodeAPI.InternalError
-                    //    };
-                    //}
-
-                    //if (request.ApartmentIdFilter == null || request.ApartmentIdFilter == Guid.Empty)
-                    //{
-                    //    return new ResponseData<PaginatedResponseDto<UnpaidServiceSummaryDto>>
-                    //    {
-                    //        Success = true,
-                    //        Message = "Thieu ApartmentIdFilter",
-                    //        Data = null,
-                    //        Code = (int)ErrorCodeAPI.InternalError
-                    //    };
-                    //}
 
                     var query = from inv in _unitOfWork.InvoiceRepository.GetQuery(x => x.IsDeleted == false)
                                 join sc in _unitOfWork.ServiceContractRepository.GetQuery(x => x.IsActive && x.IsDeleted == false)
@@ -644,7 +623,7 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<PaginatedResponseDto<UnpaidServiceSummaryDto>>
                 {
                     Success = true,
-                    Message = "Successfully retrieved service summary.",
+                    Message = MessConstant.FindSuccessfully,
                     Data = response,
                     Code = (int)ErrorCodeAPI.OK
                 };
@@ -659,94 +638,6 @@ namespace TFU_Building_API.Service.impl
                 };
             }
         }
-
-
-
-
-
-        //public async Task<ResponseData<UnpaidServiceDetailResponseDto>> GetUnpaidServiceDetailsByApartmentId(UnpaidServiceDetailRequestDto request)
-        //{
-        //    try
-        //    {
-        //        var currentMonth = request.Month;
-        //        var currentYear = request.Year;
-
-        //        //var query = from inv in _unitOfWork.InvoiceRepository.GetQuery(x => x.PaidStatus == false && (x.IsDeleted == false))   
-        //        var query = from inv in _unitOfWork.InvoiceRepository.GetQuery(x => (x.IsDeleted == false))
-        //                    join sc in _unitOfWork.ServiceContractRepository.GetQuery(x => x.IsActive && (x.IsDeleted == false) && x.ApartmentId == request.ApartmentId)
-        //                        on inv.ServiceContractId equals sc.Id
-        //                    join s in _unitOfWork.ServiceRepository.GetQuery(x => (x.IsDeleted == false))
-        //                        on sc.ServiceId equals s.Id
-        //                    join a in _unitOfWork.ApartmentRepository.GetQuery(x => (x.IsDeleted == false))
-        //                        on sc.ApartmentId equals a.Id
-        //                    join at in _unitOfWork.ApartmentTypeRepository.GetQuery(x => x.IsActive && (x.IsDeleted == false))
-        //                        on a.ApartmentTypeId equals at.Id
-        //                    join ps in _unitOfWork.PackageServiceRepository.GetQuery(x => x.IsActive && (x.IsDeleted == false))
-        //                        on sc.PackageServiceId equals ps.Id into psJoin
-        //                    from ps in psJoin.DefaultIfEmpty()
-        //                    where inv.IssueDate.HasValue && inv.IssueDate.Value.Month == currentMonth && inv.IssueDate.Value.Year == currentYear
-        //                    select new
-        //                    {
-        //                        InvoiceId = inv.Id,
-        //                        ServiceName = s.ServiceName,
-        //                        Description = s.Description,
-        //                        QuantityOrArea = s.Unit == "m2" ? $"{at.LandArea} m2" : $"x{sc.Quantity}",
-        //                        UnitPrice = s.UnitPrice,
-        //                        Discount = ps.Discount ?? 0,
-        //                        Unit = s.Unit,
-        //                        LandArea = at.LandArea,
-        //                        Quantity = sc.Quantity,
-        //                        StartDate = sc.StartDate ?? DateTime.Now,
-        //                        EndDate = sc.EndDate ?? DateTime.Now
-        //                    };
-
-        //        // Áp dụng bộ lọc theo loại dịch vụ nếu có
-        //        if (!string.IsNullOrEmpty(request.ServiceType))
-        //        {
-        //            query = query.Where(x => x.ServiceName.Contains(request.ServiceType));
-        //        }
-
-        //        var result = await query.ToListAsync();
-
-        //        // Tính toán TotalPrice sau khi dữ liệu được tải
-        //        var services = result.Select(item => new UnpaidServiceDetailDto
-        //        {
-        //            InvoiceId = item.InvoiceId,
-        //            ServiceName = item.ServiceName,
-        //            Description = item.Description,
-        //            QuantityOrArea = item.QuantityOrArea,
-        //            UnitPrice = item.UnitPrice,
-        //            TotalPrice = CalculateTotalPrice(item.UnitPrice, item.StartDate, item.EndDate, item.Discount, item.Unit, item.LandArea, item.Quantity)
-        //        }).ToList();
-
-        //        // Tính tổng giá của tất cả dịch vụ
-        //        var totalAmount = services.Sum(x => x.TotalPrice);
-
-        //        // Đóng gói kết quả vào UnpaidServiceDetailResponseDto
-        //        var response = new UnpaidServiceDetailResponseDto
-        //        {
-        //            Services = services,
-        //            TotalAmount = totalAmount
-        //        };
-
-        //        return new ResponseData<UnpaidServiceDetailResponseDto>
-        //        {
-        //            Success = true,
-        //            Message = "Successfully retrieved unpaid service details.",
-        //            Data = response,
-        //            Code = (int)ErrorCodeAPI.OK
-        //        };
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return new ResponseData<UnpaidServiceDetailResponseDto>
-        //        {
-        //            Success = false,
-        //            Message = ex.Message,
-        //            Code = (int)ErrorCodeAPI.SystemIsError
-        //        };
-        //    }
-        //}
 
         public async Task<ResponseData<UnpaidServiceDetailResponseDto>> GetUnpaidServiceDetailsByApartmentId(UnpaidServiceDetailRequestDto request)
         {
@@ -827,7 +718,7 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<UnpaidServiceDetailResponseDto>
                 {
                     Success = true,
-                    Message = "Successfully retrieved service details.",
+                    Message = MessConstant.FindSuccessfully,
                     Data = response,
                     Code = (int)ErrorCodeAPI.OK
                 };

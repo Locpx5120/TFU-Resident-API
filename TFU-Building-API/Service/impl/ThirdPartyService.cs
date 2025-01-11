@@ -1,4 +1,5 @@
 ﻿using BuildingModels;
+using Constant;
 using Core.Enums;
 using Core.Model;
 using Microsoft.EntityFrameworkCore;
@@ -121,7 +122,7 @@ namespace TFU_Building_API.Service.impl
                     return new ResponseData<AddThirdPartyContactResponseDto>
                     {
                         Success = false,
-                        Message = "Third-party contract added faill. File null",
+                        Message = "Sai định dạng File truyền vào",
                         Data = null,
                         Code = (int)ErrorCodeAPI.SystemIsError
                     };
@@ -131,7 +132,7 @@ namespace TFU_Building_API.Service.impl
                     return new ResponseData<AddThirdPartyContactResponseDto>
                     {
                         Success = false,
-                        Message = "Third-party contract added faill. StartDate < EndDate",
+                        Message = "Hợp đồng của bên thứ ba đã thêm lỗi. Ngày bắt đầu phải nhỏ hơn ngày kết thúc",
                         Data = null,
                         Code = (int)ErrorCodeAPI.SystemIsError
                     };
@@ -141,7 +142,7 @@ namespace TFU_Building_API.Service.impl
                     return new ResponseData<AddThirdPartyContactResponseDto>
                     {
                         Success = false,
-                        Message = "Third-party contract added faill. Price > 1.000.000 vnd",
+                        Message = "Hợp đồng của bên thứ ba đã thêm lỗi. Số tiền phải lớn hơn 1.000.000 vnd",
                         Data = null,
                         Code = (int)ErrorCodeAPI.SystemIsError
                     };
@@ -203,7 +204,7 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<AddThirdPartyContactResponseDto>
                 {
                     Success = true,
-                    Message = "Third-party contract added successfully.",
+                    Message = MessConstant.UpdateSuccessfully,
                     Data = new AddThirdPartyContactResponseDto { Success = true, Message = "Contract added successfully." },
                     Code = (int)ErrorCodeAPI.OK
                 };
@@ -219,77 +220,6 @@ namespace TFU_Building_API.Service.impl
                 };
             }
         }
-
-
-        //public async Task<ResponseData<List<ThirdPartyListResponseDto>>> GetThirdPartyListAsync(ThirdPartyListRequestDto request)
-        //{
-        //    try
-        //    {
-        //        var query = from tp in _unitOfWork.ThirdPartyRepository.GetQuery(x => x.IsDeleted == false && x.IsTenant == true)
-        //                    join tpc in _unitOfWork.ThirdPartyContractRepository.GetQuery(x => x.IsDeleted == false) on tp.Id equals tpc.ThirdPartyId
-        //                    join a in _unitOfWork.ApartmentRepository.GetQuery(x => x.IsDeleted == false) on tpc.ApartmentId equals a.Id into apartmentJoin
-        //                    from aj in apartmentJoin.DefaultIfEmpty() // Allow null for ApartmentId
-        //                    join b in _unitOfWork.BuildingRepository.GetQuery(x => x.IsDeleted == false) on aj.BuildingId equals b.Id into buildingJoin
-        //                    from bj in buildingJoin.DefaultIfEmpty() // Allow null for BuildingId
-        //                    join s in _unitOfWork.StaffRepository.GetQuery(x => x.IsDeleted == false) on tp.StaffId equals s.Id
-        //                    select new
-        //                    {
-        //                        tp.Id,
-        //                        tp.NameCompany,
-        //                        ContactInfo = new { s.Email, s.PhoneNumber }, // Thông tin liên hệ từ bảng Staff
-        //                        tp.Description,
-        //                        tpc.StartDate,
-        //                        tpc.EndDate,
-        //                        BuildingName = bj.Name // Tên tòa nhà
-        //                    };
-
-        //        // Tìm kiếm theo tên công ty
-        //        if (!string.IsNullOrEmpty(request.CompanyName))
-        //        {
-        //            query = query.Where(x => x.NameCompany.Contains(request.CompanyName));
-        //        }
-
-        //        // Lọc theo trạng thái
-        //        DateTime oneMonthFromNow = DateTime.Now.AddMonths(1);
-        //        if (request.Status == "Trong thời hạn")
-        //        {
-        //            query = query.Where(x => x.EndDate > DateTime.Now);
-        //        }
-        //        else if (request.Status == "Chuẩn bị hết hạn")
-        //        {
-        //            query = query.Where(x => x.EndDate <= oneMonthFromNow && x.EndDate > DateTime.Now);
-        //        }
-
-        //        // Lấy dữ liệu và chuyển đổi thành danh sách response
-        //        var result = await query.Select(item => new ThirdPartyListResponseDto
-        //        {
-        //            ThirdPartyId = item.Id,
-        //            CompanyName = item.NameCompany,
-        //            ContactInfo = $"{item.ContactInfo.Email}, {item.ContactInfo.PhoneNumber}", // Định dạng thông tin liên hệ
-        //            StoreType = item.Description,
-        //            StartDate = item.StartDate,
-        //            EndDate = item.EndDate,
-        //            BuildingName = item.BuildingName
-        //        }).ToListAsync();
-
-        //        return new ResponseData<List<ThirdPartyListResponseDto>>
-        //        {
-        //            Success = true,
-        //            Message = "Successfully retrieved third-party list.",
-        //            Data = result,
-        //            Code = (int)ErrorCodeAPI.OK
-        //        };
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return new ResponseData<List<ThirdPartyListResponseDto>>
-        //        {
-        //            Success = false,
-        //            Message = ex.Message,
-        //            Code = (int)ErrorCodeAPI.SystemIsError
-        //        };
-        //    }
-        //}
 
         public async Task<ResponseData<List<ThirdPartyListResponseDto>>> GetThirdPartyListAsync(ThirdPartyListRequestDto request)
         {
@@ -391,7 +321,7 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<List<ThirdPartyListResponseDto>>
                 {
                     Success = true,
-                    Message = "Successfully retrieved third-party list.",
+                    Message = MessConstant.FindSuccessfully,
                     Data = result,
                     Code = (int)ErrorCodeAPI.OK
                 };
@@ -402,67 +332,11 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<List<ThirdPartyListResponseDto>>
                 {
                     Success = false,
-                    Message = $"An error occurred: {ex.Message}",
+                    Message = $"Lỗi: {ex.Message}",
                     Code = (int)ErrorCodeAPI.SystemIsError
                 };
             }
         }
-
-        //public async Task<ResponseData<List<ContractDetailResponseDto>>> GetContractDetailsByThirdPartyIdAsync(ContractDetailRequestDto request)
-        //{
-        //    try
-        //    {
-        //        // Validate input
-        //        if (request.ThirdPartyId == Guid.Empty)
-        //        {
-        //            return new ResponseData<List<ContractDetailResponseDto>>
-        //            {
-        //                Success = false,
-        //                Message = "Invalid ThirdPartyId.",
-        //                Code = (int)ErrorCodeAPI.BadRequest
-        //            };
-        //        }
-
-        //        // Query the details
-        //        var query = from tpc in _unitOfWork.ThirdPartyContractRepository.GetQuery(x => x.IsDeleted == false && x.ThirdPartyId == request.ThirdPartyId)
-        //                    join a in _unitOfWork.ApartmentRepository.GetQuery(x => x.IsDeleted == false)
-        //                        on tpc.ApartmentId equals a.Id
-        //                    join b in _unitOfWork.BuildingRepository.GetQuery(x => x.IsDeleted == false)
-        //                        on a.BuildingId equals b.Id
-        //                    join tp in _unitOfWork.ThirdPartyRepository.GetQuery(x => x.IsDeleted == false)
-        //                        on tpc.ThirdPartyId equals tp.Id
-        //                    select new ContractDetailResponseDto
-        //                    {
-        //                        CompanyName = tp.NameCompany,
-        //                        Floor = a.FloorNumber,
-        //                        Room = a.RoomNumber,
-        //                        Area = a.ApartmentType.LandArea, // Assume this represents the area in square meters
-        //                        StartDate = tpc.StartDate ?? DateTime.MinValue,
-        //                        EndDate = tpc.EndDate ?? DateTime.MinValue,
-        //                        ServicePrice = tpc.Price
-        //                    };
-
-        //        var result = await query.ToListAsync();
-
-        //        return new ResponseData<List<ContractDetailResponseDto>>
-        //        {
-        //            Success = true,
-        //            Message = "Successfully retrieved contract details.",
-        //            Data = result,
-        //            Code = (int)ErrorCodeAPI.OK
-        //        };
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return new ResponseData<List<ContractDetailResponseDto>>
-        //        {
-        //            Success = false,
-        //            Message = $"An error occurred: {ex.Message}",
-        //            Code = (int)ErrorCodeAPI.SystemIsError
-        //        };
-        //    }
-        //}
-
         public async Task<ResponseData<List<ContractDetailResponseDto>>> GetContractDetailsByThirdPartyIdAsync(ContractDetailRequestDto request)
         {
             try
@@ -473,32 +347,11 @@ namespace TFU_Building_API.Service.impl
                     return new ResponseData<List<ContractDetailResponseDto>>
                     {
                         Success = false,
-                        Message = "Invalid ThirdPartyId.",
+                        Message = "Sai định dạng tham số truyền vào ThirdPartyId.",
                         Code = (int)ErrorCodeAPI.BadRequest
                     };
                 }
 
-                // Query the details
-                //var query = from tpc in _unitOfWork.ThirdPartyContractRepository.GetQuery(x => x.IsDeleted == false && x.ThirdPartyId == request.ThirdPartyId)
-                //            join a in _unitOfWork.ApartmentRepository.GetQuery(x => x.IsDeleted == false)
-                //                on tpc.ApartmentId equals a.Id into apartmentJoin
-                //            from aj in apartmentJoin.DefaultIfEmpty() // Allow null for ApartmentId
-                //            join b in _unitOfWork.BuildingRepository.GetQuery(x => x.IsDeleted == false)
-                //                on aj.BuildingId equals b.Id into buildingJoin
-                //            from bj in buildingJoin.DefaultIfEmpty() // Allow null for BuildingId
-                //            join tp in _unitOfWork.ThirdPartyRepository.GetQuery(x => x.IsDeleted == false)
-                //                on tpc.ThirdPartyId equals tp.Id
-                //            select new ContractDetailResponseDto
-                //            {
-                //                CompanyName = tp.NameCompany,
-                //                Floor = aj == null ? 0 : aj.FloorNumber, // Handle null apartment
-                //                Room = aj == null ? 0 : aj.RoomNumber, // Handle null apartment
-                //                Area = aj == null ? 0 : aj.ApartmentType.LandArea, // Handle null apartment type
-                //                NameService = tpc.NameService, // Include NameService
-                //                StartDate = (DateTime)((tp.Status == false && tp.IsTenant == false) ? null : tpc.StartDate), // Null if Status is false and IsTenant is false
-                //                EndDate = (DateTime)((tp.Status == false && tp.IsTenant == false) ? null : tpc.EndDate), // Null if Status is false and IsTenant is false
-                //                ServicePrice = tpc.Price
-                //            };
                 var query = from tpc in _unitOfWork.ThirdPartyContractRepository.GetQuery(x => x.IsDeleted == false && x.ThirdPartyId == request.ThirdPartyId)
                             join a in _unitOfWork.ApartmentRepository.GetQuery(x => x.IsDeleted == false)
                                 on tpc.ApartmentId equals a.Id into apartmentJoin
@@ -530,7 +383,7 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<List<ContractDetailResponseDto>>
                 {
                     Success = true,
-                    Message = "Successfully retrieved contract details.",
+                    Message = MessConstant.FindSuccessfully,
                     Data = result,
                     Code = (int)ErrorCodeAPI.OK
                 };
@@ -540,7 +393,7 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<List<ContractDetailResponseDto>>
                 {
                     Success = false,
-                    Message = $"An error occurred: {ex.Message}",
+                    Message = $"Lỗi: {ex.Message}",
                     Code = (int)ErrorCodeAPI.SystemIsError
                 };
             }
@@ -706,7 +559,7 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<string>
                 {
                     Success = true,
-                    Message = "Third party and staff added successfully.",
+                    Message = MessConstant.UpdateSuccessfully,
                     Data = $"Third party {request.NameCompany} added successfully.",
                     Code = (int)ErrorCodeAPI.OK
                 };
@@ -721,71 +574,6 @@ namespace TFU_Building_API.Service.impl
                 };
             }
         }
-
-        //public async Task<ResponseData<PaginatedResponseDto<TenantRentResponseDto>>> GetTenantRentHistoryAsync(GetTenantRentRequestDto request)
-        //{
-        //    try
-        //    {
-        //        // Step 1: Query ThirdParties with IsTenant = true
-        //        var query = from tp in _unitOfWork.ThirdPartyRepository.GetQuery(t => (t.IsTenant == request.Istenant) && (t.IsDeleted == false))
-        //                    join tpc in _unitOfWork.ThirdPartyContractRepository.GetQuery(c => (c.IsDeleted == false))
-        //                        on tp.Id equals tpc.ThirdPartyId
-        //                    join a in _unitOfWork.ApartmentRepository.GetQuery(a => (a.IsDeleted == false))
-        //                        on tpc.ApartmentId equals a.Id
-        //                    select new TenantRentResponseDto
-        //                    {
-        //                        CompanyName = tp.NameCompany,
-        //                        Area = (decimal)a.Price, // Assuming Area is based on Apartment price or size
-        //                        EndDate = (DateTime)tpc.EndDate,
-        //                        RentAmount = tpc.Price,
-        //                        Description = tp.Description
-        //                    };
-
-        //        // Step 2: Apply search filter
-        //        if (!string.IsNullOrEmpty(request.CompanyName))
-        //        {
-        //            query = query.Where(x => x.CompanyName.Contains(request.CompanyName));
-        //        }
-
-        //        // Step 3: Apply end date filter
-        //        if (request.EndDateFilter.HasValue)
-        //        {
-        //            query = query.Where(x => x.EndDate.Date == request.EndDateFilter.Value.Date);
-        //        }
-
-        //        // Step 4: Pagination
-        //        var totalRecords = await query.CountAsync();
-        //        var data = await query
-        //            .Skip((request.PageNumber - 1) * request.PageSize)
-        //            .Take(request.PageSize)
-        //            .ToListAsync();
-
-        //        // Step 5: Prepare response
-        //        var response = new PaginatedResponseDto<TenantRentResponseDto>
-        //        {
-        //            TotalRecords = totalRecords,
-        //            Data = data
-        //        };
-
-        //        return new ResponseData<PaginatedResponseDto<TenantRentResponseDto>>
-        //        {
-        //            Success = true,
-        //            Message = "Tenant rent history retrieved successfully.",
-        //            Data = response,
-        //            Code = (int)ErrorCodeAPI.OK
-        //        };
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return new ResponseData<PaginatedResponseDto<TenantRentResponseDto>>
-        //        {
-        //            Success = false,
-        //            Message = ex.Message,
-        //            Code = (int)ErrorCodeAPI.SystemIsError
-        //        };
-        //    }
-        //}
-
         public async Task<ResponseData<PaginatedResponseDto<TenantRentResponseDto>>> GetTenantRentHistoryAsync(GetTenantRentRequestDto request)
         {
             try
@@ -854,7 +642,7 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<PaginatedResponseDto<TenantRentResponseDto>>
                 {
                     Success = true,
-                    Message = "Tenant rent history retrieved successfully.",
+                    Message = MessConstant.FindSuccessfully,
                     Data = response,
                     Code = (int)ErrorCodeAPI.OK
                 };
@@ -865,7 +653,7 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<PaginatedResponseDto<TenantRentResponseDto>>
                 {
                     Success = false,
-                    Message = $"An error occurred while retrieving tenant rent history: {ex.Message}",
+                    Message = $"Lỗi while retrieving tenant rent history: {ex.Message}",
                     Code = (int)ErrorCodeAPI.SystemIsError
                 };
             }
@@ -934,7 +722,7 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<PaginatedResponseDto<ThirdPartyHireResponseDto>>
                 {
                     Success = true,
-                    Message = "Third-party data retrieved successfully.",
+                    Message = MessConstant.FindSuccessfully,
                     Data = response,
                     Code = (int)ErrorCodeAPI.OK
                 };
@@ -944,7 +732,7 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<PaginatedResponseDto<ThirdPartyHireResponseDto>>
                 {
                     Success = false,
-                    Message = $"An error occurred while retrieving third-party data: {ex.Message}",
+                    Message = $"Lỗi while retrieving third-party data: {ex.Message}",
                     Code = (int)ErrorCodeAPI.SystemIsError
                 };
             }
@@ -959,7 +747,7 @@ namespace TFU_Building_API.Service.impl
                     return new ResponseData<AddThirdPartyContractHireResponseDto>
                     {
                         Success = false,
-                        Message = "Third party file not null",
+                        Message = "Thiếu File",
                         Code = (int)ErrorCodeAPI.NotFound
                     };
                 }
@@ -968,7 +756,7 @@ namespace TFU_Building_API.Service.impl
                     return new ResponseData<AddThirdPartyContractHireResponseDto>
                     {
                         Success = false,
-                        Message = "Third party minimum contract of 1 million or more",
+                        Message = "Số tiền không được dưới 1.000.000 vnđ",
                         Code = (int)ErrorCodeAPI.NotFound
                     };
                 }
@@ -981,7 +769,7 @@ namespace TFU_Building_API.Service.impl
                     return new ResponseData<AddThirdPartyContractHireResponseDto>
                     {
                         Success = false,
-                        Message = "Third party not found.",
+                        Message = MessConstant.ThirdPartyContractFoundZero,
                         Code = (int)ErrorCodeAPI.NotFound
                     };
                 }
@@ -992,7 +780,7 @@ namespace TFU_Building_API.Service.impl
                     return new ResponseData<AddThirdPartyContractHireResponseDto>
                     {
                         Success = false,
-                        Message = "End date must be after start date.",
+                        Message = "Ngày bắt đầu phải nhỏ hơn ngày kết thúc.",
                         Code = (int)ErrorCodeAPI.BadRequest
                     };
                 }
@@ -1023,11 +811,11 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<AddThirdPartyContractHireResponseDto>
                 {
                     Success = true,
-                    Message = "Third-party contract added successfully.",
+                    Message = MessConstant.UpdateSuccessfully,
                     Data = new AddThirdPartyContractHireResponseDto
                     {
                         ContractId = newContract.Id,
-                        Message = "Contract created successfully."
+                        Message = MessConstant.UpdateSuccessfully
                     },
                     Code = (int)ErrorCodeAPI.OK
                 };
@@ -1037,12 +825,10 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<AddThirdPartyContractHireResponseDto>
                 {
                     Success = false,
-                    Message = $"An error occurred: {ex.Message}",
+                    Message = $"Lỗi: {ex.Message}",
                     Code = (int)ErrorCodeAPI.SystemIsError
                 };
             }
         }
     }
-
-
 }

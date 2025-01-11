@@ -1,4 +1,5 @@
 ﻿using BuildingModels;
+using Constant;
 using Core.Enums;
 using Core.Model;
 using Microsoft.EntityFrameworkCore;
@@ -29,7 +30,7 @@ namespace TFU_Building_API.Service.impl
                     return new ResponseData<OwnerShipResponseDto>
                     {
                         Success = false,
-                        Message = "Apartment not found.",
+                        Message = MessConstant.ApartmentFoundZero,
                         Code = (int)ErrorCodeAPI.NotFound
                     };
                 }
@@ -40,7 +41,7 @@ namespace TFU_Building_API.Service.impl
                     return new ResponseData<OwnerShipResponseDto>
                     {
                         Success = false,
-                        Message = "User not found.",
+                        Message = MessConstant.ResidentFoundZero,
                         Code = (int)ErrorCodeAPI.UserNotFound
                     };
                 }
@@ -61,7 +62,7 @@ namespace TFU_Building_API.Service.impl
                         return new ResponseData<OwnerShipResponseDto>
                         {
                             Success = false,
-                            Message = "User have Owner Ship",
+                            Message = MessConstant.OwnerShipHaveExist,
                             Code = (int)ErrorCodeAPI.UserNotFound
                         };
                     }
@@ -85,7 +86,7 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<OwnerShipResponseDto>
                 {
                     Success = true,
-                    Message = "Ownership created successfully.",
+                    Message = MessConstant.OwnerShipUpdateSuccessfully,
                     Data = new OwnerShipResponseDto { Id = newOwnerShip.Id },
                     Code = (int)ErrorCodeAPI.OK
                 };
@@ -112,7 +113,7 @@ namespace TFU_Building_API.Service.impl
                     return new ResponseData<OwnerShipResponseDto>
                     {
                         Success = false,
-                        Message = "Building is not exist",
+                        Message = MessConstant.BuildingFoundZero,
                         Data = null,
                         Code = (int)ErrorCodeAPI.InternalError
                     };
@@ -123,7 +124,7 @@ namespace TFU_Building_API.Service.impl
                     return new ResponseData<OwnerShipResponseDto>
                     {
                         Success = false,
-                        Message = "building is not Floor",
+                        Message = MessConstant.BuildingOverFloor + $" {request.FloorNumber}/{building.NumberFloor}",
                         Data = null,
                         Code = (int)ErrorCodeAPI.InternalError
                     };
@@ -143,7 +144,7 @@ namespace TFU_Building_API.Service.impl
                     return new ResponseData<OwnerShipResponseDto>
                     {
                         Success = false,
-                        Message = "Apartment not found.",
+                        Message = MessConstant.ApartmentFoundZero,
                         Code = (int)ErrorCodeAPI.NotFound
                     };
                 }
@@ -183,7 +184,7 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<OwnerShipResponseDto>
                 {
                     Success = true,
-                    Message = "Ownership updated successfully.",
+                    Message = MessConstant.UpdateSuccessfully,
                     Data = new OwnerShipResponseDto { Id = ownerShip.Id },
                     Code = (int)ErrorCodeAPI.OK
                 };
@@ -210,7 +211,7 @@ namespace TFU_Building_API.Service.impl
                     return new ResponseData<OwnerShipResponseDto>
                     {
                         Success = false,
-                        Message = "Ownership not found.",
+                        Message = MessConstant.OwnerShipFoundZero,
                         Code = (int)ErrorCodeAPI.NotFound
                     };
                 }
@@ -225,7 +226,7 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<OwnerShipResponseDto>
                 {
                     Success = true,
-                    Message = "Ownership deleted successfully.",
+                    Message = MessConstant.OwnerShipUpdateSuccessfully,
                     Data = new OwnerShipResponseDto { Id = ownerShip.Id },
                     Code = (int)ErrorCodeAPI.OK
                 };
@@ -313,7 +314,7 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<PaginatedResponseDto<OwnerShipListResponseDto>>
                 {
                     Success = true,
-                    Message = "Successfully retrieved owner ships.",
+                    Message = MessConstant.Successfully,
                     Data = response,
                     Code = (int)ErrorCodeAPI.OK
                 };
@@ -343,7 +344,7 @@ namespace TFU_Building_API.Service.impl
                     return new ResponseData<OwnershipInfoResponseDto>
                     {
                         Success = false,
-                        Message = "Ownership not found.",
+                        Message = MessConstant.OwnerShipFoundZero,
                         Code = (int)ErrorCodeAPI.NotFound
                     };
                 }
@@ -357,7 +358,7 @@ namespace TFU_Building_API.Service.impl
                     return new ResponseData<OwnershipInfoResponseDto>
                     {
                         Success = false,
-                        Message = "User associated with ownership not found.",
+                        Message = MessConstant.ResidentFoundZero,
                         Code = (int)ErrorCodeAPI.UserNotFound
                     };
                 }
@@ -371,7 +372,7 @@ namespace TFU_Building_API.Service.impl
                     return new ResponseData<OwnershipInfoResponseDto>
                     {
                         Success = false,
-                        Message = "Apartment associated with ownership not found.",
+                        Message = MessConstant.ApartmentFoundZero,
                         Code = (int)ErrorCodeAPI.NotFound
                     };
                 }
@@ -389,7 +390,7 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<OwnershipInfoResponseDto>
                 {
                     Success = true,
-                    Message = "Ownership found successfully.",
+                    Message = MessConstant.FindSuccessfully,
                     Data = response,
                     Code = (int)ErrorCodeAPI.OK
                 };
@@ -420,7 +421,7 @@ namespace TFU_Building_API.Service.impl
                     return new ResponseData<List<ApartmentMemberDetailDto>>
                     {
                         Success = false,
-                        Message = "Ownership not found.",
+                        Message = MessConstant.OwnerShipFoundZero,
                         Code = (int)ErrorCodeAPI.NotFound
                     };
                 }
@@ -434,7 +435,7 @@ namespace TFU_Building_API.Service.impl
                     return new ResponseData<List<ApartmentMemberDetailDto>>
                     {
                         Success = false,
-                        Message = "User associated with ownership not found.",
+                        Message = MessConstant.ResidentFoundZero,
                         Code = (int)ErrorCodeAPI.UserNotFound
                     };
                 }
@@ -448,7 +449,7 @@ namespace TFU_Building_API.Service.impl
                     return new ResponseData<List<ApartmentMemberDetailDto>>
                     {
                         Success = false,
-                        Message = "Apartment associated with ownership not found.",
+                        Message = MessConstant.ApartmentFoundZero,
                         Code = (int)ErrorCodeAPI.NotFound
                     };
                 }
@@ -482,7 +483,7 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<List<ApartmentMemberDetailDto>>
                 {
                     Success = true,
-                    Message = "Apartment member details retrieved successfully.",
+                    Message = MessConstant.FindSuccessfully,
                     Data = response,
                     Code = (int)ErrorCodeAPI.OK
                 };

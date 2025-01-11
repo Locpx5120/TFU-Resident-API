@@ -1,4 +1,5 @@
 ﻿using BuildingModels;
+using Constant;
 using Core.Enums;
 using Core.Model;
 using fake_tool.Helpers;
@@ -39,7 +40,7 @@ namespace TFU_Building_API.Service.impl
                     return new ResponseData<StaffResponseDto>
                     {
                         Success = false,
-                        Message = "A staff with this email already exists.",
+                        Message = MessConstant.StaffHasEmail,
                         Code = (int)ErrorCodeAPI.DuplicateEntry
                     };
                 }
@@ -94,7 +95,7 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<StaffResponseDto>
                 {
                     Success = true,
-                    Message = "Staff created successfully.",
+                    Message = MessConstant.UpdateSuccessfully,
                     Data = response,
                     Code = (int)ErrorCodeAPI.OK
                 };
@@ -135,7 +136,7 @@ namespace TFU_Building_API.Service.impl
                     return new ResponseData<StaffResponseDto>
                     {
                         Success = false,
-                        Message = "Staff not found.",
+                        Message = MessConstant.StaffFoundZero,
                         Code = (int)ErrorCodeAPI.UserNotFound
                     };
                 }
@@ -151,7 +152,7 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<StaffResponseDto>
                 {
                     Success = true,
-                    Message = "Staff deleted successfully.",
+                    Message = MessConstant.UpdateSuccessfully,
                     Code = (int)ErrorCodeAPI.OK
                 };
             }
@@ -180,7 +181,7 @@ namespace TFU_Building_API.Service.impl
                     return new ResponseData<StaffResponseDto>
                     {
                         Success = false,
-                        Message = "Staff not found.",
+                        Message = MessConstant.StaffFoundZero,
                         Code = (int)ErrorCodeAPI.UserNotFound
                     };
                 }
@@ -197,7 +198,7 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<StaffResponseDto>
                 {
                     Success = true,
-                    Message = "Role updated successfully.",
+                    Message = MessConstant.UpdateSuccessfully,
                     Code = (int)ErrorCodeAPI.OK
                 };
             }
@@ -287,7 +288,7 @@ namespace TFU_Building_API.Service.impl
         //            return new ResponseData<StaffInfoResponseDto>
         //            {
         //                Success = false,
-        //                Message = "Staff not found.",
+        //                Message = MessConstant.StaffFoundZero,
         //                Code = (int)ErrorCodeAPI.NotFound
         //            };
         //        }
@@ -384,7 +385,7 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<List<GetStaffResponseDto>>
                 {
                     Success = true,
-                    Message = "Successfully retrieved staff.",
+                    Message = MessConstant.FindSuccessfully,
                     Data = data,
                     Code = (int)ErrorCodeAPI.OK
                 };
@@ -394,7 +395,7 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<List<GetStaffResponseDto>>
                 {
                     Success = false,
-                    Message = $"An error occurred: {ex.Message}",
+                    Message = $"Lỗi: {ex.Message}",
                     Code = (int)ErrorCodeAPI.SystemIsError
                 };
             }
@@ -410,7 +411,7 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<List<GetStaffAssigmentResponseDto>>
                 {
                     Success = true,
-                    Message = "Successfully retrieved staff.",
+                    Message = MessConstant.FindSuccessfully,
                     Data = query.ToList(),
                     Code = (int)ErrorCodeAPI.OK
                 };
@@ -420,12 +421,10 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<List<GetStaffAssigmentResponseDto>>
                 {
                     Success = false,
-                    Message = $"An error occurred: {ex.Message}",
+                    Message = $"Lỗi: {ex.Message}",
                     Code = (int)ErrorCodeAPI.SystemIsError
                 };
             }
         }
-
-
     }
 }

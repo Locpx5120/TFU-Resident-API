@@ -1,4 +1,5 @@
 ﻿using BuildingModels;
+using Constant;
 using Core.Enums;
 using Core.Model;
 using fake_tool.Helpers;
@@ -37,7 +38,7 @@ namespace TFU_Building_API.Service.impl
                     return new ResponseData<ResidentResponseDto>
                     {
                         Success = false,
-                        Message = "Member da co trong phong nay roi. ",
+                        Message = MessConstant.ResidentHaveExist,
                         Data = null,
                         Code = (int)ErrorCodeAPI.DuplicateEntry
                     };
@@ -60,7 +61,7 @@ namespace TFU_Building_API.Service.impl
                         return new ResponseData<ResidentResponseDto>
                         {
                             Success = false,
-                            Message = "Member không đủ tuổi đănh ký ít nhất 1 tuổi",
+                            Message = "Thành viên không đủ tuổi đăng ký ít nhất 1 tuổi",
                             Data = null,
                             Code = (int)ErrorCodeAPI.DuplicateEntry
                         };
@@ -108,7 +109,7 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<ResidentResponseDto>
                 {
                     Success = true,
-                    Message = "Resident added successfully.",
+                    Message = MessConstant.Successfully,
                     Data = response,
                     Code = (int)ErrorCodeAPI.OK
                 };
@@ -138,7 +139,7 @@ namespace TFU_Building_API.Service.impl
                     return new ResponseData<ResidentUpdateRequestDto>
                     {
                         Success = false,
-                        Message = "Resident not found.",
+                        Message = MessConstant.ResidentFoundZero,
                         Code = (int)ErrorCodeAPI.NotFound
                     };
                 }
@@ -165,7 +166,7 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<ResidentUpdateRequestDto>
                 {
                     Success = true,
-                    Message = "Resident updated successfully.",
+                    Message = MessConstant.UpdateSuccessfully,
                     Data = response,
                     Code = (int)ErrorCodeAPI.OK
                 };
@@ -250,7 +251,7 @@ namespace TFU_Building_API.Service.impl
                     return new ResponseData<ResidentResponseDto>
                     {
                         Success = false,
-                        Message = "Resident not found.",
+                        Message = MessConstant.ResidentFoundZero,
                         Code = (int)ErrorCodeAPI.NotFound
                     };
                 }
@@ -263,7 +264,7 @@ namespace TFU_Building_API.Service.impl
                     return new ResponseData<ResidentResponseDto>
                     {
                         Success = false,
-                        Message = "Living not found.",
+                        Message = MessConstant.ResidentFoundZeroLiving,
                         Code = (int)ErrorCodeAPI.NotFound
                     };
                 }
@@ -279,7 +280,7 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<ResidentResponseDto>
                 {
                     Success = true,
-                    Message = "Resident deleted successfully.",
+                    Message = MessConstant.UpdateSuccessfully,
                     Code = (int)ErrorCodeAPI.OK
                 };
             }
@@ -309,7 +310,7 @@ namespace TFU_Building_API.Service.impl
                     return new ResponseData<ResidentInfoResponseDto>
                     {
                         Success = false,
-                        Message = "Resident not found.",
+                        Message = MessConstant.ResidentFoundZero,
                         Code = (int)ErrorCodeAPI.NotFound
                     };
                 }
@@ -327,7 +328,7 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<ResidentInfoResponseDto>
                 {
                     Success = true,
-                    Message = "Resident found successfully.",
+                    Message = MessConstant.FindSuccessfully,
                     Data = response,
                     Code = (int)ErrorCodeAPI.OK
                 };
@@ -401,7 +402,7 @@ namespace TFU_Building_API.Service.impl
                         return new ResponseData<List<AddMemberResponseDto>>
                         {
                             Success = false,
-                            Message = "Member da co trong phong nay roi. ",
+                            Message = MessConstant.ResidentHaveExist,
                             Data = null,
                             Code = (int)ErrorCodeAPI.DuplicateEntry
                         };
@@ -444,7 +445,7 @@ namespace TFU_Building_API.Service.impl
                     responseList.Add(new AddMemberResponseDto
                     {
                         Success = true,
-                        Message = $"Member {member.Name} added successfully with service contract."
+                        Message = $"Thành viên {member.Name} thêm hợp đồng thành công."
                     });
                 }
 
@@ -454,7 +455,7 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<List<AddMemberResponseDto>>
                 {
                     Success = true,
-                    Message = "All members and service contracts added successfully.",
+                    Message = MessConstant.Successfully,
                     Data = responseList,
                     Code = (int)ErrorCodeAPI.OK
                 };
@@ -491,7 +492,7 @@ namespace TFU_Building_API.Service.impl
                     return new ResponseData<MemberServiceDetailDto>
                     {
                         Success = false,
-                        Message = "Service contract not found.",
+                        Message = MessConstant.ServiceContractFoundZero,
                         Code = (int)ErrorCodeAPI.NotFound
                     };
                 }
@@ -507,7 +508,7 @@ namespace TFU_Building_API.Service.impl
                     return new ResponseData<MemberServiceDetailDto>
                     {
                         Success = false,
-                        Message = "Resident not found for this service contract.",
+                        Message = MessConstant.ResidentFoundZeroLiving,
                         Code = (int)ErrorCodeAPI.NotFound
                     };
                 }
@@ -530,7 +531,7 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<MemberServiceDetailDto>
                 {
                     Success = true,
-                    Message = "Member service details retrieved successfully",
+                    Message = MessConstant.UpdateSuccessfully,
                     Data = response,
                     Code = (int)ErrorCodeAPI.OK
                 };
@@ -575,7 +576,7 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<List<GetResidentResponseDto>>
                 {
                     Success = true,
-                    Message = "All resident successfully.",
+                    Message = MessConstant.FindSuccessfully,
                     Data = residentResponseDtos,
                     Code = (int)ErrorCodeAPI.OK
                 };

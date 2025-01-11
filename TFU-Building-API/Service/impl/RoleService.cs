@@ -1,4 +1,5 @@
 ﻿using BuildingModels;
+using Constant;
 using Core.Enums;
 using Core.Model;
 using Microsoft.EntityFrameworkCore;
@@ -28,7 +29,7 @@ namespace TFU_Building_API.Service.impl
                     return new ResponseData<RoleResponseDto>
                     {
                         Success = false,
-                        Message = "Role already exists.",
+                        Message = "Vai trò đã tồn tại",
                         Code = (int)ErrorCodeAPI.DuplicateEntry
                     };
                 }
@@ -55,7 +56,7 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<RoleResponseDto>
                 {
                     Success = true,
-                    Message = "Role added successfully.",
+                    Message = MessConstant.UpdateSuccessfully,
                     Data = response,
                     Code = (int)ErrorCodeAPI.OK
                 };
@@ -88,7 +89,7 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<List<RoleResponseDto>>
                 {
                     Success = true,
-                    Message = "Roles retrieved successfully.",
+                    Message = MessConstant.UpdateSuccessfully,
                     Data = roles,
                     Code = (int)ErrorCodeAPI.OK
                 };

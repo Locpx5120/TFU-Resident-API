@@ -1,4 +1,5 @@
-﻿using Core.Enums;
+﻿using Constant;
+using Core.Enums;
 using Core.Model;
 using TFU_Building_API.Core.Helper;
 using TFU_Building_API.Core.Infrastructure;
@@ -33,7 +34,7 @@ public class ServiceRequestService : IServiceRequestService
                             Building = building.Name,
                             Status = serviceContract.Status == ServiceContractStatus.Pending ? "Đang xử lý" :
                                      serviceContract.Status == ServiceContractStatus.Approved ? "Đồng ý" :
-                                     serviceContract.Status == ServiceContractStatus.Rejected ? "Reject" : "Unknown",
+                                     serviceContract.Status == ServiceContractStatus.Rejected ? "Từ chối" : "Không xác định",
                             ServiceContractId = serviceContract.Id
                         };
 
@@ -59,7 +60,7 @@ public class ServiceRequestService : IServiceRequestService
             return new ResponseData<PaginatedList<ServiceRequestDto>>
             {
                 Success = true,
-                Message = "Service requests retrieved successfully.",
+                Message = MessConstant.UpdateSuccessfully,
                 Data = paginatedList,
                 Code = (int)ErrorCodeAPI.OK
             };

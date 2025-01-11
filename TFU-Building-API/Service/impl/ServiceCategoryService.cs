@@ -1,4 +1,4 @@
-﻿using BuildingModels;
+﻿using Constant;
 using Core.Enums;
 using Core.Model;
 using Microsoft.EntityFrameworkCore;
@@ -34,7 +34,7 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<List<ServiceCategoryResponseDto>>
                 {
                     Success = true,
-                    Message = "Service categories retrieved successfully.",
+                    Message = MessConstant.FindSuccessfully,
                     Data = categories,
                     Code = (int)ErrorCodeAPI.OK
                 };

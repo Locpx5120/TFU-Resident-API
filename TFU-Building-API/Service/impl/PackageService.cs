@@ -1,4 +1,5 @@
-﻿using Core.Enums;
+﻿using Constant;
+using Core.Enums;
 using Core.Model;
 using Microsoft.EntityFrameworkCore;
 using TFU_Building_API.Core.Handler;
@@ -33,7 +34,7 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<List<PackageServiceBasicDto>>
                 {
                     Success = true,
-                    Message = "Successfully retrieved package services.",
+                    Message = MessConstant.FindSuccessfully,
                     Data = packageServices,
                     Code = (int)ErrorCodeAPI.OK
                 };

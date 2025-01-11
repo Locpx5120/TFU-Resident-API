@@ -95,13 +95,13 @@ namespace TFU_Building_API.Service.impl
                 var response = new CreateNotifyResponseDto
                 {
                     Id = newNotify.Id,
-                    Message = "Bản tin đã được tạo thành công"
+                    Message = MessConstant.NotifyCreateSuccessfully,
                 };
 
                 return new ResponseData<CreateNotifyResponseDto>
                 {
                     Success = true,
-                    Message = "Bản tin đã được tạo thành công.",
+                    Message = MessConstant.NotifyCreateSuccessfully,
                     Data = response,
                     Code = (int)ErrorCodeAPI.OK
                 };
@@ -111,7 +111,7 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<CreateNotifyResponseDto>
                 {
                     Success = false,
-                    Message = $"An error occurred: {ex.Message}",
+                    Message = $"Lỗi: {ex.Message}",
                     Code = (int)ErrorCodeAPI.SystemIsError
                 };
             }
@@ -170,7 +170,7 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<PaginatedResponseDto<NotifyResponseDto>>
                 {
                     Success = true,
-                    Message = "Successfully retrieved notify list.",
+                    Message = MessConstant.FindSuccessfully,
                     Data = response,
                     Code = (int)ErrorCodeAPI.OK
                 };
@@ -221,7 +221,7 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<List<NotifyResponseDto>>
                 {
                     Success = true,
-                    Message = "Successfully retrieved notify list.",
+                    Message = MessConstant.FindSuccessfully,
                     Data = resultData,
                     Code = (int)ErrorCodeAPI.OK
                 };
@@ -249,7 +249,7 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<NotifyDetailResponseDto>
                 {
                     Success = true,
-                    Message = "Successfully retrieved notify list.",
+                    Message = MessConstant.FindSuccessfully,
                     Data = query.First(),
                     Code = (int)ErrorCodeAPI.OK
                 };
@@ -276,7 +276,7 @@ namespace TFU_Building_API.Service.impl
                     return new ResponseData<NotifyDetailResponseDto>
                     {
                         Success = false,
-                        Message = "Not found Noty.",
+                        Message = MessConstant.NotifyFoundZero,
                         Data = null,
                         Code = (int)ErrorCodeAPI.OK
                     };
@@ -288,7 +288,7 @@ namespace TFU_Building_API.Service.impl
                     return new ResponseData<NotifyDetailResponseDto>
                     {
                         Success = true,
-                        Message = "Successfully update notify.",
+                        Message = MessConstant.NotifyUpdateSuccessfully,
                         Data = null,
                         Code = (int)ErrorCodeAPI.OK
                     };
@@ -307,7 +307,7 @@ namespace TFU_Building_API.Service.impl
             return new ResponseData<NotifyDetailResponseDto>
             {
                 Success = false,
-                Message = "Liên hệ admin check lại code #_#",
+                Message = "Liên hệ admin kiểm tra lỗi",
                 Code = (int)ErrorCodeAPI.SystemIsError
             };
         }
@@ -323,7 +323,7 @@ namespace TFU_Building_API.Service.impl
                     return new ResponseData<NotifyDetailResponseDto>
                     {
                         Success = false,
-                        Message = "Not found Noty.",
+                        Message = MessConstant.NotifyFoundZero,
                         Data = null,
                         Code = (int)ErrorCodeAPI.OK
                     };
@@ -335,7 +335,7 @@ namespace TFU_Building_API.Service.impl
                     return new ResponseData<NotifyDetailResponseDto>
                     {
                         Success = true,
-                        Message = "Successfully update notify.",
+                        Message = MessConstant.NotifyUpdateSuccessfully,
                         Data = null,
                         Code = (int)ErrorCodeAPI.OK
                     };
@@ -354,7 +354,7 @@ namespace TFU_Building_API.Service.impl
             return new ResponseData<NotifyDetailResponseDto>
             {
                 Success = false,
-                Message = "Liên hệ admin check lại code #_#",
+                Message = "Liên hệ admin check lại",
                 Code = (int)ErrorCodeAPI.SystemIsError
             };
         }
@@ -371,7 +371,7 @@ namespace TFU_Building_API.Service.impl
                     return new ResponseData<NotifyDetailResponseDto>
                     {
                         Success = false,
-                        Message = "Not found Noty.",
+                        Message = MessConstant.NotifyFoundZero,
                         Data = null,
                         Code = (int)ErrorCodeAPI.OK
                     };
@@ -388,7 +388,7 @@ namespace TFU_Building_API.Service.impl
                             return new ResponseData<NotifyDetailResponseDto>
                             {
                                 Success = true,
-                                Message = "Successfully update notify.",
+                                Message = MessConstant.NotifyUpdateSuccessfully,
                                 Data = null,
                                 Code = (int)ErrorCodeAPI.OK
                             };
@@ -399,7 +399,7 @@ namespace TFU_Building_API.Service.impl
                         return new ResponseData<NotifyDetailResponseDto>
                         {
                             Success = false,
-                            Message = $"Role {_userIdentity.RoleName} not APPLYING",
+                            Message = $"Vài trò {_userIdentity.RoleName} không thể cập nhật",
                             Data = null,
                             Code = (int)ErrorCodeAPI.OK
                         };
@@ -440,7 +440,7 @@ namespace TFU_Building_API.Service.impl
                     return new ResponseData<NotifyDetailResponseDto>
                     {
                         Success = true,
-                        Message = "Successfully update notify.",
+                        Message = MessConstant.NotifyUpdateSuccessfully,
                         Data = null,
                         Code = (int)ErrorCodeAPI.OK
                     };
@@ -459,7 +459,7 @@ namespace TFU_Building_API.Service.impl
             return new ResponseData<NotifyDetailResponseDto>
             {
                 Success = false,
-                Message = "Liên hệ admin check lại code #_#",
+                Message = "Liên hệ admin check lại",
                 Code = (int)ErrorCodeAPI.SystemIsError
             };
         }

@@ -1,4 +1,5 @@
-﻿using Core.Enums;
+﻿using Constant;
+using Core.Enums;
 using Core.Model;
 using Microsoft.EntityFrameworkCore;
 using TFU_Building_API.Core.Handler;
@@ -94,7 +95,7 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<PaginatedResponseDto<ResidentPaymentDto>>
                 {
                     Success = true,
-                    Message = "Successfully retrieved resident payments.",
+                    Message = MessConstant.FindSuccessfully,
                     Data = paginatedResponse,
                     Code = (int)ErrorCodeAPI.OK
                 };
