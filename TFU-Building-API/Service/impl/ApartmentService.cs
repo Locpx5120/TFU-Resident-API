@@ -359,6 +359,19 @@ namespace TFU_Building_API.Service.impl
                     })
                     .ToListAsync();
 
+                if (_userIdentity.RoleName.Equals(Constants.ROLE_Resident))
+                {
+                    List<OwnerShip> ownerShips = _unitOfWork.OwnerShipRepository.GetQuery(x => x.ResidentId == _userIdentity.UserId).ToList();
+                    if (ownerShips.Any())
+                    {
+                        apartments = apartments.Where(z => ownerShips.Select(x => x.ApartmentId).ToList().Contains(z.Id)).ToList();
+                    }
+                    else
+                    {
+                        apartments = new List<ApartmentDto>();
+                    }
+                }
+
                 return new ResponseData<List<ApartmentDto>>
                 {
                     Success = true,
@@ -389,7 +402,7 @@ namespace TFU_Building_API.Service.impl
                     return new ResponseData<AddApartmentResDto>
                     {
                         Success = false,
-                        Message = "Building is not exist",
+                        Message = "Vui lòng nhập lại vì trùng phòng\r\nKhông có toà nhà đã chọn",
                         Data = null,
                         Code = (int)ErrorCodeAPI.InternalError
                     };
@@ -401,12 +414,12 @@ namespace TFU_Building_API.Service.impl
                    && r.IsDeleted == false)
                     .ToListAsync();
 
-                if (building.NumberApartment >= apartments.Count)
+                if (apartments.Count >= building.NumberApartment)
                 {
                     return new ResponseData<AddApartmentResDto>
                     {
                         Success = false,
-                        Message = "building is full",
+                        Message = $"Vui lòng nhập lại vì trùng phòng\r\nToà nhà đã đạt số lượng phòng tối đa {apartments.Count}/{building.NumberApartment}",
                         Data = null,
                         Code = (int)ErrorCodeAPI.InternalError
                     };
@@ -417,7 +430,7 @@ namespace TFU_Building_API.Service.impl
                     return new ResponseData<AddApartmentResDto>
                     {
                         Success = false,
-                        Message = "building is not Floor",
+                        Message = $"Vui lòng nhập lại vì trùng phòng\r\nSố tầng đã chọn không hợp lệ. Toà nhà có {building.NumberFloor} tầng.",
                         Data = null,
                         Code = (int)ErrorCodeAPI.InternalError
                     };
@@ -432,7 +445,7 @@ namespace TFU_Building_API.Service.impl
                     return new ResponseData<AddApartmentResDto>
                     {
                         Success = false,
-                        Message = "Room is exist",
+                        Message = "Vui lòng nhập lại vì trùng phòng\r\nTrùng căn hộ ! Vui lòng nhập lại",
                         Data = null,
                         Code = (int)ErrorCodeAPI.InternalError
                     };
@@ -468,7 +481,7 @@ namespace TFU_Building_API.Service.impl
                 return new ResponseData<AddApartmentResDto>
                 {
                     Success = true,
-                    Message = "Apartment member added successfully.",
+                    Message = "Thêm phòng thành công",
                     Data = new AddApartmentResDto { ApartmentId = apartment.Id },
                     Code = (int)ErrorCodeAPI.OK
                 };

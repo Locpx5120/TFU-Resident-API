@@ -360,18 +360,32 @@ namespace TFU_Building_API.Service.impl
                     }
                 }
 
-                // Step 4: Retrieve and transform data into response DTO
-                var result = await query.Select(item => new ThirdPartyListResponseDto
+                List<Guid> idThs = new List<Guid>();
+                List<ThirdPartyListResponseDto> thirdPartyListResponseDtos = new List<ThirdPartyListResponseDto>();
+                foreach (var item in query)
                 {
-                    ThirdPartyId = item.Id,
-                    CompanyName = item.NameCompany,
-                    ContactInfo = $"{item.ContactInfo.Email}, {item.ContactInfo.PhoneNumber}", // Format contact info
-                    StoreType = item.Description,
-                    StartDate = item.StartDate,
-                    EndDate = item.EndDate,
-                    BuildingName = item.BuildingName,
-                    Status = item.ContractStatus // Add the contract status to the response
-                }).ToListAsync();
+                    if (idThs.Contains(item.Id))
+                    {
+                        continue;
+                    }
+                    idThs.Add(item.Id);
+
+                    ThirdPartyListResponseDto thirdPartyListResponseDto = new ThirdPartyListResponseDto
+                    {
+                        ThirdPartyId = item.Id,
+                        CompanyName = item.NameCompany,
+                        ContactInfo = $"{item.ContactInfo.Email}, {item.ContactInfo.PhoneNumber}", // Format contact info
+                        StoreType = item.Description,
+                        StartDate = item.StartDate,
+                        EndDate = item.EndDate,
+                        BuildingName = item.BuildingName,
+                        Status = item.ContractStatus // Add the contract status to the response
+                    };
+                    thirdPartyListResponseDtos.Add(thirdPartyListResponseDto);
+                }
+
+                // Step 4: Retrieve and transform data into response DTO
+                var result = thirdPartyListResponseDtos.ToList();
 
                 // Step 5: Return successful response
                 return new ResponseData<List<ThirdPartyListResponseDto>>

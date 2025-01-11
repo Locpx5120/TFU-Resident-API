@@ -77,6 +77,8 @@
         public string BuildingName { get; set; } // toa nha
         public Guid BuildingId { get; set; } // toa nha
         public Guid ApartmentId { get; set; } // toa nha
+        public string SentUser { get; set; }
+        public string ReciveUser { get; set; }
     }
 
     public class TransactionRequestDto

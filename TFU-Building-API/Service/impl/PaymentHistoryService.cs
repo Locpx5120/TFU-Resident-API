@@ -199,7 +199,7 @@ namespace TFU_Building_API.Service.impl
                                 }
 
                                 BuildingModels.Building building = _unitOfWork.BuildingRepository.GetById((Guid)apartment.BuildingId);
-
+                                ThirdParty thirdParty = _unitOfWork.ThirdPartyRepository.GetById((Guid)item.ThirdPartyId);
                                 transactionResponseDto.Transfer += item.Price;
                                 var transactionTransfer = new TransactionTransferResponseDto
                                 {
@@ -212,6 +212,8 @@ namespace TFU_Building_API.Service.impl
                                     ApartmentId = apartment != null ? apartment.Id : Guid.Empty,
                                     BuildingName = building != null ? building.Name : "",
                                     BuildingId = building != null ? building.Id : Guid.Empty,
+                                    SentUser = thirdParty.NameCompany,
+                                    ReciveUser = AccountName,
                                 };
                                 transactionTransfers.Add(transactionTransfer);
                             }

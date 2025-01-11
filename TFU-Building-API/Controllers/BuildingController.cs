@@ -42,9 +42,9 @@ namespace TFU_Building_API.Controllers
 
 
         [HttpGet("get")]
-        public async Task<IActionResult> GetBuildings()
+        public async Task<IActionResult> GetBuildings(String? buildingName)
         {
-            var result = await _buildingService.GetBuildingsAsync();
+            var result = await _buildingService.GetBuildingsAsync(buildingName ?? "");
             return StatusCode(result.Code, result);
         }
 

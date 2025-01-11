@@ -18,12 +18,18 @@ namespace TFU_Building_API.Dto
         public DateTime CreateAt { get; set; } // thời điểm toà nhà đc tạo
     }
 
+    public class BuildingGetRequestDto
+    {
+        public string? BuildingName { get; set; }
+    }
+
     public class BuildingResponseDto
     {
         public Guid Id { get; set; }
         public string BuildingName { get; set; }
         public int NumberFloor { get; set; }
         public int NumberApartment { get; set; }
+        public int NumberOfCitizen { get; set; }
         public string Address { get; set; }
         public DateTime? CreateAt { get; set; }
     }

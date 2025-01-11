@@ -43,6 +43,30 @@ namespace TFU_Building_API.Service.impl
                     };
                 }
 
+                if (request.Birthday != null)
+                {
+                    DateTime birthday = request.Birthday.Value;
+                    DateTime today = DateTime.Today;
+                    int age = today.Year - birthday.Year;
+
+                    if (today.Month < birthday.Month || (today.Month == birthday.Month && today.Day < birthday.Day))
+                    {
+                        age--;
+                    }
+
+                    // Kiểm tra nếu tuổi nhỏ hơn 1 thì không được đăng ký
+                    if (age < 1)
+                    {
+                        return new ResponseData<ResidentResponseDto>
+                        {
+                            Success = false,
+                            Message = "Member không đủ tuổi đănh ký ít nhất 1 tuổi",
+                            Data = null,
+                            Code = (int)ErrorCodeAPI.DuplicateEntry
+                        };
+                    }
+                }
+
                 // Tạo mới Resident và thiết lập các giá trị từ request
                 var newResident = new Resident
                 {
@@ -528,7 +552,10 @@ namespace TFU_Building_API.Service.impl
             {
                 List<GetResidentResponseDto> residentResponseDtos = new List<GetResidentResponseDto>();
                 var responseList = _unitOfWork.ResidentRepository.GetQuery(x => x.IsDeleted == false).ToList();
-
+                if (responseList.Any())
+                {
+                    responseList = responseList.ToList().OrderByDescending(x => x.InsertedAt).ToList();
+                }
                 foreach (var item in responseList)
                 {
                     // Step 1: Insert into Residents table

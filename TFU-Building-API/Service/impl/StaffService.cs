@@ -55,7 +55,7 @@ namespace TFU_Building_API.Service.impl
                     FullName = request.Name,
                     Email = request.Email,
                     Password = generatedPassword, // Lưu mật khẩu dạng plain text
-                    PhoneNumber = request.Phone,
+                    PhoneNumber = request.PhoneNumber,
                     RoleId = request.RoleId,
                     InsertedAt = DateTime.Now,
                     UpdatedAt = DateTime.Now,

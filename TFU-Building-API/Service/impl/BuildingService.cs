@@ -126,12 +126,12 @@ namespace TFU_Building_API.Service.impl
             }
         }
 
-        public async Task<ResponseData<List<BuildingResponseDto>>> GetBuildingsAsync()
+        public async Task<ResponseData<List<BuildingResponseDto>>> GetBuildingsAsync(String buildingName)
         {
             try
             {
                 // Lấy danh sách các tòa nhà không bị xóa
-                var query = _unitOfWork.BuildingRepository.GetQuery(x => x.IsDeleted == false)
+                var buildings = _unitOfWork.BuildingRepository.GetQuery(x => x.IsDeleted == false)
                     .Select(b => new BuildingResponseDto
                     {
                         Id = b.Id,
@@ -140,15 +140,51 @@ namespace TFU_Building_API.Service.impl
                         NumberFloor = (int)b.NumberFloor,
                         NumberApartment = (int)b.NumberApartment,
                         Address = b.Address,
-                    });
+                    }).ToList();
+                if (!String.IsNullOrEmpty(buildingName))
+                {
+                    buildingName = buildingName.Trim();
+                    if (!String.IsNullOrEmpty(buildingName))
+                    {
+                        buildings = buildings.Where(x => x.BuildingName.ToUpper().StartsWith(buildingName.ToUpper())).ToList();
+                    }
+                }
 
-                var buildings = await query.ToListAsync();
+                List<Apartment> apartments = _unitOfWork.ApartmentRepository.GetQuery(x => buildings.Select(k => k.Id).ToList().Contains(x.BuildingId)).ToList();
+                foreach (var item in buildings)
+                {
+                    if (!apartments.Any())
+                    {
+                        item.NumberOfCitizen = 0;
+                        continue;
+                    }
+                    List<Apartment> apartmentBuilding = apartments.Where(x => x.BuildingId == item.Id).ToList();
+                    if (!apartmentBuilding.Any())
+                    {
+                        item.NumberOfCitizen = 0;
+                        continue;
+                    }
+                    List<OwnerShip> ownerShips = _unitOfWork.OwnerShipRepository.GetQuery(x => apartmentBuilding.Select(k => k.Id).ToList().Contains((Guid)x.ApartmentId)).ToList();
+                    if (ownerShips.Any())
+                    {
+                        item.NumberOfCitizen += ownerShips.Count();
+                        continue;
+                    }
+                    List<Living> livings = _unitOfWork.LivingRepository.GetQuery(x => apartmentBuilding.Select(k => k.Id).ToList().Contains((Guid)x.ApartmentId)).ToList();
+                    if (livings.Any())
+                    {
+                        item.NumberOfCitizen += livings.Count();
+                        continue;
+                    }
+                }
+
+
 
                 return new ResponseData<List<BuildingResponseDto>>
                 {
                     Success = true,
-                    Message = "Successfully retrieved buildings.",
-                    Data = buildings,
+                    Message = "Lấy thông tin toà nhà thành công",
+                    Data = buildings ?? new List<BuildingResponseDto>(),
                     Code = (int)ErrorCodeAPI.OK
                 };
             }

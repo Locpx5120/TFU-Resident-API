@@ -28,7 +28,7 @@ namespace TFU_Building_API.Controllers
             return BadRequest(response);
         }
 
-        [HttpPut("UpdateOwnerShip")]
+        [HttpPost("UpdateOwnerShip")]
         public async Task<IActionResult> UpdateOwnerShip(OwnerShipUpdateRequestDto request)
         {
             var response = await _ownerShipService.UpdateOwnerShip(request);
