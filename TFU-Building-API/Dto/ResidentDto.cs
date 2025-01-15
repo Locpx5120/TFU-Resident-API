@@ -45,6 +45,8 @@ namespace TFU_Building_API.Dto
         [Required]
         public string Name { get; set; }
 
+        public DateTime? DateOfBirth { get; set; } 
+
         [Required]
         [EmailAddress]
         public string Email { get; set; }

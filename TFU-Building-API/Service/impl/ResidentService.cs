@@ -172,6 +172,7 @@ namespace TFU_Building_API.Service.impl
                 existingResident.Email = request.Email;
                 existingResident.Phone = request.Phone;
                 existingResident.UpdatedAt = DateTime.Now;
+                existingResident.Birthday = request.DateOfBirth;
 
                 // Lưu thay đổi
                 _unitOfWork.ResidentRepository.Update(existingResident);
@@ -183,7 +184,8 @@ namespace TFU_Building_API.Service.impl
                     Id = existingResident.Id,
                     Name = existingResident.Name,
                     Email = existingResident.Email,
-                    Phone = existingResident.Phone
+                    Phone = existingResident.Phone,
+                    DateOfBirth = existingResident.Birthday,
                 };
 
                 return new ResponseData<ResidentUpdateRequestDto>
