@@ -152,8 +152,7 @@ namespace TFU_Building_API.Service.impl
                 // Stage 1: Fetch data from the database
                 var query = await _unitOfWork.TransactionRepository.GetQuery(x => x.IsDeleted == false
                 //&& !x.Status.Equals(Constants.TRANS_STATUS_LOG_INIT)
-                && x.Status.Equals(Constants.TRANS_STATUS_LOG_DONE)
-                ).ToListAsync();
+                && x.Status.Equals(Constants.TRANS_STATUS_LOG_DONE)).ToListAsync();
                 List<Guid> thirdPartiesId = _unitOfWork.ThirdPartyRepository.GetQuery(x => x.IsDeleted == false && x.IsTenant == false).Select(x => x.Id).ToList();
 
                 if (transactionRequest.To != null)
@@ -227,14 +226,22 @@ namespace TFU_Building_API.Service.impl
                                 {
                                     continue;
                                 }
-                                Apartment apartment = _unitOfWork.ApartmentRepository.GetById((Guid)item.ApartmentId);
+                                Apartment apartment = _unitOfWork.ApartmentRepository.GetById(item.ApartmentId ?? Guid.Empty);
+                                if (apartment == null)
+                                {
+                                    continue;
+                                }
                                 if (transactionRequest.BuildingId != null && transactionRequest.BuildingId != apartment.BuildingId)
                                 {
                                     continue;
                                 }
-                                BuildingModels.Building building = _unitOfWork.BuildingRepository.GetById((Guid)apartment.BuildingId);
-                                ThirdParty thirdParty = _unitOfWork.ThirdPartyRepository.GetById((Guid)item.ThirdPartyId);
-                                transactionResponseDto.Transfer += item.Price;
+                                BuildingModels.Building building = _unitOfWork.BuildingRepository.GetById(apartment.BuildingId);
+                                ThirdParty thirdParty = _unitOfWork.ThirdPartyRepository.GetById(item.ThirdPartyId ?? Guid.Empty);
+                                if (thirdParty == null)
+                                {
+                                    continue;
+                                }
+                                //transactionResponseDto.Transfer += item.Price;
                                 var transaction = new TransactionHistoryResponseDto
                                 {
                                     //ServiceId = (Guid)serviceContract.ServiceId,
@@ -265,70 +272,72 @@ namespace TFU_Building_API.Service.impl
 
                 }
                 // Stage 3: In-memory transformations
-
-                foreach (var item in query.ToList())
+                if (!_userIdentity.RoleName.Equals(Constants.ROLE_KE_TOAN))
                 {
-                    List<RequestBodyItem> items = Utill.ConvertJsonToObject<List<RequestBodyItem>>(item.RequestBody);
-                    List<Guid> ids = items.Select(item => item.Id).ToList();
-                    List<Invoice> invoices = _unitOfWork.InvoiceRepository.GetQuery(x => ids.Contains(x.Id)).ToList();
-                    foreach (var itemInvoice in invoices)
+                    foreach (var item in query.ToList())
                     {
-                        ServiceContract serviceContract = _unitOfWork.ServiceContractRepository.GetById(itemInvoice.ServiceContractId);
-                        if (transactionRequest.ApartmentId != null && transactionRequest.ApartmentId != serviceContract.ApartmentId)
+                        List<RequestBodyItem> items = Utill.ConvertJsonToObject<List<RequestBodyItem>>(item.RequestBody);
+                        List<Guid> ids = items.Select(item => item.Id).ToList();
+                        List<Invoice> invoices = _unitOfWork.InvoiceRepository.GetQuery(x => ids.Contains(x.Id)).ToList();
+                        foreach (var itemInvoice in invoices)
                         {
-                            continue;
-                        }
-                        Apartment apartment = _unitOfWork.ApartmentRepository.GetById((Guid)serviceContract.ApartmentId);
-                        if (transactionRequest.BuildingId != null && transactionRequest.BuildingId != apartment.BuildingId)
-                        {
-                            continue;
-                        }
-                        BuildingModels.Building building = _unitOfWork.BuildingRepository.GetById((Guid)apartment.BuildingId);
-
-                        Service = _unitOfWork.ServiceRepository.GetById((Guid)serviceContract.ServiceId);
-                        string user = "";
-                        if (item.InsertedById != null)
-                        {
-                            Staff staff = _unitOfWork.StaffRepository.GetById((Guid)item.InsertedById);
-                            if (staff != null)
+                            ServiceContract serviceContract = _unitOfWork.ServiceContractRepository.GetById(itemInvoice.ServiceContractId);
+                            if (transactionRequest.ApartmentId != null && transactionRequest.ApartmentId != serviceContract.ApartmentId)
                             {
-                                user = staff.Email;
+                                continue;
                             }
-                            else
+                            Apartment apartment = _unitOfWork.ApartmentRepository.GetById((Guid)serviceContract.ApartmentId);
+                            if (transactionRequest.BuildingId != null && transactionRequest.BuildingId != apartment.BuildingId)
                             {
-                                Resident resident = _unitOfWork.ResidentRepository.GetById((Guid)item.InsertedById);
-                                if (resident != null)
+                                continue;
+                            }
+                            BuildingModels.Building building = _unitOfWork.BuildingRepository.GetById((Guid)apartment.BuildingId);
+
+                            Service = _unitOfWork.ServiceRepository.GetById((Guid)serviceContract.ServiceId);
+                            string user = "";
+                            if (item.InsertedById != null)
+                            {
+                                Staff staff = _unitOfWork.StaffRepository.GetById((Guid)item.InsertedById);
+                                if (staff != null)
                                 {
-                                    user = resident.Email;
+                                    user = staff.Email;
+                                }
+                                else
+                                {
+                                    Resident resident = _unitOfWork.ResidentRepository.GetById((Guid)item.InsertedById);
+                                    if (resident != null)
+                                    {
+                                        user = resident.Email;
+                                    }
                                 }
                             }
+                            var transaction = new TransactionHistoryResponseDto
+                            {
+                                ServiceId = (Guid)serviceContract.ServiceId,
+                                Service = Service.ServiceName,
+                                SentUser = user,
+                                ReciveUser = AccountName,
+                                Status = "Hoàn thành",
+                                //Id = item.Id,
+                                ApartmentFloorNumber = apartment.FloorNumber,
+                                ApartmentRoomNumber = apartment.RoomNumber,
+                                ApartmentId = apartment.Id,
+                                BuildingName = building.Name,
+                                BuildingId = building.Id,
+                                Type = item.Type,
+                                CreateAt = (DateTime)item.UpdatedAt,
+                                TransactionMapId = item.TransactionMapId,
+                                Amount = (decimal)item.Price,
+                                Content = item.Content,
+                                Bank = item.Bank,
+                                AccountNumber = item.AccountNumber,
+                            };
+                            resultData.Add(transaction);
+                            transactionResponseDto.Pay += itemInvoice.TotalAmount;
                         }
-                        var transaction = new TransactionHistoryResponseDto
-                        {
-                            ServiceId = (Guid)serviceContract.ServiceId,
-                            Service = Service.ServiceName,
-                            SentUser = user,
-                            ReciveUser = AccountName,
-                            Status = "Hoàn thành",
-                            //Id = item.Id,
-                            ApartmentFloorNumber = apartment.FloorNumber,
-                            ApartmentRoomNumber = apartment.RoomNumber,
-                            ApartmentId = apartment.Id,
-                            BuildingName = building.Name,
-                            BuildingId = building.Id,
-                            Type = item.Type,
-                            CreateAt = (DateTime)item.UpdatedAt,
-                            TransactionMapId = item.TransactionMapId,
-                            Amount = (decimal)item.Price,
-                            Content = item.Content,
-                            Bank = item.Bank,
-                            AccountNumber = item.AccountNumber,
-                        };
-                        resultData.Add(transaction);
-                        transactionResponseDto.Pay += itemInvoice.TotalAmount;
                     }
-
                 }
+
                 transactionResponseDto.Total = transactionResponseDto.Pay + transactionResponseDto.Transfer;
                 transactionResponseDto.TransactionHistories = resultData;
                 return new ResponseData<TransactionResponseDto>

@@ -208,6 +208,11 @@ namespace TFU_Building_API.Service.impl
                                     ? sc.UpdatedAt : (DateTime?)null
                             };
 
+                if (_userIdentity.RoleName.Equals(Constants.ROLE_Resident))
+                {
+
+                }
+
                 // Get the total record count before pagination
                 var totalRecords = await query.CountAsync();
 
@@ -265,6 +270,11 @@ namespace TFU_Building_API.Service.impl
                 ServiceContractStatus.Pending => "Processing",
                 ServiceContractStatus.Approved => "Approved",
                 ServiceContractStatus.Rejected => "Rejected",
+                ServiceContractStatus.Assigment => "Assigment",
+                ServiceContractStatus.ApprovedAssigmentStaff => "ApprovedAssigmentStaff",
+                ServiceContractStatus.RejectedAssigmentStaff => "RejectedAssigmentStaff",
+                ServiceContractStatus.StaffPending => "StaffPending",
+                ServiceContractStatus.StaffDone => "StaffDone",
                 _ => "Unknown"
             };
         }

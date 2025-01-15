@@ -55,6 +55,8 @@ namespace TFU_Building_API.Dto
         public int Month { get; set; }
         public int Year { get; set; }
         public string PaymentStatus { get; set; }
+        public decimal PriceTT { get; set; }      // Tiền đã thanh toán
+        public decimal PriceNotTT { get; set; }      // Tiền chưa thanh toán
     }
 
 
@@ -83,6 +85,8 @@ namespace TFU_Building_API.Dto
         public string PaymentStatus { get; set; }
         public DateTime? PaymentDate { get; set; }
         public DateTime? UpdateAt { get; set; }
+
+
     }
 
     public class UnpaidServiceDetailResponseDto

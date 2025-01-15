@@ -45,6 +45,18 @@ namespace TFU_Building_API.Service.impl
                     };
                 }
 
+                Resident residenCheck = _unitOfWork.ResidentRepository.GetQuery(x => x.Email.ToLower().Equals(request.Email.ToLower().Trim())).FirstOrDefault();
+                if (residenCheck != null)
+                {
+                    return new ResponseData<StaffResponseDto>
+                    {
+                        Success = false,
+                        Message = "Email đã tồn tại trong bản cư dân",
+                        Data = null,
+                        Code = (int)ErrorCodeAPI.DuplicateEntry
+                    };
+                }
+
                 // Tạo mật khẩu ngẫu nhiên cho nhân viên mới
                 var generatedPassword = Utill.GenerateRandomPassword();
 

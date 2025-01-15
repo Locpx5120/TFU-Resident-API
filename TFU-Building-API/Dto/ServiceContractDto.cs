@@ -31,8 +31,9 @@
         public int PageNumber { get; set; } = 1;
         public int PageSize { get; set; } = 10;
         public string? ServiceName { get; set; } // New filter field for searching by service name
-        public Guid? BuildingId { get; set; } // New filter field for filtering by building
-        public Guid? ServiceTypeId { get; set; } // New filter field for filtering by service type/category
+        public string? Status { get; set; }
+        public Guid? BuildingId { get; set; } = null; // New filter field for filtering by building
+        public Guid? ServiceTypeId { get; set; } = null;// New filter field for filtering by service type/category
     }
 
     public class ServiceRequestSearchDto
@@ -72,7 +73,7 @@
         public string Purpose { get; set; }
     }
 
-  
+
 
 
 }

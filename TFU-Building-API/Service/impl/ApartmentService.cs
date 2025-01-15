@@ -80,10 +80,12 @@ namespace TFU_Building_API.Service.impl
             {
                 List<OwnerShip> ownerships = new List<OwnerShip>();
                 // Lấy danh sách Ownerships liên quan tới ResidentId
-                if (_userIdentity.RoleName.Equals(Constants.ROLE_HANH_CHINH))
+
+                if (_userIdentity.RoleName.Equals(Constants.ROLE_Resident))
                 {
+                    residentId = (Guid)_userIdentity.UserId;
                     ownerships = await _unitOfWork.OwnerShipRepository
-                    .GetQuery(o => o.IsDeleted == false)
+                    .GetQuery(o => o.ResidentId == residentId && o.IsDeleted == false)
                     .Include(o => o.Apartment)  // Include Apartment để tránh phải join
                     .ThenInclude(a => a.Building) // Include Building to fetch Building Name
                     .Include(o => o.Resident)   // Include Resident để lấy thông tin liên quan
@@ -92,12 +94,26 @@ namespace TFU_Building_API.Service.impl
                 else
                 {
                     ownerships = await _unitOfWork.OwnerShipRepository
-                    .GetQuery(o => o.ResidentId == residentId && o.IsDeleted == false)
-                    .Include(o => o.Apartment)  // Include Apartment để tránh phải join
-                    .ThenInclude(a => a.Building) // Include Building to fetch Building Name
-                    .Include(o => o.Resident)   // Include Resident để lấy thông tin liên quan
-                    .ToListAsync();
+                   .GetQuery(o => o.IsDeleted == false)
+                   .Include(o => o.Apartment)  // Include Apartment để tránh phải join
+                   .ThenInclude(a => a.Building) // Include Building to fetch Building Name
+                   .Include(o => o.Resident)   // Include Resident để lấy thông tin liên quan
+                   .ToListAsync();
                 }
+
+                //if (_userIdentity.RoleName.Equals(Constants.ROLE_HANH_CHINH))
+                //{
+
+                //}
+                //else
+                //{
+                //    ownerships = await _unitOfWork.OwnerShipRepository
+                //    .GetQuery(o => o.ResidentId == residentId && o.IsDeleted == false)
+                //    .Include(o => o.Apartment)  // Include Apartment để tránh phải join
+                //    .ThenInclude(a => a.Building) // Include Building to fetch Building Name
+                //    .Include(o => o.Resident)   // Include Resident để lấy thông tin liên quan
+                //    .ToListAsync();
+                //}
 
 
                 // Lấy tất cả Living liên quan tới các ApartmentId đã lấy được

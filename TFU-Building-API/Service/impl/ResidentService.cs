@@ -68,6 +68,29 @@ namespace TFU_Building_API.Service.impl
                     }
                 }
 
+                Resident residenCheck = _unitOfWork.ResidentRepository.GetQuery(x => x.Email.ToLower().Equals(request.Email.ToLower().Trim())).FirstOrDefault();
+                if (residenCheck != null)
+                {
+                    return new ResponseData<ResidentResponseDto>
+                    {
+                        Success = false,
+                        Message = "Email đã tồn tại trong bản cư dân",
+                        Data = null,
+                        Code = (int)ErrorCodeAPI.DuplicateEntry
+                    };
+                }
+
+                Staff staff = _unitOfWork.StaffRepository.GetQuery(x => x.Email.ToLower().Equals(request.Email.ToLower().Trim())).FirstOrDefault();
+                if (staff != null)
+                {
+                    return new ResponseData<ResidentResponseDto>
+                    {
+                        Success = false,
+                        Message = "Email đã tồn tại trong bản nhân viên",
+                        Data = null,
+                        Code = (int)ErrorCodeAPI.DuplicateEntry
+                    };
+                }
                 // Tạo mới Resident và thiết lập các giá trị từ request
                 var newResident = new Resident
                 {

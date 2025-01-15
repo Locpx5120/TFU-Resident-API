@@ -563,8 +563,6 @@ namespace TFU_Building_API.Service.impl
                     unpaidServiceSummaryDtos = query.ToList();
                 }
 
-
-
                 // Apply filters from request
                 if (request.BuildingIdFilter.HasValue)
                 {
@@ -612,6 +610,50 @@ namespace TFU_Building_API.Service.impl
                 var data = groupedQuery
                     .Skip((request.PageNumber - 1) * request.PageSize)
                     .Take(request.PageSize).ToList();
+
+                if (_userIdentity.RoleName.Equals(Constants.ROLE_KE_TOAN))
+                {
+                    foreach (UnpaidServiceSummaryDto item in data)
+                    {
+                        #region Tính tiền đã thanh toán và chưa thanh toán
+                        var currentMonth = item.Month;
+                        var currentYear = item.Year;
+
+                        var query = from inv in _unitOfWork.InvoiceRepository.GetQuery(x => (x.IsDeleted == false))
+                                    join sc in _unitOfWork.ServiceContractRepository.GetQuery(x => x.IsActive && (x.IsDeleted == false) && x.ApartmentId == item.ApartmentId)
+                                        on inv.ServiceContractId equals sc.Id
+                                    join s in _unitOfWork.ServiceRepository.GetQuery(x => (x.IsDeleted == false))
+                                        on sc.ServiceId equals s.Id
+                                    join a in _unitOfWork.ApartmentRepository.GetQuery(x => (x.IsDeleted == false))
+                                        on sc.ApartmentId equals a.Id
+                                    join at in _unitOfWork.ApartmentTypeRepository.GetQuery(x => x.IsActive && (x.IsDeleted == false))
+                                        on a.ApartmentTypeId equals at.Id
+                                    join ps in _unitOfWork.PackageServiceRepository.GetQuery(x => x.IsActive && (x.IsDeleted == false))
+                                        on sc.PackageServiceId equals ps.Id into psJoin
+                                    from ps in psJoin.DefaultIfEmpty()
+                                    where inv.IssueDate.HasValue && inv.IssueDate.Value.Month == currentMonth && inv.IssueDate.Value.Year == currentYear
+                                    select new
+                                    {
+                                        PaidStatus = inv.PaidStatus,
+                                        TotalPrice = inv.TotalAmount < s.UnitPrice ? s.UnitPrice : inv.TotalAmount,
+                                    };
+
+                        var result = await query.ToListAsync();
+
+                        foreach (var itemSub in result)
+                        {
+                            if (itemSub.PaidStatus)
+                            {
+                                item.PriceTT += itemSub.TotalPrice;
+                            }
+                            else
+                            {
+                                item.PriceNotTT += itemSub.TotalPrice;
+                            }
+                        }
+                        #endregion
+                    }
+                }
 
                 // Wrap the result in PaginatedResponseDto
                 var response = new PaginatedResponseDto<UnpaidServiceSummaryDto>
