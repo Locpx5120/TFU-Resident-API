@@ -152,6 +152,24 @@ namespace TFU_Building_API.Dto
         public Guid BuildingId { get; set; }
     }
 
+    public class ServiceContractDetailResponseDto
+    {
+        public Guid Id { get; set; }
+        public string CompanyName { get; set; } // Name of the third party
+        public string NameService { get; set; }
+        public int Floor { get; set; } // Floor number
+        public int Room { get; set; } // Room number
+        public decimal Area { get; set; } // Area in square meters
+        public DateTime? StartDate { get; set; } // Contract start date
+        public DateTime? EndDate { get; set; } // Contract end date
+        public decimal ServicePrice { get; set; } // Price of the service
+        public Guid FileId { get; set; }
+        public string BuildingName { get; set; }
+        public Guid BuildingId { get; set; }
+        public int Status { get; set; }
+        public int ApartmentNumber { get; set; }
+    }
+
     public class AddThirdPartyContractHireRequestDto
     {
         [Required]

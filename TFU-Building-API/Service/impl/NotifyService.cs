@@ -72,7 +72,7 @@ namespace TFU_Building_API.Service.impl
                 var newNotify = new Notify
                 {
                     Id = Guid.NewGuid(),
-                    ApplyDate = request.ApplyDate,
+                    ApplyDate = request.ApplyTime,
                     NotificationType = request.NotificationType,
                     BuildingId = request.BuildingId,
                     RoleId = request.RoleId,

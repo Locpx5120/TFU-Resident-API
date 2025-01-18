@@ -359,6 +359,154 @@ namespace TFU_Building_API.Service.impl
             }
         }
 
+        public async Task<ResponseData<TransactionResponseDto>> GetTransactionsThirty(TransactionRequestDto transactionRequest)
+        {
+            try
+            {
+                TransactionResponseDto transactionResponseDto = new TransactionResponseDto();
+                var resultData = new List<TransactionHistoryResponseDto>();
+                // Stage 1: Fetch data from the database
+                var query = await _unitOfWork.TransactionRepository.GetQuery(x => x.IsDeleted == false
+                //&& !x.Status.Equals(Constants.TRANS_STATUS_LOG_INIT)
+                && x.Status.Equals(Constants.TRANS_STATUS_LOG_DONE)).ToListAsync();
+                List<Guid> thirdPartiesId = _unitOfWork.ThirdPartyRepository.GetQuery(x => x.IsDeleted == false && x.IsTenant == false).Select(x => x.Id).ToList();
+
+                if (transactionRequest.To != null)
+                {
+                    query = query.Where(x => x.InsertedAt <= transactionRequest.To).ToList();
+                }
+                if (transactionRequest.From != null)
+                {
+                    query = query.Where(x => x.InsertedAt >= transactionRequest.From).ToList();
+                }
+
+                List<ThirdPartyContact> thirdPartyContacts = _unitOfWork.ThirdPartyContractRepository
+                    .GetQuery(x => x.IsDeleted == false && x.ThirdPartyId != null).ToList();
+
+                if (thirdPartiesId != null && thirdPartiesId.Count > 0)
+                {
+                    if (transactionRequest.To != null)
+                    {
+                        thirdPartyContacts = thirdPartyContacts.Where(x => x.EndDate <= transactionRequest.To).ToList();
+                    }
+                    if (transactionRequest.From != null)
+                    {
+                        thirdPartyContacts = thirdPartyContacts.Where(x => x.StartDate >= transactionRequest.From).ToList();
+                    }
+                    List<ThirdPartyContact> thirdPartyContactsIsTenantF = thirdPartyContacts.Where(x => thirdPartiesId.Contains((Guid)x.ThirdPartyId)).ToList();
+                    List<ThirdPartyContact> thirdPartyContactsIsTenantT = thirdPartyContacts.Where(x => !thirdPartiesId.Contains((Guid)x.ThirdPartyId)).ToList();
+
+                    if (thirdPartyContactsIsTenantF != null && thirdPartyContactsIsTenantF.Count > 0)
+                    {
+                        List<TransactionTransferResponseDto> transactionTransfers = new List<TransactionTransferResponseDto>();
+                        foreach (var item in thirdPartyContactsIsTenantF)
+                        {
+                            if (transactionRequest.ApartmentId != null && transactionRequest.ApartmentId != item.ApartmentId)
+                            {
+                                continue;
+                            }
+
+                            Apartment apartment = _unitOfWork.ApartmentRepository.GetById((Guid)item.ApartmentId);
+                            if (transactionRequest.BuildingId != null && transactionRequest.BuildingId != apartment.BuildingId)
+                            {
+                                continue;
+                            }
+
+                            BuildingModels.Building building = _unitOfWork.BuildingRepository.GetById((Guid)apartment.BuildingId);
+                            ThirdParty thirdParty = _unitOfWork.ThirdPartyRepository.GetById((Guid)item.ThirdPartyId);
+                            transactionResponseDto.Transfer += item.Price;
+                            var transactionTransfer = new TransactionTransferResponseDto
+                            {
+                                Id = item.Id,
+                                NameService = item.NameService,
+                                Price = item.Price,
+                                Type = "Hợp Đồng Thuê",
+                                ApartmentFloorNumber = apartment != null ? apartment.FloorNumber : 0,
+                                ApartmentRoomNumber = apartment != null ? apartment.RoomNumber : 0,
+                                ApartmentId = apartment != null ? apartment.Id : Guid.Empty,
+                                BuildingName = building != null ? building.Name : "",
+                                BuildingId = building != null ? building.Id : Guid.Empty,
+                                SentUser = thirdParty.NameCompany,
+                                ReciveUser = AccountName,
+                            };
+                            transactionTransfers.Add(transactionTransfer);
+                        }
+                        transactionResponseDto.TransactionTransferResponseDtos = transactionTransfers;
+                    }
+                    if (thirdPartyContactsIsTenantT != null && thirdPartyContactsIsTenantT.Count > 0)
+                    {
+                        foreach (var item in thirdPartyContactsIsTenantT)
+                        {
+                            if (transactionRequest.ApartmentId != null && transactionRequest.ApartmentId != item.ApartmentId)
+                            {
+                                continue;
+                            }
+                            Apartment apartment = _unitOfWork.ApartmentRepository.GetById(item.ApartmentId ?? Guid.Empty);
+                            if (apartment == null)
+                            {
+                                continue;
+                            }
+                            if (transactionRequest.BuildingId != null && transactionRequest.BuildingId != apartment.BuildingId)
+                            {
+                                continue;
+                            }
+                            BuildingModels.Building building = _unitOfWork.BuildingRepository.GetById(apartment.BuildingId);
+                            ThirdParty thirdParty = _unitOfWork.ThirdPartyRepository.GetById(item.ThirdPartyId ?? Guid.Empty);
+                            if (thirdParty == null)
+                            {
+                                continue;
+                            }
+                            //transactionResponseDto.Transfer += item.Price;
+                            var transaction = new TransactionHistoryResponseDto
+                            {
+                                //ServiceId = (Guid)serviceContract.ServiceId,
+                                Service = "Hợp đồng cho thuê",
+                                SentUser = thirdParty.NameCompany,
+                                ReciveUser = AccountName,
+                                Status = "Hoàn thành",
+                                //Id = item.Id,
+                                ApartmentFloorNumber = apartment.FloorNumber,
+                                ApartmentRoomNumber = apartment.RoomNumber,
+                                ApartmentId = apartment.Id,
+                                BuildingName = building.Name,
+                                BuildingId = building.Id,
+                                Type = "Hợp Đồng Cho Thuê",
+                                CreateAt = (DateTime)item.UpdatedAt,
+                                //TransactionMapId = item.TransactionMapId,
+                                Amount = (decimal)item.Price,
+                                Content = "Thanh toán hợp đồng",
+                                Bank = BankId,
+                                AccountNumber = SoTaiKhoan,
+                            };
+                            resultData.Add(transaction);
+                            transactionResponseDto.Pay += item.Price;
+
+                        }
+                    }
+                }
+
+                transactionResponseDto.Total = transactionResponseDto.Pay + transactionResponseDto.Transfer;
+                transactionResponseDto.TransactionHistories = resultData;
+                return new ResponseData<TransactionResponseDto>
+                {
+                    Success = true,
+                    Message = MessConstant.FindSuccessfully,
+                    Data = transactionResponseDto,
+                    Code = (int)ErrorCodeAPI.OK
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResponseData<TransactionResponseDto>
+                {
+                    Success = false,
+                    Message = ex.Message,
+                    Code = (int)ErrorCodeAPI.SystemIsError
+                };
+            }
+        }
+
+
         public async Task<ResponseData<UnpaidServiceDetailResponseDto>> GetTransactionsDetail(Guid id)
         {
             try

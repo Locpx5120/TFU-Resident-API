@@ -445,6 +445,7 @@ namespace TFU_Building_API.Service.impl
             }
         }
 
+
         public async Task<ResponseData<AddVehicleServiceResponseDto>> UpdateVehicleServiceRequestAsync(UpdateVehicleServiceRequestDto request)
         {
             try
@@ -540,6 +541,75 @@ namespace TFU_Building_API.Service.impl
                     Success = false,
                     Message = ex.Message,
                     Data = new AddVehicleServiceResponseDto { Success = false, Message = ex.Message },
+                    Code = (int)ErrorCodeAPI.SystemIsError
+                };
+            }
+        }
+
+        public async Task<ResponseData<ServiceContractDetailResponseDto>> GetThirdpartyDetails(Guid serviceContractId)
+        {
+            try
+            {
+                ServiceContract serviceContract = UnitOfWork.ServiceContractRepository.GetById(serviceContractId);
+                if (serviceContract == null)
+                {
+                    return new ResponseData<ServiceContractDetailResponseDto>
+                    {
+                        Success = false,
+                        Message = MessConstant.ServiceContractFoundZero,
+                        Code = (int)ErrorCodeAPI.NotFound
+                    };
+                }
+
+                var latestContract = await _unitOfWork.ThirdPartyContractRepository
+                   .GetQuery(tpc => tpc.ApartmentId == serviceContract.ApartmentId && tpc.IsDeleted == false)
+                   .OrderByDescending(tpc => tpc.EndDate)
+                   .FirstOrDefaultAsync();
+
+                var query = from tpc in _unitOfWork.ThirdPartyContractRepository.GetQuery(x => x.IsDeleted == false && x.ThirdPartyId == latestContract.ThirdPartyId)
+                            join a in _unitOfWork.ApartmentRepository.GetQuery(x => x.IsDeleted == false)
+                                on tpc.ApartmentId equals a.Id into apartmentJoin
+                            from aj in apartmentJoin.DefaultIfEmpty() // Allow null for ApartmentId
+                            join b in _unitOfWork.BuildingRepository.GetQuery(x => x.IsDeleted == false)
+                                on aj.BuildingId equals b.Id into buildingJoin
+                            from bj in buildingJoin.DefaultIfEmpty() // Allow null for BuildingId
+                            join tp in _unitOfWork.ThirdPartyRepository.GetQuery(x => x.IsDeleted == false)
+                                on tpc.ThirdPartyId equals tp.Id
+                            select new ServiceContractDetailResponseDto
+                            {
+                                Id = tpc.Id,
+                                CompanyName = tp.NameCompany,
+                                Floor = aj == null ? 0 : aj.FloorNumber,
+                                Room = aj == null ? 0 : aj.RoomNumber, // Handle null apartment
+                                Area = aj == null ? 0 : aj.ApartmentType.LandArea, // Handle null apartment type
+                                NameService = tpc.NameService, // Include NameService
+                                //StartDate = (tp.Status == false && tp.IsTenant == false) ? null : tpc.StartDate, // Null if Status is false and IsTenant is false
+                                //EndDate = (tp.Status == false && tp.IsTenant == false) ? null : tpc.EndDate, // Null if Status is false and IsTenant is false
+                                StartDate = tpc.StartDate,
+                                EndDate = tpc.EndDate,
+                                ServicePrice = tpc.Price,
+                                FileId = tpc.FileId ?? Guid.Empty,
+                                BuildingName = bj == null ? "" : bj.Name,
+                                BuildingId = bj == null ? Guid.Empty : bj.Id,
+                                ApartmentNumber = aj == null ? 0 : aj.RoomNumber
+                            };
+                var data = query.ToList().FirstOrDefault();
+                data.Status = serviceContract.Status ?? 0;
+
+                return new ResponseData<ServiceContractDetailResponseDto>
+                {
+                    Success = true,
+                    Message = MessConstant.FindSuccessfully,
+                    Data = data,
+                    Code = (int)ErrorCodeAPI.OK
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResponseData<ServiceContractDetailResponseDto>
+                {
+                    Success = false,
+                    Message = ex.Message,
                     Code = (int)ErrorCodeAPI.SystemIsError
                 };
             }

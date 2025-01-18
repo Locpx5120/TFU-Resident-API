@@ -41,6 +41,13 @@ namespace TFU_Building_API.Controllers
             return StatusCode(result.Code, result);
         }
 
+        [HttpPost("get-transactions-thirty")]
+        public async Task<IActionResult> GetTransactionsThirty([FromBody] TransactionRequestDto transaction)
+        {
+            var result = await paymentHistoryService.GetTransactionsThirty(transaction);
+            return StatusCode(result.Code, result);
+        }
+
         [HttpPost("getTransactionDetail/{id}")]
         public async Task<IActionResult> GetTransactionDetail(Guid id)
         {

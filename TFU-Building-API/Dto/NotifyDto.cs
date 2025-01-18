@@ -2,7 +2,7 @@
 {
     public class CreateNotifyRequestDto
     {
-        public DateTime ApplyDate { get; set; }
+        public DateTime ApplyTime { get; set; }
         public string NotificationType { get; set; }
         public Guid BuildingId { get; set; }
         public Guid? RoleId { get; set; }

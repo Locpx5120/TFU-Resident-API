@@ -142,6 +142,24 @@ namespace TFU_Building_API.Controllers
             return Ok(new { result.Success, result.Message, Data = result.Data });
         }
 
+        [HttpGet("thirdparty/{serviceContractId}")]
+        /// <summary>
+        /// Chi tiết dịch vụ xe
+        /// </summary>
+        /// <param name="serviceContractId"></param>
+        /// <returns></returns>
+        public async Task<IActionResult> GetThirdpartyDetails(Guid serviceContractId)
+        {
+            var result = await _serviceContractService.GetThirdpartyDetails(serviceContractId);
+
+            if (!result.Success)
+            {
+                return StatusCode(result.Code, new { result.Success, result.Message });
+            }
+
+            return Ok(new { result.Success, result.Message, Data = result.Data });
+        }
+
         /// <summary>
         /// Cập nhật trạng thái và ghi chú cho yêu cầu dịch vụ
         /// </summary>
