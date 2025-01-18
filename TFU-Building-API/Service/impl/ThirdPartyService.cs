@@ -147,7 +147,7 @@ namespace TFU_Building_API.Service.impl
                         Code = (int)ErrorCodeAPI.SystemIsError
                     };
                 }
-                if (request.StartDate >= request.EndDate)
+                if (request.StartDate > request.EndDate)
                 {
                     return new ResponseData<AddThirdPartyContactResponseDto>
                     {
@@ -181,6 +181,48 @@ namespace TFU_Building_API.Service.impl
 
                     if (apartment == null)
                     {
+                        Building building = _unitOfWork.BuildingRepository.GetById(request.BuildingId);
+
+                        List<Apartment> apartments = await _unitOfWork.ApartmentRepository.GetQuery(r =>
+                                   r.BuildingId == request.BuildingId
+                                   && r.IsActive
+                                   && r.IsDeleted == false)
+                                    .ToListAsync();
+
+                        if (apartments.Count >= building.NumberApartment)
+                        {
+                            return new ResponseData<AddThirdPartyContactResponseDto>
+                            {
+                                Success = false,
+                                Message = $"Phòng không tồn tại\nToà nhà đã đạt số lượng phòng tối đa {apartments.Count}/{building.NumberApartment}",
+                                Data = null,
+                                Code = (int)ErrorCodeAPI.InternalError
+                            };
+                        }
+
+
+                        if (building.NumberFloor < request.FloorNumber || request.FloorNumber < 0)
+                        {
+                            return new ResponseData<AddThirdPartyContactResponseDto>
+                            {
+                                Success = false,
+                                Message = $"Phòng không tồn tại\r\nSố tầng đã chọn không hợp lệ. Toà nhà có {building.NumberFloor} tầng.",
+                                Data = null,
+                                Code = (int)ErrorCodeAPI.InternalError
+                            };
+                        }
+
+                        if (request.RoomNumber < 0)
+                        {
+                            return new ResponseData<AddThirdPartyContactResponseDto>
+                            {
+                                Success = false,
+                                Message = $"Phòng không tồn tại\r\nSố phồng đã chọn không hợp lệ. Không có phòng {request.RoomNumber}",
+                                Data = null,
+                                Code = (int)ErrorCodeAPI.InternalError
+                            };
+                        }
+
                         apartment = new Apartment();
                         apartment.Id = Guid.NewGuid();
                         apartment.FloorNumber = (int)request.FloorNumber;
@@ -202,6 +244,21 @@ namespace TFU_Building_API.Service.impl
                     apartmentId = apartment.Id;
                 }
 
+                ThirdPartyContact thirdPartyContactCheck = _unitOfWork.ThirdPartyContractRepository
+                    .GetQuery(x => x.ApartmentId == apartmentId && x.ThirdPartyId != request.ThirdPartyId && x.EndDate > DateTime.Now)
+                    .FirstOrDefault();
+
+                if (thirdPartyContactCheck != null)
+                {
+                    return new ResponseData<AddThirdPartyContactResponseDto>
+                    {
+                        Success = false,
+                        Message = "Hợp đồng của bên thứ ba đã thêm lỗi. Căn hộ đã có bên khác thuê",
+                        Data = null,
+                        Code = (int)ErrorCodeAPI.SystemIsError
+                    };
+                }
+
                 // Tạo đối tượng hợp đồng bên thứ ba
                 var thirdPartyContact = new ThirdPartyContact
                 {
@@ -216,6 +273,8 @@ namespace TFU_Building_API.Service.impl
                     IsActive = true,
                     FileId = request.FileId,
                 };
+
+
 
                 // Thêm hợp đồng vào cơ sở dữ liệu
                 _unitOfWork.ThirdPartyContractRepository.Add(thirdPartyContact);

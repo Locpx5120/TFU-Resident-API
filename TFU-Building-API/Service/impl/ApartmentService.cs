@@ -22,57 +22,6 @@ namespace TFU_Building_API.Service.impl
             _userIdentity = userIdentity;
         }
 
-        //public async Task<ResponseData<List<ApartmentResponseDto>>> GetApartmentsByResidentIdAsync(Guid residentId)
-        //{
-        //    try
-        //    {
-        //        // Lấy danh sách Ownerships liên quan tới ResidentId
-        //        var ownerships = await _unitOfWork.OwnerShipRepository
-        //            .GetQuery(o => o.ResidentId == residentId && o.IsDeleted == false)
-        //            .Include(o => o.Apartment)  // Include Apartment để tránh phải join
-        //            .Include(o => o.Resident)   // Include Resident để lấy thông tin liên quan
-        //            .ToListAsync();
-
-        //        // Lấy tất cả Living liên quan tới các ApartmentId đã lấy được
-        //        var apartmentIds = ownerships.Select(o => o.ApartmentId).ToList();
-        //        var livings = await _unitOfWork.LivingRepository
-        //            .GetQuery(l => apartmentIds.Contains(l.ApartmentId) && l.IsDeleted == false)
-        //            .ToListAsync();
-
-        //        // Group Livings by ApartmentId để tính số thành viên
-        //        var livingCounts = livings.GroupBy(l => l.ApartmentId)
-        //                                  .ToDictionary(g => g.Key, g => g.Count());
-
-        //        // Tạo danh sách ApartmentResponseDto
-        //        var apartments = ownerships.Select(ownership => new ApartmentResponseDto
-        //        {
-        //            ApartmentId = ownership.ApartmentId ?? Guid.Empty, // Thêm trường ApartmentId
-        //            OwnerName = ownership.Resident?.Name ?? string.Empty,
-        //            RoomNumber = ownership.Apartment?.RoomNumber ?? 0,
-        //            FloorNumber = ownership.Apartment?.FloorNumber ?? 0,
-        //            NumberOfMembers = livingCounts.ContainsKey(ownership.ApartmentId) ? livingCounts[ownership.ApartmentId] : 0,
-        //            Email = ownership.Resident?.Email ?? string.Empty,
-        //            PhoneNumber = ownership.Resident?.Phone ?? string.Empty
-        //        }).ToList();
-
-        //        return new ResponseData<List<ApartmentResponseDto>>
-        //        {
-        //            Success = true,
-        //            Message = "Apartment information retrieved successfully.",
-        //            Data = apartments,
-        //            Code = (int)ErrorCodeAPI.OK
-        //        };
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return new ResponseData<List<ApartmentResponseDto>>
-        //        {
-        //            Success = false,
-        //            Message = ex.Message,
-        //            Code = (int)ErrorCodeAPI.SystemIsError
-        //        };
-        //    }
-        //}
 
         public async Task<ResponseData<List<ApartmentResponseDto>>> GetApartmentsByResidentIdAsync(Guid residentId)
         {
@@ -100,21 +49,6 @@ namespace TFU_Building_API.Service.impl
                    .Include(o => o.Resident)   // Include Resident để lấy thông tin liên quan
                    .ToListAsync();
                 }
-
-                //if (_userIdentity.RoleName.Equals(Constants.ROLE_HANH_CHINH))
-                //{
-
-                //}
-                //else
-                //{
-                //    ownerships = await _unitOfWork.OwnerShipRepository
-                //    .GetQuery(o => o.ResidentId == residentId && o.IsDeleted == false)
-                //    .Include(o => o.Apartment)  // Include Apartment để tránh phải join
-                //    .ThenInclude(a => a.Building) // Include Building to fetch Building Name
-                //    .Include(o => o.Resident)   // Include Resident để lấy thông tin liên quan
-                //    .ToListAsync();
-                //}
-
 
                 // Lấy tất cả Living liên quan tới các ApartmentId đã lấy được
                 var apartmentIds = ownerships.Select(o => o.ApartmentId).ToList();
@@ -158,75 +92,6 @@ namespace TFU_Building_API.Service.impl
                 };
             }
         }
-
-
-        //public async Task<ResponseData<List<ApartmentMemberDetailDto>>> GetApartmentDetailsByApartmentIdAsync(Guid apartmentId)
-        //{
-        //    try
-        //    {
-        //        // Lấy thông tin chủ căn hộ từ bảng Ownership
-        //        var ownership = await _unitOfWork.OwnerShipRepository.GetQuery(o => o.ApartmentId == apartmentId && o.IsDeleted == false)
-        //            .Include(o => o.Resident)
-        //            .FirstOrDefaultAsync();
-
-        //        if (ownership == null)
-        //        {
-        //            return new ResponseData<List<ApartmentMemberDetailDto>>
-        //            {
-        //                Success = false,
-        //                Message = "Apartment owner not found.",
-        //                Code = (int)ErrorCodeAPI.NotFound
-        //            };
-        //        }
-
-        //        var owner = ownership.Resident;
-
-        //        // Lấy danh sách các thành viên từ bảng Livings, trừ chủ căn hộ
-        //        var members = await _unitOfWork.LivingRepository.GetQuery(l => l.ApartmentId == apartmentId && l.IsDeleted == false && l.ResidentId != owner.Id)
-        //            .Include(l => l.Resident)
-        //            .ToListAsync();
-
-        //        // Chuyển đổi danh sách thành ApartmentMemberDetailDto và đánh số STT
-        //        //        var response = new List<ApartmentMemberDetailDto>
-        //        //{
-        //        //    new ApartmentMemberDetailDto
-        //        //    {
-        //        //        STT = 1,
-        //        //        MemberName = owner.Name,
-        //        //        Role = "Chủ căn hộ",
-        //        //        Email = owner.Email,
-        //        //        PhoneNumber = owner.Phone
-        //        //    }
-        //        //};
-
-        //        var response = new List<ApartmentMemberDetailDto>();
-        //        response.AddRange(members.Select((l, index) => new ApartmentMemberDetailDto
-        //        {
-        //            STT = index + 2, // Đánh số STT bắt đầu từ 2 cho các thành viên
-        //            MemberName = l.Resident.Name,
-        //            Role = "Thành viên",
-        //            Email = l.Resident.Email,
-        //            PhoneNumber = l.Resident.Phone
-        //        }));
-
-        //        return new ResponseData<List<ApartmentMemberDetailDto>>
-        //        {
-        //            Success = true,
-        //            Message = "Apartment member details retrieved successfully.",
-        //            Data = response,
-        //            Code = (int)ErrorCodeAPI.OK
-        //        };
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return new ResponseData<List<ApartmentMemberDetailDto>>
-        //        {
-        //            Success = false,
-        //            Message = ex.Message,
-        //            Code = (int)ErrorCodeAPI.SystemIsError
-        //        };
-        //    }
-        //}
 
         public async Task<ResponseData<List<ApartmentMemberDetailDto>>> GetApartmentDetailsByApartmentIdAsync(Guid apartmentId, string? memberName = null)
         {
@@ -412,6 +277,16 @@ namespace TFU_Building_API.Service.impl
         {
             try
             {
+                if (request.ApartmentTypeId == Guid.Parse("0A8D67F1-5AEA-418A-97A2-BC0F5C46D511") && (request.Id != null && request.Id != Guid.Empty))
+                {
+                    return new ResponseData<AddApartmentResDto>
+                    {
+                        Success = false,
+                        Message = "Vui lòng nhập lại\r\nPhòng không được add chủ căn hộ",
+                        Data = null,
+                        Code = (int)ErrorCodeAPI.InternalError
+                    };
+                }
                 Building building = await _unitOfWork.BuildingRepository.GetByIdAsync(request.BuildingId);
                 if (building == null)
                 {
@@ -491,18 +366,21 @@ namespace TFU_Building_API.Service.impl
 
                 _unitOfWork.ApartmentRepository.Add(apartment);
 
-                if (request.Id != null || request.Id == Guid.Empty)
+                if (request.Id != null && request.Id != Guid.Empty)
                 {
                     var newOwnerShip = new OwnerShip
                     {
+                        Id = Guid.NewGuid(),
                         ApartmentId = apartment.Id,
                         ResidentId = request.Id,
                         StartDate = DateTime.Now,
                         EndDate = DateTime.Now.AddYears(50),
                     };
+                    Resident resident = _unitOfWork.ResidentRepository.GetById(request.Id ?? Guid.Empty);
+                    resident.IsOwner = true;
+                    _unitOfWork.ResidentRepository.Update(resident);
                     _unitOfWork.OwnerShipRepository.Add(newOwnerShip);
                 }
-
 
                 await _unitOfWork.SaveChangesAsync();
 

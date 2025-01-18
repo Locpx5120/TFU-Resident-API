@@ -21,6 +21,7 @@ namespace TFU_Building_API.Service.impl
         {
             try
             {
+
                 // Tìm kiếm Apartment theo roomnumber và floor
                 var apartment = await _unitOfWork.ApartmentRepository.GetQuery(a => a.RoomNumber == request.RoomNumber
                 && a.FloorNumber == request.FloorNumber
@@ -32,6 +33,17 @@ namespace TFU_Building_API.Service.impl
                         Success = false,
                         Message = MessConstant.ApartmentFoundZero,
                         Code = (int)ErrorCodeAPI.NotFound
+                    };
+                }
+
+                if (apartment.ApartmentTypeId == Guid.Parse("0A8D67F1-5AEA-418A-97A2-BC0F5C46D511"))
+                {
+                    return new ResponseData<OwnerShipResponseDto>
+                    {
+                        Success = false,
+                        Message = "Vui lòng nhập lại\r\nPhòng không thuộc diện cập nhật",
+                        Data = null,
+                        Code = (int)ErrorCodeAPI.InternalError
                     };
                 }
 
@@ -108,6 +120,16 @@ namespace TFU_Building_API.Service.impl
         {
             try
             {
+                if (request.ApartmentTypeId == Guid.Parse("0A8D67F1-5AEA-418A-97A2-BC0F5C46D511"))
+                {
+                    return new ResponseData<OwnerShipResponseDto>
+                    {
+                        Success = false,
+                        Message = "Vui lòng nhập lại\r\nPhòng không thuộc diện cập nhật",
+                        Data = null,
+                        Code = (int)ErrorCodeAPI.InternalError
+                    };
+                }
                 Building building = await _unitOfWork.BuildingRepository.GetByIdAsync(request.BuildingId);
                 if (building == null)
                 {
