@@ -170,13 +170,10 @@ namespace TFU_Building_API.Service.impl
 
                     if (thirdPartiesId != null && thirdPartiesId.Count > 0)
                     {
-                        if (transactionRequest.To != null)
-                        {
-                            thirdPartyContacts = thirdPartyContacts.Where(x => x.EndDate <= transactionRequest.To).ToList();
-                        }
                         if (transactionRequest.From != null)
                         {
-                            thirdPartyContacts = thirdPartyContacts.Where(x => x.StartDate >= transactionRequest.From).ToList();
+                            transactionRequest.From = transactionRequest.From.Value.AddDays(1);
+                            thirdPartyContacts = thirdPartyContacts.Where(x => x.StartDate.Value.Year == transactionRequest.From.Value.Year && x.StartDate.Value.Month == transactionRequest.From.Value.Month).ToList();
                         }
                         List<ThirdPartyContact> thirdPartyContactsIsTenantF = thirdPartyContacts.Where(x => thirdPartiesId.Contains((Guid)x.ThirdPartyId)).ToList();
                         List<ThirdPartyContact> thirdPartyContactsIsTenantT = thirdPartyContacts.Where(x => !thirdPartiesId.Contains((Guid)x.ThirdPartyId)).ToList();
@@ -385,13 +382,11 @@ namespace TFU_Building_API.Service.impl
 
                 if (thirdPartiesId != null && thirdPartiesId.Count > 0)
                 {
-                    if (transactionRequest.To != null)
-                    {
-                        thirdPartyContacts = thirdPartyContacts.Where(x => x.EndDate <= transactionRequest.To).ToList();
-                    }
+
                     if (transactionRequest.From != null)
                     {
-                        thirdPartyContacts = thirdPartyContacts.Where(x => x.StartDate >= transactionRequest.From).ToList();
+                        transactionRequest.From = transactionRequest.From.Value.AddDays(1);
+                        thirdPartyContacts = thirdPartyContacts.Where(x => x.StartDate.Value.Year == transactionRequest.From.Value.Year && x.StartDate.Value.Month == transactionRequest.From.Value.Month).ToList();
                     }
                     List<ThirdPartyContact> thirdPartyContactsIsTenantF = thirdPartyContacts.Where(x => thirdPartiesId.Contains((Guid)x.ThirdPartyId)).ToList();
                     List<ThirdPartyContact> thirdPartyContactsIsTenantT = thirdPartyContacts.Where(x => !thirdPartiesId.Contains((Guid)x.ThirdPartyId)).ToList();
