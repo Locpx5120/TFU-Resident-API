@@ -3,6 +3,7 @@ using Constant;
 using Core.Enums;
 using Core.Model;
 using Microsoft.EntityFrameworkCore;
+using TFU_Building_API.Core.Dapper.User;
 using TFU_Building_API.Core.Helper;
 using TFU_Building_API.Core.Infrastructure;
 using TFU_Building_API.Dto;
@@ -12,10 +13,15 @@ namespace TFU_Building_API.Service.impl
     public class ThirdPartyService : IThirdPartyService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IConfiguration _config;
+        private readonly IUserRepository _userRepository;
 
-        public ThirdPartyService(IUnitOfWork unitOfWork)
+        public ThirdPartyService(IUnitOfWork unitOfWork, IConfiguration config,
+            IUserRepository userRepository)
         {
             _unitOfWork = unitOfWork;
+            _config = config;
+            _userRepository = userRepository;
         }
 
         public async Task<ResponseData<AddThirdPartyResponseDto>> AddThirdPartyAsync(AddThirdPartyRequestDto request)
@@ -57,6 +63,20 @@ namespace TFU_Building_API.Service.impl
                     IsChangePassword = false
                 };
                 _unitOfWork.StaffRepository.Add(staff);
+
+                var emailService = new EmailService(_config);
+
+                string subject = "Your New Account Details";
+                string body = $@"
+            <p>Dear {staff.FullName},</p>
+            <p>Your new account has been created successfully. Below are your login details:</p>
+            <p><b>Email:</b> {staff.Email}</p>
+            <p><b>Password:</b> {staff.Password}</p>
+            <p>Please log in and change your password as soon as possible.</p>
+            <br/>
+            <p>Best Regards,<br/>TFU Building Management Team</p>";
+
+                await emailService.SendEmailAsync(staff.Email, subject, body);
 
                 // Bước 3: Thêm vào bảng ThirdParties
                 var thirdParty = new ThirdParty
