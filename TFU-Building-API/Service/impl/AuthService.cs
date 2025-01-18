@@ -91,11 +91,25 @@ namespace TFU_Building_API.Service.Impl
                 x => x.Email == request.Email &&
                 x.Password == request.Password &&
                 x.IsActive == true &&
-                x.IsOwner == true &&
+                //x.IsOwner == true &&
                 x.IsDeleted == false).FirstOrDefaultAsync();
 
             if (resident != null)
             {
+                if (resident.IsOwner == null || resident.IsOwner == false)
+                {
+                    OwnerShip ownerShip = UnitOfWork.OwnerShipRepository.GetQuery(x => x.ResidentId == resident.Id).FirstOrDefault();
+                    if (ownerShip != null)
+                    {
+                        resident.IsOwner = true;
+                        UnitOfWork.ResidentRepository.Update(resident);
+                        await UnitOfWork.SaveChangesAsync();
+                    }
+                    else
+                    {
+                        return new ResponseData<LoginResponseDto>(ErrorCodeAPI.BadRequest);
+                    }
+                }
                 user = resident;
                 userRole = Constants.ROLE_Resident; // Thiết lập vai trò là Resident
             }

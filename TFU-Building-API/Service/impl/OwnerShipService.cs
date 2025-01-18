@@ -45,7 +45,8 @@ namespace TFU_Building_API.Service.impl
                         Code = (int)ErrorCodeAPI.UserNotFound
                     };
                 }
-
+                user.IsOwner = true;
+                _unitOfWork.ResidentRepository.Update(user);
                 // Kiểm tra xem ApartmentId đã tồn tại trong OwnerShip chưa
                 var existingOwnerShip = await _unitOfWork.OwnerShipRepository.GetQuery(x => x.ApartmentId == apartment.Id && x.IsDeleted == false).FirstOrDefaultAsync();
                 if (existingOwnerShip != null)
